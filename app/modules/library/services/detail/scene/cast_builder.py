@@ -22,22 +22,9 @@ class SceneCastBuilder:
     ) -> List[Dict[str, Any]]:
         cast_by_name = {}
 
-        def calculate_age_at_release(birthday_str: str, release_date_str: str) -> Any:
-            if not birthday_str or not release_date_str:
-                return None
-            try:
-                from datetime import datetime
-                b_date = datetime.strptime(birthday_str[:10], "%Y-%m-%d")
-                r_date = datetime.strptime(release_date_str[:10], "%Y-%m-%d")
-                age = r_date.year - b_date.year
-                if (r_date.month, r_date.day) < (b_date.month, b_date.day):
-                    age -= 1
-                return age
-            except Exception:
-                return None
+        from app.core.date_utils import calculate_age_at_release
 
-        from app.modules.settings.services.settings_service import SettingsService
-        gender_pref = SettingsService(db).get_setting("adult_gender_preference") or "all"
+        from app.modules.people.helpers import should_exclude_adult_performer
 
         # 1. Add performers from local database match
         if match_db:
@@ -57,11 +44,8 @@ class SceneCastBuilder:
             for link in sorted(people_links, key=lambda x: x.order if x.order is not None else 0):
                 person = link.person
                 if person:
-                    if gender_pref != "all":
-                        if gender_pref == "female" and person.gender != 1:
-                            continue
-                        if gender_pref == "male" and person.gender != 2:
-                            continue
+                    if should_exclude_adult_performer(db, person.gender, is_adult=True):
+                        continue
                     custom_img = override_map.get(person.id)
                     cast_by_name[person.name.lower()] = {
                         "id": f"local:{person.id}",
@@ -96,11 +80,8 @@ class SceneCastBuilder:
             elif gender_str:
                 mapped_gender = 3
 
-            if gender_pref != "all":
-                if gender_pref == "female" and mapped_gender != 1:
-                    continue
-                if gender_pref == "male" and mapped_gender != 2:
-                    continue
+            if should_exclude_adult_performer(db, mapped_gender, is_adult=True):
+                continue
 
             person_db = None
             perf_ext_id = perf.get("id")

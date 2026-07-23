@@ -16,6 +16,17 @@ from app.modules.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
+import threading
+_settings_lock = threading.Lock()
+_system_settings_cache = None
+_user_settings_cache = {}
+
+def clear_settings_cache():
+    global _system_settings_cache, _user_settings_cache
+    with _settings_lock:
+        _system_settings_cache = None
+        _user_settings_cache.clear()
+
 class SettingsService:
     def __init__(
         self,
@@ -37,11 +48,27 @@ class SettingsService:
         self.user_id = user_id
 
     def get_system_setting(self, key: str) -> Optional[Any]:
-        setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
-        return setting.value if setting else None
+        global _system_settings_cache
+        with _settings_lock:
+            if _system_settings_cache is None:
+                try:
+                    _system_settings_cache = {
+                        s.key: s.value for s in self.db.query(SystemSetting).all()
+                    }
+                except Exception as e:
+                    logger.debug(f"Failed to query all system settings: {e}", exc_info=True)
+                    setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
+                    return setting.value if setting else None
+            return _system_settings_cache.get(key)
 
     def get_all_system_settings(self) -> Dict[str, Any]:
-        return {s.key: s.value for s in self.db.query(SystemSetting).all()}
+        global _system_settings_cache
+        with _settings_lock:
+            if _system_settings_cache is None:
+                _system_settings_cache = {
+                    s.key: s.value for s in self.db.query(SystemSetting).all()
+                }
+            return dict(_system_settings_cache)
 
     def get_setting(self, key: str, user_id: Optional[int] = None) -> Optional[Any]:
         if user_id is None:
@@ -53,9 +80,21 @@ class SettingsService:
             except Exception:
                 user_id = None
         if user_id is not None:
-            user_setting = self.db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
-            if user_setting is not None:
-                return user_setting.value
+            global _user_settings_cache
+            with _settings_lock:
+                if user_id not in _user_settings_cache:
+                    try:
+                        _user_settings_cache[user_id] = {
+                            s.key: s.value for s in self.db.query(UserSetting).filter(UserSetting.user_id == user_id).all()
+                        }
+                    except Exception as e:
+                        logger.debug(f"Failed to query user settings: {e}", exc_info=True)
+                        user_setting = self.db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
+                        if user_setting is not None:
+                            return user_setting.value
+                        return self.get_system_setting(key)
+                if key in _user_settings_cache[user_id]:
+                    return _user_settings_cache[user_id][key]
         return self.get_system_setting(key)
 
     def get_user_settings(self, user_id: int) -> Any:
@@ -68,6 +107,13 @@ class SettingsService:
         setting = UserSetting(user_id=user_id, key=key, value=value, description=description)
         self.db.add(setting)
         self.db.flush()
+        
+        global _user_settings_cache
+        with _settings_lock:
+            if user_id not in _user_settings_cache:
+                _user_settings_cache[user_id] = {}
+            _user_settings_cache[user_id][key] = value
+            
         return setting
 
     def set_setting(self, key: str, value: Any, user_id: Optional[int] = None) -> None:
@@ -87,6 +133,13 @@ class SettingsService:
             setting = UserSetting(user_id=user_id, key=key, value=value)
             self.db.add(setting)
         self.db.flush()
+        
+        if user_id is not None:
+            global _user_settings_cache
+            with _settings_lock:
+                if user_id not in _user_settings_cache:
+                    _user_settings_cache[user_id] = {}
+                _user_settings_cache[user_id][key] = value
 
 
     def get_settings(self) -> Dict[str, Any]:
@@ -397,6 +450,13 @@ class SettingsService:
             setting.value = value
         self.db.flush()
         self.db.commit()
+        
+        global _system_settings_cache
+        with _settings_lock:
+            if _system_settings_cache is None:
+                _system_settings_cache = {}
+            _system_settings_cache[key] = value
+            
         return setting
 
     def get_user_settings_list(self, user_id: int) -> List[UserSetting]:
@@ -411,5 +471,12 @@ class SettingsService:
             if description:
                 setting.description = description
             self.db.flush()
+            
+            global _user_settings_cache
+            with _settings_lock:
+                if user_id not in _user_settings_cache:
+                    _user_settings_cache[user_id] = {}
+                _user_settings_cache[user_id][key] = value
+                
         self.db.commit()
         return setting

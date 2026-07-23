@@ -148,7 +148,11 @@ class StudioPersister:
                             new_alias = StudioAlias(alias_name=raw_s_name.strip(), studio=studio)
                             self.db.add(new_alias)
                             self.db.flush()
-                    except Exception:
+                    except Exception as e:
+                        try:
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                        except Exception:
+                            pass
                         pass
             
             if studio_info.get("logo_path") and (

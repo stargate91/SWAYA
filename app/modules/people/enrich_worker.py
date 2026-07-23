@@ -218,13 +218,12 @@ class PeopleEnrichWorker:
             person_name = person.name
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
             link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
-            external_ids = person.external_ids or {}
             is_adult = person.is_adult
         finally:
             db.close()
 
         enricher = PeopleEnricher(None, self.scrapers, session_factory=self.session_factory, task_monitor=self.task_monitor, image_downloader=self.image_downloader)
-        fetched_data = enricher.fetch_external_details(person_name, external_ids, link_data, is_adult=is_adult)
+        fetched_data = enricher.fetch_external_details(person_name, {}, link_data, is_adult=is_adult)
         if not fetched_data:
             return False
 

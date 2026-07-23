@@ -1,6 +1,12 @@
 import re
+import enum
 from typing import Dict, List, Optional, Tuple, Any
 from app.core.enums import Provider, MediaType
+
+class ProviderCapability(str, enum.Enum):
+    PERSON_DETAILS = "person_details"
+    PERSON_FILMOGRAPHY = "person_filmography"
+    PERSON_ENRICHMENT = "person_enrichment"
 
 class ProviderConfig:
     def __init__(
@@ -15,7 +21,8 @@ class ProviderConfig:
         aliases: Optional[List[str]] = None,
         priority: int = 0,
         web_base_url: Optional[str] = None,
-        display_name: Optional[str] = None
+        display_name: Optional[str] = None,
+        capabilities: Optional[set[ProviderCapability]] = None
     ):
         self.provider = provider
         self.prefix = prefix
@@ -28,6 +35,7 @@ class ProviderConfig:
         self.priority = priority
         self.web_base_url = web_base_url
         self.display_name = display_name or prefix.capitalize()
+        self.capabilities = capabilities or set()
 
 class ProviderRegistry:
     _configs: Dict[Provider, ProviderConfig] = {}
@@ -76,6 +84,15 @@ class ProviderRegistry:
         return list(cls._prefix_map.keys())
 
     @classmethod
+    def supports(cls, provider: Provider, capability: ProviderCapability) -> bool:
+        cfg = cls._configs.get(provider)
+        return cfg is not None and capability in cfg.capabilities
+
+    @classmethod
+    def get_providers_with(cls, capability: ProviderCapability) -> List[Provider]:
+        return [p for p, cfg in cls._configs.items() if capability in cfg.capabilities]
+
+    @classmethod
     def clean_id(cls, prefixed_id: str) -> Tuple[Provider, str]:
         """
         Parses and validates a prefixed ID string (e.g. 'stashdb_8f93...').
@@ -104,7 +121,8 @@ ProviderRegistry.register(ProviderConfig(
     id_pattern=r"^\d+$",
     priority=4,
     web_base_url="https://www.themoviedb.org",
-    display_name="TMDB"
+    display_name="TMDB",
+    capabilities={ProviderCapability.PERSON_DETAILS, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_ENRICHMENT}
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.OMDB,
@@ -126,7 +144,8 @@ ProviderRegistry.register(ProviderConfig(
     aliases=["stash"],
     priority=3,
     web_base_url="https://stashdb.org",
-    display_name="StashDB"
+    display_name="StashDB",
+    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS}
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.FANSDB,
@@ -138,7 +157,8 @@ ProviderRegistry.register(ProviderConfig(
     uses_flat_measurements=True,
     priority=2,
     web_base_url="https://fansdb.cc",
-    display_name="FansDB"
+    display_name="FansDB",
+    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS}
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.PORNDB,
@@ -150,7 +170,8 @@ ProviderRegistry.register(ProviderConfig(
     aliases=["theporndb"],
     priority=1,
     web_base_url="https://theporndb.net",
-    display_name="ThePornDB"
+    display_name="ThePornDB",
+    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS}
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.MANUAL,

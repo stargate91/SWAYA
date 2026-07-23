@@ -104,21 +104,12 @@ class PersonEnrichmentQueue:
             from app.modules.tasks.image_download_service import ImageDownloadService
             enricher = PeopleEnricher(db, scrapers=self.scrapers, image_downloader=ImageDownloadService())
             
-            ext_ids = person.external_ids or {}
             links = people_repo.get_external_links_by_person_id(person_id)
             link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
-            
-            for prov_name, ext_id in ext_ids.items():
-                try:
-                     prov = Provider(prov_name.lower())
-                     if not any(ld["provider"] == prov for ld in link_data):
-                         link_data.append({"provider": prov, "external_id": str(ext_id)})
-                except Exception as e:
-                     logger.debug(f"Swallowed exception in app/modules/people/services/people_status_service.py:71: {e}", exc_info=True)
 
             fetched_data = enricher.fetch_external_details(
                 person.name,
-                ext_ids,
+                {},
                 link_data,
                 is_adult=person.is_adult
             )
@@ -129,45 +120,31 @@ class PersonEnrichmentQueue:
 
             # Automatic HealthyCeleb enrichment for SFW performers
             logger.info(f"HC enrichment check for {person.name}: is_adult={person.is_adult}, birthday={person.birthday!r}")
-            if not person.is_adult and person.birthday:
+            if not person.is_adult:
                 try:
-                    from app.modules.people.services.people_detail_service import PeopleDetailService
-                    # Call scrape_healthyceleb as an unbound method to avoid
-                    # PeopleDetailService.__init__ which requires full scrapers
-                    # (PerformerDetailReader calls scrapers.tmdb(db) eagerly).
-                    # scrape_healthyceleb only uses self.db internally.
-                    _dummy = object.__new__(PeopleDetailService)
-                    _dummy.db = db
-                    
-                    hc_data = _dummy.scrape_healthyceleb(person.id)
+                    from app.modules.people.services.people_detail_service import scrape_healthyceleb_data
+                    hc_data = scrape_healthyceleb_data(db, person.id)
                     
                     # Birthday-based underage check
-                    person_bday = person.birthday
-                    if person_bday and isinstance(person_bday, str):
-                        try:
-                            from datetime import datetime as dt
-                            person_bday = dt.strptime(person_bday.split("T")[0].strip(), "%Y-%m-%d").date()
-                        except ValueError:
-                            person_bday = None
-                    elif hasattr(person_bday, "date"):
-                        person_bday = person_bday.date()
-                    
-                    hc_bday = hc_data.get("date_of_birth")
+                    from app.core.date_utils import parse_date
+                    person_bday = parse_date(person.birthday) if person.birthday else None
+                    hc_bday = parse_date(hc_data.get("date_of_birth")) if hc_data.get("date_of_birth") else None
                     
                     if hc_bday and person_bday and hc_bday != person_bday:
                         logger.warning(f"HC birthday mismatch for {person.name}: HC={hc_bday}, DB={person_bday} — applying data anyway")
 
+                    if hc_bday and not person.birthday:
+                        person.birthday = hc_bday.isoformat()
+
                     is_underage = False
-                    effective_bday = person_bday or hc_bday
+                    effective_bday = person.birthday or hc_data.get("date_of_birth")
                     if effective_bday:
-                        from datetime import date, timedelta
+                        from app.modules.people.helpers import calculate_underage_threshold
+                        from datetime import date
                         today = date.today()
-                        try:
-                            threshold = effective_bday.replace(year=effective_bday.year + 18) + timedelta(days=14)
-                            if threshold > today:
-                                is_underage = True
-                        except Exception:
-                            pass
+                        threshold = calculate_underage_threshold(effective_bday)
+                        if threshold and threshold > today:
+                            is_underage = True
 
                     if not is_underage:
                         if hc_data.get("height") and (not person.height or person.height < 100):
@@ -203,7 +180,11 @@ class PersonEnrichmentQueue:
                                     person.butt_size = "BIG"
                                 else:
                                     person.butt_size = "EXTRA_BIG"
-                            except (ValueError, TypeError, ZeroDivisionError):
+                            except (ValueError, TypeError, ZeroDivisionError) as e:
+                                try:
+                                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                                except Exception:
+                                    pass
                                 pass
 
                         # Auto-calculate breast_size from cup_size/band_size/height
@@ -248,7 +229,11 @@ class PersonEnrichmentQueue:
                                     person.breast_size = "BIG"
                                 else:
                                     person.breast_size = "EXTRA_BIG"
-                            except (ValueError, TypeError):
+                            except (ValueError, TypeError) as e:
+                                try:
+                                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                                except Exception:
+                                    pass
                                 pass
 
                     if hc_data.get("ethnicity") and not person.ethnicity:

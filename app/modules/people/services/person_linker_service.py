@@ -42,19 +42,7 @@ class PersonLinkerService:
         if existing_link:
             duplicate_person = existing_link.person
 
-        if not duplicate_person and source == "tmdb":
-            try:
-                tmdb_int = int(external_id)
-                duplicate_person = db.query(Person).filter(Person.id == tmdb_int).first()
-            except ValueError as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
-
-        ext_ids = dict(person.external_ids or {})
-        ext_ids[source] = str(external_id)
-        ext_ids[f"{source}_id"] = str(external_id)
-        if "source" not in ext_ids:
-            ext_ids["source"] = source
-        person.external_ids = ext_ids
+        # No legacy external_ids mutations. Provider links are mapped exclusively in ExternalSourceLink
 
         from app.modules.scrapers.support.registry import ProviderRegistry
         p_enum = ProviderRegistry.get_provider_by_prefix(source)
@@ -143,10 +131,6 @@ class PersonLinkerService:
                 ).first()
                 if not exists:
                     ext_link.person_id = person.id
-                    target_ids = dict(person.external_ids or {})
-                    target_ids[ext_link.provider.value] = ext_link.external_id
-                    target_ids[f"{ext_link.provider.value}_id"] = ext_link.external_id
-                    person.external_ids = target_ids
                 else:
                     db.delete(ext_link)
 
@@ -177,17 +161,9 @@ class PersonLinkerService:
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person.id).all()
             link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
             
-            for prov_name, ext_id in (person.external_ids or {}).items():
-                try:
-                    prov = Provider(prov_name.lower())
-                    if not any(ld["provider"] == prov for ld in link_data):
-                        link_data.append({"provider": prov, "external_id": str(ext_id)})
-                except Exception as e:
-                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-
             fetched_data = enricher.fetch_external_details(
                 person.name,
-                person.external_ids or {},
+                {},
                 link_data,
                 is_adult=person.is_adult
             )
@@ -222,17 +198,7 @@ class PersonLinkerService:
             ExternalSourceLink.provider == provider_enum
         ).first()
 
-        ext_ids = dict(person.external_ids or {})
-        ext_ids.pop(source, None)
-        ext_ids.pop(f"{source}_id", None)
-        if ext_ids.get("source") == source:
-            ext_ids.pop("source", None)
-            from app.modules.scrapers.support.registry import ProviderRegistry
-            for k in ProviderRegistry.get_all_prefixes():
-                if k in ext_ids:
-                    ext_ids["source"] = k
-                    break
-        person.external_ids = ext_ids
+        # No external_ids mutation on unlink
 
         if link:
             if link in person.external_links:
@@ -249,11 +215,7 @@ class PersonLinkerService:
                 known_for_department=person.known_for_department or "Acting",
                 is_active=True,
                 profile_path=link.profile_url if (link and link.profile_url) else person.profile_path,
-                external_ids={
-                    source: link.external_id if link else "",
-                    f"{source}_id": link.external_id if link else "",
-                    "source": source
-                }
+                external_ids={}
             )
             db.add(new_person)
             db.flush()
@@ -281,7 +243,7 @@ class PersonLinkerService:
                     link_data = [{"provider": provider_enum, "external_id": link.external_id}]
                     fetched_data = enricher.fetch_external_details(
                         new_person.name,
-                        new_person.external_ids or {},
+                        {},
                         link_data,
                         is_adult=new_person.is_adult
                     )
@@ -307,7 +269,10 @@ class PersonLinkerService:
 
     def _sync_person_media_links(self, db: Session, person: Person):
         """Automatically scans library items matched to the performer's external sources and links them."""
-        links = {x.provider.value: x.external_id for x in person.external_links}
+        links = {
+            (x.provider.value if hasattr(x.provider, "value") else str(x.provider)): x.external_id
+            for x in person.external_links
+        }
         if not links:
             return
             

@@ -96,7 +96,7 @@ class TvShowFormatter(DetailFormatter):
                     role_str = link.role.value if hasattr(link.role, "value") else str(link.role)
                     role_name = role_str
                     credit_item = {
-                        "id": int(person_obj.external_ids.get("tmdb")) if (person_obj.external_ids and person_obj.external_ids.get("tmdb") and person_obj.external_ids.get("tmdb").isdigit()) else person_obj.id,
+                        "id": int(person_obj.get_external_id("tmdb")) if (person_obj.get_external_id("tmdb") and person_obj.get_external_id("tmdb").isdigit()) else person_obj.id,
                         "name": person_obj.name,
                         "profile_path": person_obj.local_profile_path or person_obj.profile_path,
                         "gender": person_obj.gender,

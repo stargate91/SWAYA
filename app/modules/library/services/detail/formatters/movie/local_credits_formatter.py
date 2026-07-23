@@ -45,10 +45,16 @@ class LocalCreditsFormatter:
             except Exception as ex:
                 logger.error(f"Failed to auto-enqueue missing birthdays in local movie credits: {ex}")
 
+        from app.modules.people.helpers import should_exclude_adult_performer
+
         for link in sorted(people_links, key=lambda x: x.order):
             person = link.person
             if not person:
                 continue
+
+            if should_exclude_adult_performer(db, person.gender, is_adult=bool(active_match and active_match.is_adult)):
+                continue
+
             custom_img = override_map.get(person.id)
             person_data = {
                 "id": person.id,
@@ -76,14 +82,5 @@ class LocalCreditsFormatter:
         return cast, directors, writers
 
     def _calculate_age_at_release(self, birthday_str: str, release_date_str: str) -> Any:
-        if not birthday_str or not release_date_str:
-            return None
-        try:
-            b_date = datetime.strptime(birthday_str[:10], "%Y-%m-%d")
-            r_date = datetime.strptime(release_date_str[:10], "%Y-%m-%d")
-            age = r_date.year - b_date.year
-            if (r_date.month, r_date.day) < (b_date.month, b_date.day):
-                age -= 1
-            return age
-        except Exception:
-            return None
+        from app.core.date_utils import calculate_age_at_release
+        return calculate_age_at_release(birthday_str, release_date_str)

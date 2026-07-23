@@ -455,7 +455,6 @@ class BaseQueryBuilder:
         from app.modules.settings.services.settings_service import SettingsService
         settings = SettingsService(self.db)
         ui_lang = get_user_ui_language(settings)
-        gender_pref = settings.get_setting("adult_gender_preference") or "all"
 
         formatted_items = []
         for match in items:
@@ -505,11 +504,9 @@ class BaseQueryBuilder:
                 for link in sorted(match_people, key=lambda x: x.order):
                     person = link.person
                     if person:
-                        if is_adult_item and gender_pref != "all":
-                            if gender_pref == "female" and person.gender != 1:
-                                continue
-                            if gender_pref == "male" and person.gender != 2:
-                                continue
+                        from app.modules.people.helpers import should_exclude_adult_performer
+                        if should_exclude_adult_performer(self.db, person.gender, is_adult=is_adult_item):
+                            continue
                         people_list.append({
                             "id": person.id,
                             "name": person.name,

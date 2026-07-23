@@ -59,13 +59,6 @@ def fetch_external_details(
     is_adult: bool = False
 ) -> Optional[dict]:
     all_links = list(links)
-    if not all_links:
-        for prov_name, ext_id in external_ids.items():
-            try:
-                prov = Provider(prov_name)
-                all_links.append({"provider": prov, "external_id": str(ext_id)})
-            except ValueError as e:
-                logger.debug(f"Swallowed exception in app/modules/people/services/enrichment/fetcher.py:72: {e}", exc_info=True)
 
     result = PrioritizedResultDict({
         "birthday": None,
@@ -126,14 +119,6 @@ def fetch_external_details(
                 if enricher.adult_enricher.enrich_adult(provider, external_id, result, to_process, processed_pairs):
                     has_data = True
 
-    existing_providers = {x["provider"] for x in links}
-    for prov_name, ext_id in external_ids.items():
-        try:
-            prov = Provider(prov_name)
-            if prov not in existing_providers:
-                result.set_provider(prov)
-                result["links_to_create"].append({"provider": prov, "external_id": str(ext_id)})
-        except ValueError as e:
-            logger.debug(f"Swallowed exception in app/modules/people/services/enrichment/fetcher.py:139: {e}", exc_info=True)
+    # No external_ids fallback to append links_to_create
 
     return result if has_data else None

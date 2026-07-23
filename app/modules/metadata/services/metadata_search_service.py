@@ -146,18 +146,11 @@ class MetadataSearchService:
 
         # 2. Post-process to filter by performer gender preference
         if source_lower != "tmdb" and type_lower == "person":
-            from app.modules.settings.services.settings_service import SettingsService
-            settings_svc = SettingsService(self.db)
-            pref = settings_svc.get_setting("adult_gender_preference") or "all"
-            if pref != "all":
-                def match_pref(item):
-                    g = item.get("gender")
-                    if pref == "female":
-                        return g in (1, "1")
-                    elif pref == "male":
-                        return g in (2, "2")
-                    return True
-                results = [r for r in results if match_pref(r)]
+            from app.modules.people.helpers import should_exclude_adult_performer
+            results = [
+                r for r in results
+                if not should_exclude_adult_performer(self.db, r.get("gender"), is_adult=True)
+            ]
 
         return results
 

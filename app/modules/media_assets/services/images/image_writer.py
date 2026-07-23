@@ -59,10 +59,11 @@ def finalize_file(temp_path: Path, target_path: Path, url: Optional[str] = None)
             with Image.open(temp_path) as img:
                 img.verify()
             
+            from app.core.enums import MediaSubfolder
             # Open again to process/resize if needed
             with Image.open(temp_path) as img:
                 img_format = img.format or "JPEG"
-                if "scene_stills" in target_path.parts or "backdrops" in target_path.parts:
+                if MediaSubfolder.SCENE_STILLS in target_path.parts or MediaSubfolder.BACKDROPS in target_path.parts:
                     width, height = img.size
                     if width > 3840 or height > 3840:
                         if width >= height:

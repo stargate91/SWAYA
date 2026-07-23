@@ -302,9 +302,11 @@ def link_person_source(
     return linker.link_person_source(
         db,
         person=person,
-        provider=payload.provider,
+        source=payload.source,
         external_id=payload.external_id,
-        user_id=current_uid
+        profile_url=payload.profile_url,
+        overrides=payload.overrides,
+        current_uid=current_uid
     )
 
 @router.post("/{person_id}/unlink")
@@ -321,8 +323,8 @@ def unlink_person_source(
     return linker.unlink_person_source(
         db,
         person=person,
-        provider=payload.provider,
-        external_id=payload.external_id
+        source=payload.source,
+        action=payload.action
     )
 
 @router.post("/{person_id}/status")

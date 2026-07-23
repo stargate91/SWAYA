@@ -187,6 +187,15 @@ class PeopleLibraryService:
 
         query = query.filter(Person.is_adult == include_adult)
 
+        if include_adult:
+            from app.modules.settings.services.settings_service import SettingsService
+            settings_svc = SettingsService(self.db)
+            gender_pref = settings_svc.get_setting("adult_gender_preference", user_id=self.user_id) or "all"
+            if gender_pref == "female":
+                query = query.filter(Person.gender == 1)
+            elif gender_pref == "male":
+                query = query.filter(Person.gender == 2)
+
         fallback_name = "Unknown Person"
         if normalized_role == "actor":
             query = query.filter(Person.known_for_department == "Acting")
@@ -210,6 +219,19 @@ class PeopleLibraryService:
             raw_poster = (override_dict.get("custom_poster") if override_dict else None) or person.local_profile_path or person.profile_path
             poster_path = self.image_service.resolve_image_url(raw_poster, "people")
             
+            ext_ids = {}
+            if person.external_ids and "urls" in person.external_ids:
+                ext_ids["urls"] = person.external_ids["urls"]
+            for link in person.external_links:
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                cfg = ProviderRegistry.get_config(link.provider)
+                if cfg:
+                    ext_ids[cfg.prefix] = link.external_id
+                    ext_ids[f"{cfg.prefix}_id"] = link.external_id
+                    for alias in cfg.aliases:
+                        ext_ids[alias] = link.external_id
+                        ext_ids[f"{alias}_id"] = link.external_id
+
             people_list.append(PeopleGroupItem(
                 id=person.id,
                 name=person.name or fallback_name,
@@ -233,7 +255,7 @@ class PeopleLibraryService:
                 library_count=project_counts.get(person.id, 0),
                 people_role=person.known_for_department.lower() if person.known_for_department else "person",
                 is_adult_person=person.is_adult,
-                external_ids=person.external_ids or {},
+                external_ids=ext_ids,
                 cup_size=person.cup_size,
                 band_size=person.band_size,
                 waist=person.waist,

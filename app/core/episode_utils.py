@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import json
 from typing import Optional, Union, List
 
@@ -17,7 +19,11 @@ def normalize_episode_numbers(episode_number: Union[int, float, str, list]) -> L
         for n in episode_number:
             try:
                 nums.append(int(float(n)))
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
         return sorted(list(set(nums)))
 
@@ -36,7 +42,11 @@ def normalize_episode_numbers(episode_number: Union[int, float, str, list]) -> L
         if ',' in trimmed:
             try:
                 return normalize_episode_numbers([x.strip() for x in trimmed.split(',')])
-            except Exception:
+            except Exception as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
 
         if '-' in trimmed:
@@ -46,7 +56,11 @@ def normalize_episode_numbers(episode_number: Union[int, float, str, list]) -> L
                     # Return all integers in the range
                     return list(range(parts[0], parts[-1] + 1))
                 return parts
-            except Exception:
+            except Exception as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
 
         try:

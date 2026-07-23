@@ -43,16 +43,7 @@ class PersonDetailCollator:
         
         loc = LanguageService.get_best_localization(person.localizations, ui_lang)
 
-        ext_ids = person.external_ids or {}
-        tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
-        if not tmdb_id:
-            for link in person.external_links:
-                provider_val = getattr(link.provider, "value", link.provider)
-                if provider_val == "tmdb":
-                    tmdb_id = link.external_id
-                    break
-        if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
-            tmdb_id = person_id
+        tmdb_id = person.get_external_id("tmdb")
             
         if tmdb_id:
             has_local_details = (
@@ -114,22 +105,40 @@ class PersonDetailCollator:
                         
                         ext_ids_from_tmdb = tmdb_details.get("external_ids") or {}
                         imdb_id_from_tmdb = tmdb_details.get("imdb_id") or ext_ids_from_tmdb.get("imdb_id")
-                        current_ids = dict(person.external_ids or {})
-                        updated = False
-                        if imdb_id_from_tmdb and current_ids.get("imdb_id") != imdb_id_from_tmdb:
-                            current_ids["imdb_id"] = imdb_id_from_tmdb
-                            updated = True
+                        
+                        socials = dict(person.socials or {})
+                        updated_socials = False
                         for key in ["facebook_id", "instagram_id", "twitter_id"]:
                             val = ext_ids_from_tmdb.get(key)
-                            if val and current_ids.get(key) != val:
-                                current_ids[key] = val
-                                updated = True
-                        if tmdb_id and current_ids.get("tmdb") != str(tmdb_id):
-                            current_ids["tmdb"] = str(tmdb_id)
-                            current_ids["tmdb_id"] = str(tmdb_id)
-                            updated = True
-                        if updated:
-                            person.external_ids = current_ids
+                            if val:
+                                platform = key.replace("_id", "")
+                                if socials.get(platform) != val:
+                                    socials[platform] = val
+                                    updated_socials = True
+                        if updated_socials:
+                            person.socials = socials
+
+                        if imdb_id_from_tmdb:
+                            imdb_link = next((x for x in person.external_links if x.provider == Provider.OMDB), None)
+                            if not imdb_link:
+                                new_link = ExternalSourceLink(
+                                    person_id=person.id,
+                                    provider=Provider.OMDB,
+                                    external_id=imdb_id_from_tmdb
+                                )
+                                db.add(new_link)
+                                person.external_links.append(new_link)
+
+                        if tmdb_id:
+                            tmdb_link = next((x for x in person.external_links if x.provider == Provider.TMDB), None)
+                            if not tmdb_link:
+                                new_link = ExternalSourceLink(
+                                    person_id=person.id,
+                                    provider=Provider.TMDB,
+                                    external_id=str(tmdb_id)
+                                )
+                                db.add(new_link)
+                                person.external_links.append(new_link)
 
                         db.commit()
                         person = db.merge(person)
@@ -143,18 +152,8 @@ class PersonDetailCollator:
                     from app.modules.people.services.people_enricher import PeopleEnricher
                     enricher = PeopleEnricher(db, scrapers=self.scrapers)
                     
-                    ext_ids = person.external_ids or {}
                     link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
-                    
-                    for prov_name, ext_id in ext_ids.items():
-                        try:
-                             prov = Provider(prov_name.lower())
-                             if not any(ld["provider"] == prov for ld in link_data):
-                                 link_data.append({"provider": prov, "external_id": str(ext_id)})
-                        except Exception as e:
-                             logger.debug(f"Swallowed exception: {e}", exc_info=True)
-    
-                    fetched_data = enricher.fetch_external_details(person.name, ext_ids, link_data, is_adult=True)
+                    fetched_data = enricher.fetch_external_details(person.name, {}, link_data, is_adult=True)
                     if fetched_data:
                         enricher.apply_enriched_data(person, fetched_data)
                         db.commit()
@@ -218,18 +217,19 @@ class PersonDetailCollator:
                     ext = ".jpg"
 
                 existing_file = None
-                tmdb_id = (person.external_ids or {}).get("tmdb")
+                tmdb_id = person.get_external_id("tmdb")
                 if tmdb_id:
                     clean_path = effective_profile.lstrip("/")
                     profile_filename = f"tmdb_{tmdb_id}_{clean_path}"
                 else:
                     ext_id = person.id
                     prov_val = "person"
-                    if person.external_ids:
-                        for k, v in person.external_ids.items():
-                            if k != "urls" and v:
-                                prov_val = k
-                                ext_id = v
+                    if person.external_links:
+                        for link in person.external_links:
+                            provider_val = getattr(link.provider, "value", link.provider)
+                            if provider_val and link.external_id:
+                                prov_val = provider_val
+                                ext_id = link.external_id
                                 break
                     stem_filename = f"{prov_val}_{ext_id}"
                     from app.modules.media_assets.services.images import image_processing_service, image_path_resolver

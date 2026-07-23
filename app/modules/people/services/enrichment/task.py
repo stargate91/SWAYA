@@ -49,7 +49,6 @@ def enrich_people_for_matches(
             person_name = person.name
             links = local_db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
             link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
-            external_ids = person.external_ids or {}
             is_adult = person.is_adult
         finally:
             local_db.close()
@@ -66,7 +65,7 @@ def enrich_people_for_matches(
             enricher._update_progress_cb,
             task_monitor=enricher.task_monitor
         )
-        fetched_data = sub_enricher.fetch_external_details(person_name, external_ids, link_data, is_adult=is_adult)
+        fetched_data = sub_enricher.fetch_external_details(person_name, {}, link_data, is_adult=is_adult)
         if not fetched_data:
             return False
 

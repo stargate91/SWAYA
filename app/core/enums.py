@@ -214,3 +214,14 @@ class CustomListType(str, enum.Enum):
     MOVIE_TV = "movie_tv"
     VIDEO_SCENE = "video_scene"
     PERSON = "person"
+
+
+class MediaSubfolder(str, enum.Enum):
+    """Subfolders under the media assets directory."""
+    POSTERS = "posters"
+    BACKDROPS = "backdrops"
+    LOGOS = "logos"
+    STILLS = "stills"
+    SCENE_STILLS = "scene_stills"
+    PEOPLE = "people"
+    AVATARS = "avatars"

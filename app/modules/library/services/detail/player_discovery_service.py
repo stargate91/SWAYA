@@ -248,17 +248,16 @@ class PlayerDiscoveryService:
             if media_type == "scene":
                 from app.modules.people.models import MediaPersonLink, Person
                 
-                gender_pref = settings_adapter.get_setting("adult_gender_preference", user_id=current_uid) or "all"
+                from app.modules.people.helpers import should_exclude_adult_performer
                 
                 perf_links = db.query(MediaPersonLink, Person.gender).join(Person, Person.id == MediaPersonLink.person_id).filter(
                     MediaPersonLink.match_id == match.id
                 ).all()
                 
-                selected_link = None
-                if gender_pref == "female":
-                    selected_link = next((pl for pl, gender in perf_links if gender == 1), None)
-                elif gender_pref == "male":
-                    selected_link = next((pl for pl, gender in perf_links if gender == 2), None)
+                selected_link = next(
+                    (pl for pl, gender in perf_links if not should_exclude_adult_performer(db, gender, is_adult=True)),
+                    None
+                )
                 
                 if not selected_link and perf_links:
                     selected_link = perf_links[0][0]

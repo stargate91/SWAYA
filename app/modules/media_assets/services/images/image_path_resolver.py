@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 from typing import Optional
 from pathlib import Path
@@ -16,12 +18,35 @@ def get_original_path(image_root: Path, subfolder: str, filename: str) -> Path:
     """Returns target path for original resolution image."""
     return image_root / "original" / subfolder / filename.lstrip("/")
 
+from app.core.enums import MediaSubfolder
+
 def get_thumbnail_path(image_root: Path, subfolder: str, filename: str) -> Path:
     """Returns target path for the thumbnail image (keeping original extension, except for scene_stills which forces .jpg)."""
-    if subfolder == "scene_stills":
+    if subfolder == MediaSubfolder.SCENE_STILLS:
         base, _ = os.path.splitext(filename)
         filename = f"{base}.jpg"
     return image_root / "thumbnails" / subfolder / filename.lstrip("/")
+
+import time
+import fnmatch
+from threading import Lock
+
+_dir_cache = {}
+_dir_cache_lock = Lock()
+
+def get_dir_contents(dir_path: Path, ttl: float = 5.0) -> list[Path]:
+    now = time.time()
+    with _dir_cache_lock:
+        if dir_path in _dir_cache:
+            mtime, files = _dir_cache[dir_path]
+            if now - mtime < ttl:
+                return files
+        try:
+            files = [p for p in dir_path.iterdir() if p.is_file()]
+        except Exception:
+            files = []
+        _dir_cache[dir_path] = (now, files)
+        return files
 
 def exists(path: str | Path) -> bool:
     """Checks if a file exists and is not corrupted/empty."""
@@ -47,10 +72,16 @@ def find_existing_file_by_stem(image_root: Path, folder_type: str, subfolder: st
         if exists(candidate):
             return candidate
     try:
-        for item in dir_path.glob(f"*_{stem}.*"):
-            if exists(item):
-                return item
-    except Exception:
+        pattern = f"*_{stem.lower()}.*"
+        for item in get_dir_contents(dir_path):
+            if fnmatch.fnmatch(item.name.lower(), pattern):
+                if exists(item):
+                    return item
+    except Exception as e:
+        try:
+            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+        except Exception:
+            pass
         pass
     return None
 

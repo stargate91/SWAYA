@@ -87,7 +87,11 @@ class RemoteCreditsFetcher:
                         if date_str:
                             try:
                                 year = int(date_str.split("-")[0])
-                            except Exception:
+                            except Exception as e:
+                                try:
+                                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                                except Exception:
+                                    pass
                                 pass
                         studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
                         poster_url = s["images"][0].get("url") if s.get("images") else None
@@ -180,24 +184,9 @@ class RemoteCreditsFetcher:
             
         from app.modules.scrapers.support.registry import ProviderRegistry
         prov_enum = ProviderRegistry.resolve_prefix(source)
-        ext_ids = person.external_ids or {}
         ext_id = None
         if prov_enum:
-            cfg = ProviderRegistry.get_config(prov_enum)
-            if cfg:
-                keys_to_try = [cfg.prefix] + cfg.aliases
-                for k in keys_to_try:
-                    ext_id = ext_ids.get(k) or ext_ids.get(f"{k}_id")
-                    if ext_id:
-                        break
-
-        if not ext_id and prov_enum:
-            try:
-                link = next((x for x in person.external_links if x.provider == prov_enum), None)
-                if link:
-                    ext_id = link.external_id
-            except Exception as e:
-                logger.debug(f"Swallowed exception in app/modules/people/services/filmography/remote_fetcher.py:50: {e}", exc_info=True)
+            ext_id = person.get_external_id(prov_enum.value)
                 
         if not ext_id:
             return None

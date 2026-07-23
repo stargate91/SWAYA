@@ -206,7 +206,9 @@ class PeopleQueryBuilder:
 
         people_list = []
         for person, library_count, linked_adult_flag in results:
-            external_ids = dict(person.external_ids or {})
+            external_ids = {}
+            if person.external_ids and "urls" in person.external_ids:
+                external_ids["urls"] = person.external_ids["urls"]
             for link in person.external_links:
                 from app.modules.scrapers.support.registry import ProviderRegistry
                 cfg = ProviderRegistry.get_config(link.provider)

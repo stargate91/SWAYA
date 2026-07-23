@@ -40,9 +40,6 @@ class PeopleSearchService:
         adult_results = []
 
         if adult_only and source != "tmdb":
-            def get_stable_integer_id(src: str, u_str: str) -> int:
-                h = hashlib.sha256(f"{src}:{u_str}".encode()).hexdigest()
-                return int(h[:7], 16)
 
             from app.modules.scrapers.support.registry import ProviderRegistry
             if source == "all":
@@ -68,8 +65,6 @@ class PeopleSearchService:
                         if not uuid_str:
                             continue
 
-                        get_stable_integer_id(source_name, uuid_str)
-
                         gender_str = str(perf.get("gender") or "").upper()
                         if "FEMALE" in gender_str:
                             mapped_gender = 1
@@ -79,6 +74,10 @@ class PeopleSearchService:
                             mapped_gender = 3
                         else:
                             mapped_gender = 0
+
+                        from app.modules.people.helpers import should_exclude_adult_performer
+                        if should_exclude_adult_performer(db, mapped_gender, is_adult=True):
+                            continue
 
                         images = perf.get("images") or []
                         profile_url = images[0].get("url") if images else None
@@ -136,19 +135,30 @@ class PeopleSearchService:
                 continue
             try:
                 person_ids.append(int(result.get("id")))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError) as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 continue
 
         local_people = {}
         linked_person_ids = set()
 
         if person_ids:
+            from app.core.enums import Provider
+            from sqlalchemy import and_, or_
             local_people = {
                 person.id: person
-                for person in db.query(Person).filter(
-                    (Person.id.in_(person_ids)) | 
-                    (Person.external_ids["tmdb"].as_string().in_([str(pid) for pid in person_ids]))
-                ).all()
+                for person in db.query(Person)
+                    .outerjoin(ExternalSourceLink, and_(
+                        ExternalSourceLink.person_id == Person.id,
+                        ExternalSourceLink.provider == Provider.TMDB
+                    ))
+                    .filter(or_(
+                        Person.id.in_(person_ids),
+                        ExternalSourceLink.external_id.in_([str(pid) for pid in person_ids])
+                    )).all()
             }
 
             active_match_ids = self.resolver.get_active_match_ids()
@@ -169,14 +179,22 @@ class PeopleSearchService:
                 continue
             try:
                 person_id = int(result.get("id"))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError) as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 continue
 
             local_person = local_people.get(person_id)
             if not local_person:
-                local_person = next((p for p in local_people.values() if p.external_ids and p.external_ids.get("tmdb") == str(person_id)), None)
+                local_person = next((p for p in local_people.values() if p.get_external_id("tmdb") == str(person_id)), None)
 
             mapped_gender = result.get("gender") or 0
+
+            from app.modules.people.helpers import should_exclude_adult_performer
+            if should_exclude_adult_performer(db, mapped_gender, is_adult=bool(adult_only or result.get("adult"))):
+                continue
 
             raw_known_for = result.get("known_for") or []
             known_for_list = []
@@ -320,7 +338,11 @@ class PeopleSearchService:
             except (TypeError, ValueError):
                 raise HTTPException(status_code=400, detail="Invalid person ID format")
 
-            person_query = db.query(Person).filter(Person.external_ids["tmdb"].as_string() == str(tmdb_id))
+            from app.core.enums import Provider
+            person_query = db.query(Person).join(ExternalSourceLink).filter(
+                ExternalSourceLink.provider == Provider.TMDB,
+                ExternalSourceLink.external_id == str(tmdb_id)
+            )
             if is_adult is not None:
                 person = person_query.filter(Person.is_adult == is_adult).first()
             else:

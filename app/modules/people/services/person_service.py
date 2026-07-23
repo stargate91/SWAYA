@@ -84,20 +84,15 @@ class PersonService:
             elif is_adult and not person.known_for_department:
                 person.known_for_department = "Acting"
 
-        # Update external_ids dictionary
+        # Update external_ids dictionary (for urls only)
         all_links = dict(extracted_ids)
         if provider and external_id:
             all_links[provider] = str(external_id)
         if tmdb_id:
             all_links[Provider.TMDB] = str(tmdb_id)
 
-        ids = person.external_ids or {}
-        for ext_prov, ext_val in all_links.items():
-            key = ext_prov.value if isinstance(ext_prov, Provider) else str(ext_prov)
-            ids[key] = str(ext_val)
-            ids[f"{key}_id"] = str(ext_val)
-        
         if urls:
+            ids = person.external_ids or {}
             existing_urls = ids.get("urls") or []
             existing_urls_set = {u.get("url") if isinstance(u, dict) else u for u in existing_urls}
             for new_url in urls:
@@ -106,7 +101,7 @@ class PersonService:
                     existing_urls.append({"url": url_str})
                     existing_urls_set.add(url_str)
             ids["urls"] = existing_urls
-        person.external_ids = ids
+            person.external_ids = ids
 
         # 3. Create or update ExternalSourceLink relationships for all resolved links
         for ext_prov, ext_val in all_links.items():
@@ -186,12 +181,16 @@ class PersonService:
 
     def get_person_by_tmdb_id(self, tmdb_id: str, is_adult: bool) -> Optional[Any]:
         for obj in self.db.new:
-            if isinstance(obj, Person) and obj.is_adult == is_adult and obj.external_ids and obj.external_ids.get("tmdb") == str(tmdb_id):
-                return obj
-        return self.db.query(Person).filter(
-            Person.is_adult == is_adult,
-            Person.external_ids["tmdb"].as_string() == str(tmdb_id)
+            if isinstance(obj, ExternalSourceLink):
+                if obj.provider == Provider.TMDB and obj.external_id == str(tmdb_id):
+                    if obj.person and obj.person.is_adult == is_adult:
+                        return obj.person
+        link = self.db.query(ExternalSourceLink).join(Person).filter(
+            ExternalSourceLink.provider == Provider.TMDB,
+            ExternalSourceLink.external_id == str(tmdb_id),
+            Person.is_adult == is_adult
         ).first()
+        return link.person if link else None
 
     def get_external_link(self, person_id: Optional[int], provider: Provider, external_id: str, person: Optional[Any] = None) -> Optional[Any]:
         for obj in self.db.new:

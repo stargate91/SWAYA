@@ -112,7 +112,11 @@ class TmdbSearchResolver:
             if release_date:
                 try:
                     year_val = int(release_date.split("-")[0])
-                except Exception:
+                except Exception as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
             formatted.append({
                 "id": r.get("id"),

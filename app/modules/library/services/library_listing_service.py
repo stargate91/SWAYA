@@ -208,11 +208,11 @@ class LibraryListingService:
             include_adult=include_adult,
         )
         if include_adult and people_items:
-            gender_pref = self.settings.get_setting("adult_gender_preference") or "all"
-            if gender_pref == "female":
-                people_items = [p for p in people_items if p.gender == 1]
-            elif gender_pref == "male":
-                people_items = [p for p in people_items if p.gender == 2]
+            from app.modules.people.helpers import should_exclude_adult_performer
+            people_items = [
+                p for p in people_items
+                if not should_exclude_adult_performer(self.db, p.gender, is_adult=True)
+            ]
         people_count = len(people_items) if people_items else 0
         
         # Collections count

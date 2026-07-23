@@ -28,12 +28,11 @@ class MovieCreditsFormatter:
             try:
                 from sqlalchemy import or_
                 quoted_pids = [f'"{pid}"' for pid in person_ids]
-                raw_pids = list(person_ids)
-                local_people = db.query(Person).filter(
-                    or_(
-                        Person.external_ids["tmdb"].as_string().in_(raw_pids),
-                        Person.external_ids["tmdb"].as_string().in_(quoted_pids)
-                    )
+                from app.core.enums import Provider
+                from app.modules.people.models import ExternalSourceLink
+                local_people = db.query(Person).join(ExternalSourceLink).filter(
+                    ExternalSourceLink.provider == Provider.TMDB,
+                    ExternalSourceLink.external_id.in_([str(pid) for pid in person_ids])
                 ).all()
                 
                 local_person_ids = [lp.id for lp in local_people]
@@ -44,7 +43,7 @@ class MovieCreditsFormatter:
                 override_map = {ov.person_id: ov.custom_poster for ov in overrides if ov.custom_poster}
 
                 for lp in local_people:
-                    tmdb_id_str = lp.external_ids.get("tmdb")
+                    tmdb_id_str = lp.get_external_id("tmdb")
                     if tmdb_id_str:
                         custom_img = override_map.get(lp.id)
                         local_profiles[int(tmdb_id_str)] = {
@@ -63,19 +62,7 @@ class MovieCreditsFormatter:
             except Exception as e:
                 logger.error(f"Failed to query custom performer avatars for movie detail: {e}")
 
-        def calculate_age_at_release(birthday_str: str, release_date_str: str) -> Any:
-            if not birthday_str or not release_date_str:
-                return None
-            try:
-                from datetime import datetime
-                b_date = datetime.strptime(birthday_str[:10], "%Y-%m-%d")
-                r_date = datetime.strptime(release_date_str[:10], "%Y-%m-%d")
-                age = r_date.year - b_date.year
-                if (r_date.month, r_date.day) < (b_date.month, b_date.day):
-                    age -= 1
-                return age
-            except Exception:
-                return None
+        from app.core.date_utils import calculate_age_at_release
 
         cast = []
         directors = []

@@ -47,7 +47,11 @@ class ActiveSessionsSet(set):
             val = int(item)
             if super().__contains__(val):
                 return True
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
+            try:
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            except Exception:
+                pass
             pass
         return False
 

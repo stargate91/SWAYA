@@ -22,6 +22,7 @@ class AdultDiscoveryService:
         if not api_key:
             return []
 
+
         from app.core.cache_service import CacheService
         cache_srv = CacheService()
         
@@ -295,6 +296,11 @@ class AdultDiscoveryService:
                     if p_gender:
                         p_gender_str = str(p_gender).upper()
                         gender_int = 1 if "FEMALE" in p_gender_str else (2 if "MALE" in p_gender_str else None)
+                    
+                    from app.modules.people.helpers import should_exclude_adult_performer
+                    if should_exclude_adult_performer(self.db, gender_int, is_adult=True):
+                        continue
+
                     ext_id = str(p.get("id", ""))
                     local_id = ext_to_local.get(ext_id)
                     performers_list.append({

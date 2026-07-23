@@ -24,6 +24,10 @@
   white-space: nowrap;
 }
 
+.button[data-full-width="true"] {
+  width: 100%;
+}
+
 /* Inner Icon and Content layouts */
 .icon {
   display: inline-flex;

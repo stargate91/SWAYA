@@ -90,7 +90,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
     profile_path = person.profile_path
     if profile_path:
         existing_file = None
-        tmdb_id = person.external_ids.get("tmdb") if person.external_ids else None
+        tmdb_id = person.get_external_id("tmdb")
         
         from app.modules.media_assets.services.images import image_processing_service
         url = image_processing_service.get_download_url(profile_path, "people") or profile_path
@@ -106,11 +106,12 @@ def apply_enriched_data(enricher, person: Person, data: dict):
                 ext = ".jpg"
             ext_id = "unknown"
             prov_val = "perf"
-            if person.external_ids:
-                for k, v in person.external_ids.items():
-                    if k != "urls" and v:
-                        prov_val = k
-                        ext_id = v
+            if person.external_links:
+                for link in person.external_links:
+                    provider_val = getattr(link.provider, "value", link.provider)
+                    if provider_val and link.external_id:
+                        prov_val = provider_val
+                        ext_id = link.external_id
                         break
             stem_filename = f"{prov_val}_{ext_id}"
             from app.modules.media_assets.services.images import image_processing_service, image_path_resolver

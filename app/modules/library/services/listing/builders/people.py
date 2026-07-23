@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 from typing import Tuple, List, Any
 from sqlalchemy.orm import Session
 
@@ -240,7 +242,11 @@ class PeopleQueryBuilder:
                     h = float(item.hip) if item.hip else 0.0
                     if w > 0 and h > 0:
                         return w / h
-                except (ValueError, TypeError):
+                except (ValueError, TypeError) as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
                 return None
 
@@ -263,7 +269,11 @@ class PeopleQueryBuilder:
                         h_cm = height if height > 0 else 165.0
                         w_cm = w * 2.54
                         return w_cm / h_cm
-                except (ValueError, TypeError):
+                except (ValueError, TypeError) as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
                 return None
 
@@ -292,7 +302,11 @@ class PeopleQueryBuilder:
                         band_val = float(item.band_size) if item.band_size else 34.0
                         breast_score = (cup_val + (band_val - 30.0) / 2.0) if cup_val > 0 else 0.0
                         return lower_diff + breast_score
-                except (ValueError, TypeError):
+                except (ValueError, TypeError) as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
                 return None
 

@@ -148,7 +148,11 @@ class ScanCollector:
                         e.strip().lower() if e.strip().startswith('.') else f".{e.strip().lower()}"
                         for e in settings["naming_video_exts"].split(",") if e.strip()
                     }
-            except Exception:
+            except Exception as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
 
         # We probe all potential_media, plus any potential_extras that have video extensions (like .mkv)

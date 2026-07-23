@@ -724,7 +724,11 @@ class ListsService:
                 if year_val:
                     try:
                         rel_date = datetime(int(year_val), 1, 1)
-                    except Exception:
+                    except Exception as e:
+                        try:
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                        except Exception:
+                            pass
                         pass
 
                 from app.modules.scrapers.support.registry import ProviderRegistry
@@ -920,7 +924,11 @@ class ListsService:
                 db_item = self.db.query(CustomListItem).filter(CustomListItem.id == serialized_fallback["id"]).first()
                 if db_item:
                     return self._serialize_item(db_item)
-            except Exception:
+            except Exception as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
             return serialized_fallback
 
@@ -953,7 +961,11 @@ class ListsService:
         else:
             try:
                 media_item_id = int(item_id)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
 
         query = self.db.query(CustomListItem)
@@ -1144,4 +1156,3 @@ class ListsService:
         self.db.commit()
 
         return self.get_list_details(list_id)
-

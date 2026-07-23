@@ -478,7 +478,11 @@ class PlaybackService:
             if isinstance(current_ep, list) and current_ep:
                 try:
                     episode_number = int(current_ep[-1])
-                except (ValueError, TypeError):
+                except (ValueError, TypeError) as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
             elif isinstance(current_ep, (int, float)):
                 episode_number = int(current_ep)
@@ -493,7 +497,11 @@ class PlaybackService:
                 except Exception:
                     try:
                         episode_number = int(current_ep)
-                    except (ValueError, TypeError):
+                    except (ValueError, TypeError) as e:
+                        try:
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                        except Exception:
+                            pass
                         pass
 
             if show_match:

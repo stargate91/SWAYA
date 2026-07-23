@@ -40,7 +40,11 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
                         if date_str:
                             try:
                                 year = int(date_str.split("-")[0])
-                            except Exception:
+                            except Exception as e:
+                                try:
+                                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                                except Exception:
+                                    pass
                                 pass
                         studio_name = x.get("site", {}).get("name") if x.get("site") else None
                         poster_val = x.get("poster")
@@ -154,7 +158,11 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
             if date_str:
                 try:
                     year = int(date_str.split("-")[0])
-                except Exception:
+                except Exception as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
             studio_name = x.get("site", {}).get("name") if x.get("site") else None
             poster_val = x.get("poster")
@@ -256,4 +264,3 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
             logger.error(f"Error updating cache in background: {e}", exc_info=True)
         finally:
             db_session.close()
-

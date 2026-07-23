@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 from typing import List, Optional, Any, TYPE_CHECKING
 from datetime import datetime
 from sqlalchemy import String, Integer, Float, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, DateTime, func
@@ -30,6 +32,7 @@ class Person(Base):
     local_backdrop_path: Mapped[Optional[str]] = mapped_column(String)
     homepage: Mapped[Optional[str]] = mapped_column(String)
     images: Mapped[Optional[List[str]]] = mapped_column(JSON)
+    # Stores non-provider metadata only (urls, source). Provider IDs are mapped exclusively in ExternalSourceLink
     external_ids: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
     socials: Mapped[Optional[dict[str, str]]] = mapped_column(JSON)
     is_active: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
@@ -80,6 +83,24 @@ class Person(Base):
     def raw_backdrop_source(self) -> Optional[str]:
         """Prioritized raw backdrop path: Local Cached > Remote API URL"""
         return self.local_backdrop_path or self.backdrop_path
+
+    def get_external_id(self, provider_name: str) -> Optional[str]:
+        """Look up an external ID by provider prefix from ExternalSourceLink."""
+        for link in self.external_links:
+            prov_val = getattr(link.provider, "value", link.provider)
+            if prov_val == provider_name:
+                return link.external_id
+        return None
+
+    def get_provider_for(self, capability) -> Optional["ExternalSourceLink"]:
+        """Return highest-priority ExternalSourceLink that supports a capability."""
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        best, best_priority = None, -1
+        for link in self.external_links:
+            cfg = ProviderRegistry.get_config(link.provider)
+            if cfg and capability in cfg.capabilities and cfg.priority > best_priority:
+                best, best_priority = link, cfg.priority
+        return best
 
     def recalculate_projection(self, db):
         from app.modules.scrapers.support.registry import ProviderRegistry
@@ -289,7 +310,11 @@ class Person(Base):
                         butt_size = "BIG"
                     else:
                         butt_size = "EXTRA_BIG"
-                except (ValueError, TypeError, ZeroDivisionError):
+                except (ValueError, TypeError, ZeroDivisionError) as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
 
         breast_size = None
@@ -339,7 +364,11 @@ class Person(Base):
                         breast_size = "BIG"
                     else:
                         breast_size = "EXTRA_BIG"
-                except (ValueError, TypeError):
+                except (ValueError, TypeError) as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
 
         if butt_shape:
@@ -353,19 +382,7 @@ class Person(Base):
         if career_end_year is not None:
             self.career_end_year = career_end_year
         
-        ext_ids = dict(self.external_ids or {})
-        for link in self.external_links:
-            key = link.provider.value if hasattr(link.provider, 'value') else link.provider
-            ext_ids[key] = str(link.external_id)
-            ext_ids[f"{key}_id"] = str(link.external_id)
-        active_providers = {link.provider.value if hasattr(link.provider, 'value') else link.provider for link in self.external_links}
-        from app.modules.scrapers.support.registry import ProviderRegistry
-        registered_providers = [p.value for p in ProviderRegistry.get_all_providers()]
-        for provider_val in registered_providers:
-            if provider_val not in active_providers:
-                ext_ids.pop(provider_val, None)
-                ext_ids.pop(f"{provider_val}_id", None)
-        self.external_ids = ext_ids
+        # No legacy external_ids re-projection. Provider links are mapped exclusively in ExternalSourceLink
         
         existing_localizations = {x.locale: x for x in self.localizations}
         for loc, bio_text in biographies.items():

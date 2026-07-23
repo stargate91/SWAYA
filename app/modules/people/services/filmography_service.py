@@ -73,21 +73,11 @@ class FilmographyService:
             from app.modules.people.models import Person
             person = self.db.query(Person).filter(Person.id == person_id).first()
             if person:
-                ext_ids = person.external_ids or {}
                 from app.modules.scrapers.support.registry import ProviderRegistry
-                adult_providers = [cfg.prefix for cfg in ProviderRegistry._configs.values() if cfg.is_adult]
-                for prov in adult_providers:
-                    ext_id = ext_ids.get(prov) or ext_ids.get(f"{prov}_id")
-                    if not ext_id:
-                        try:
-                            prov_enum = ProviderRegistry.get_provider_by_prefix(prov)
-                            link = next((x for x in person.external_links if x.provider == prov_enum), None)
-                            if link:
-                                ext_id = link.external_id
-                        except Exception:
-                            pass
-                    if ext_id:
-                        adult_known_for = self.remote_fetcher.fetch_remote_known_for(person_id, prov, ext_id)
+                for link in person.external_links:
+                    cfg = ProviderRegistry.get_config(link.provider)
+                    if cfg and cfg.is_adult:
+                        adult_known_for = self.remote_fetcher.fetch_remote_known_for(person_id, cfg.prefix, link.external_id)
                         if adult_known_for:
                             break
 

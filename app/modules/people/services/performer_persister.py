@@ -67,11 +67,12 @@ class PerformerPersister:
         re.sub(r"[^A-Za-z0-9_.-]+", "_", person.name).strip("_")
         ext_id = "unknown"
         prov_val = "perf"
-        if person.external_ids:
-            for k, v in person.external_ids.items():
-                if k != "urls" and v:
-                    prov_val = k
-                    ext_id = v
+        if person.external_links:
+            for link in person.external_links:
+                provider_val = getattr(link.provider, "value", link.provider)
+                if provider_val and link.external_id:
+                    prov_val = provider_val
+                    ext_id = link.external_id
                     break
         stem_filename = f"{prov_val}_{ext_id}"
         from app.modules.media_assets.services.images import image_processing_service

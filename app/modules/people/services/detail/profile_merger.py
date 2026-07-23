@@ -30,7 +30,8 @@ class ProfileMerger:
                 person.local_backdrop_path, "backdrops", size="original"
             )
             if effective_backdrop:
-                source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
+                tmdb_id_val = person.get_external_id("tmdb")
+                source_tmdb_id = int(tmdb_id_val) if (tmdb_id_val and tmdb_id_val.isdigit()) else None
 
         if not effective_backdrop and person.backdrop_path:
             from app.modules.media_assets.services.images import image_processing_service
@@ -38,9 +39,10 @@ class ProfileMerger:
                 person.backdrop_path, "backdrops", size="original"
             )
             if effective_backdrop:
-                source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
+                tmdb_id_val = person.get_external_id("tmdb")
+                source_tmdb_id = int(tmdb_id_val) if (tmdb_id_val and tmdb_id_val.isdigit()) else None
 
-        if not effective_backdrop and person.external_ids and (person.external_ids.get("tmdb") or person.external_ids.get("tmdb_id")):
+        if not effective_backdrop and person.get_external_id("tmdb"):
             from app.modules.people.helpers import resolve_person_known_for_backdrop
             raw_backdrop, source_tmdb_id, source_media_type = resolve_person_known_for_backdrop(
                 db,
@@ -69,7 +71,11 @@ class ProfileMerger:
                             if int(w) >= 1280 and int(h) >= 720:
                                 selected_scene = item
                                 break
-                        except Exception:
+                        except Exception as e:
+                            try:
+                                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                            except Exception:
+                                pass
                             pass
             
             # Fallback to the first one with an image
@@ -105,7 +111,9 @@ class ProfileMerger:
 
     def build_external_ids(self, person: Person) -> Dict[str, Any]:
         """Constructs external IDs payload combining DB sources, links, and actor attributes."""
-        external_ids = dict(person.external_ids or {})
+        external_ids = {}
+        if person.external_ids and "urls" in person.external_ids:
+            external_ids["urls"] = person.external_ids["urls"]
         for link in person.external_links:
             from app.modules.scrapers.support.registry import ProviderRegistry
             cfg = ProviderRegistry.get_config(link.provider)

@@ -122,8 +122,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             except Exception as e:
                 logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:37: {e}", exc_info=True)
                 
-        from app.modules.settings.services.settings_service import SettingsService
-        gender_pref = SettingsService(db).get_setting("adult_gender_preference") or "all"
+        from app.modules.people.helpers import should_exclude_adult_performer
 
         cast = []
         for perf in movie_data.get("performers") or []:
@@ -138,11 +137,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             elif "MALE" in gender_str:
                 mapped_gender = 2
             
-            if gender_pref != "all":
-                if gender_pref == "female" and mapped_gender != 1:
-                    continue
-                if gender_pref == "male" and mapped_gender != 2:
-                    continue
+            if should_exclude_adult_performer(db, mapped_gender, is_adult=True):
+                continue
                 
             # Check if person exists in DB
             person_db = None
@@ -193,7 +189,11 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 if date_str:
                     try:
                         rel_date = datetime.strptime(date_str, "%Y-%m-%d")
-                    except Exception:
+                    except Exception as e:
+                        try:
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                        except Exception:
+                            pass
                         pass
                 with db.begin_nested():
                     match = MetadataMatch(

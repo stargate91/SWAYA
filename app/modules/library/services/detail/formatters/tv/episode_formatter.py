@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from app.core.enums import Provider, MediaType
@@ -117,7 +119,11 @@ class TvEpisodeFormatter:
                             adapter = ImageDownloadService()
                             url = adapter.get_download_url(still, "stills") or f"https://image.tmdb.org/t/p/original{still}"
                             adapter.enqueue_download(url, "stills", filename)
-                except Exception:
+                except Exception as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
 
             episodes.append({

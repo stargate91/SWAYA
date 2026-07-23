@@ -1,4 +1,4 @@
-from app.core.enums import ExtraSubtype
+from app.core.enums import ExtraSubtype, MediaSubfolder
 
 # API URLs and Base Endpoints
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/"
@@ -25,34 +25,42 @@ DEFAULT_TTLS = {
 
 # Image Processing Specifications
 MIN_CACHED_IMAGE_BYTES = 512
-MEDIA_IMAGE_SUBFOLDERS = ["posters", "backdrops", "logos", "stills", "scene_stills", "people", "avatars"]
+MEDIA_IMAGE_SUBFOLDERS = [
+    MediaSubfolder.POSTERS,
+    MediaSubfolder.BACKDROPS,
+    MediaSubfolder.LOGOS,
+    MediaSubfolder.STILLS,
+    MediaSubfolder.SCENE_STILLS,
+    MediaSubfolder.PEOPLE,
+    MediaSubfolder.AVATARS
+]
 
 TMDB_DOWNLOAD_SIZES = {
-    "posters": "original",
-    "backdrops": "original",
-    "logos": "original",
-    "stills": "original",
-    "people": "original",
-    "avatars": "original"
+    MediaSubfolder.POSTERS: "original",
+    MediaSubfolder.BACKDROPS: "original",
+    MediaSubfolder.LOGOS: "original",
+    MediaSubfolder.STILLS: "original",
+    MediaSubfolder.PEOPLE: "original",
+    MediaSubfolder.AVATARS: "original"
 }
 
 # 3.6 Flash layout requirements: central HSL colors and desktop-only layout (no media queries)
 MEDIA_IMAGE_LIMITS = {
-    "backdrops": {"max_width": 3840},     # 4K limit
-    "posters": {"max_width": 3840},       # 4K limit
-    "people": {"max_width": 3840},        # 4K limit
-    "stills": {"max_width": 3840},         # 4K limit
-    "scene_stills": {"max_width": 3840},   # 3840 width limit
-    "logos": None,                        # Keep original, no resize
-    "avatars": {"max_width": 500}
+    MediaSubfolder.BACKDROPS: {"max_width": 3840},     # 4K limit
+    MediaSubfolder.POSTERS: {"max_width": 3840},       # 4K limit
+    MediaSubfolder.PEOPLE: {"max_width": 3840},        # 4K limit
+    MediaSubfolder.STILLS: {"max_width": 3840},         # 4K limit
+    MediaSubfolder.SCENE_STILLS: {"max_width": 3840},   # 3840 width limit
+    MediaSubfolder.LOGOS: None,                        # Keep original, no resize
+    MediaSubfolder.AVATARS: {"max_width": 500}
 }
 
 MEDIA_THUMBNAIL_LIMITS = {
-    "posters": {"max_width": 500},
-    "people": {"max_height": 632},
-    "stills": {"max_width": 500},
-    "scene_stills": {"max_width": 500},
-    "avatars": {"max_width": 200}
+    MediaSubfolder.POSTERS: {"max_width": 500},
+    MediaSubfolder.PEOPLE: {"max_height": 632},
+    MediaSubfolder.STILLS: {"max_width": 500},
+    MediaSubfolder.SCENE_STILLS: {"max_width": 500},
+    MediaSubfolder.AVATARS: {"max_width": 200}
 }
 
 # Image Selection and Download Settings

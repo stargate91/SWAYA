@@ -83,7 +83,11 @@ class PornDBMovieResolver:
                 continue
             try:
                 numeric = float(value)
-            except (TypeError, ValueError):
+            except (TypeError, ValueError) as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 continue
             if numeric <= 0:
                 continue

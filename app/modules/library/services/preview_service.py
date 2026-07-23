@@ -100,7 +100,11 @@ class PreviewService:
             if os.path.exists(output_path):
                 try:
                     os.remove(output_path)
-                except Exception:
+                except Exception as e:
+                    try:
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    except Exception:
+                        pass
                     pass
             raise RuntimeError(f"FFmpeg failed: {e.stderr}")
         except Exception as e:

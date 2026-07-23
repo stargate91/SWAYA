@@ -15,7 +15,7 @@ class PaginatedCreditsRetriever:
         self.resolve_img_fn = resolve_img_fn
         self.fetch_remote_credits_fn = fetch_remote_credits_fn
 
-    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
+    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False, sort_by: Optional[str] = None):
         """Fetches paginated, formatted movies that a performer is credited in."""
         from app.modules.scrapers.support.registry import ProviderRegistry
         resolved = ProviderRegistry.resolve_prefix(source) if source else None
@@ -71,7 +71,7 @@ class PaginatedCreditsRetriever:
             "total_pages": total_pages,
         }
 
-    def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12):
+    def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12, sort_by: Optional[str] = None):
         """Fetches paginated, formatted TV shows that a performer is credited in."""
         db = self.db
         active_match_ids = self.resolver.get_active_match_ids(media_type="tv_or_episode")

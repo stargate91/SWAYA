@@ -139,7 +139,11 @@ class MatchPersister:
                 if last_air_date_str:
                     try:
                         last_air_date = datetime.strptime(last_air_date_str, "%Y-%m-%d")
-                    except Exception:
+                    except Exception as e:
+                        try:
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                        except Exception:
+                            pass
                         pass
 
             match = MetadataMatch(
@@ -183,7 +187,11 @@ class MatchPersister:
                             continue
                         try:
                             candidate_year = int(str(candidate_date).split("-")[0])
-                        except Exception:
+                        except Exception as e:
+                            try:
+                                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                            except Exception:
+                                pass
                             continue
                         if abs(candidate_year - target_year) <= 1:
                             ambiguous_exact_candidates += 1

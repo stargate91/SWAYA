@@ -162,7 +162,11 @@ class DownloadWorker:
                     header = f.read(4096).strip().lower()
                     if header.startswith(b"<svg") or header.startswith(b"<?xml") or b"<svg" in header:
                         is_svg = True
-            except Exception:
+            except Exception as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
 
             if is_svg and not orig_path.name.lower().endswith(".svg"):
@@ -234,4 +238,3 @@ class DownloadWorker:
             except Exception as e:
                 logger.error(f"Exception in DownloadWorker loop-{worker_id}: {e}")
                 await asyncio.sleep(2)
-

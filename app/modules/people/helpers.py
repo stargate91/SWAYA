@@ -203,7 +203,11 @@ def resolve_person_known_for_backdrop(
             continue
         try:
             parsed_credit_id = int(credit_id)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as e:
+            try:
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            except Exception:
+                pass
             continue
 
         media_key = (media_type, parsed_credit_id)
@@ -265,3 +269,65 @@ def merge_images(existing: Optional[list[str]], new_images: list[str]) -> list[s
             seen.add(norm)
             res_list.append(img)
     return res_list
+
+
+def should_exclude_adult_performer(db: Session, gender: Any, is_adult: bool = True) -> bool:
+    """
+    Returns True if the performer should be excluded based on the adult_gender_preference setting.
+    Handles both integer gender codes (1=female, 2=male) and raw strings.
+    """
+    if not is_adult:
+        return False
+
+    from app.modules.settings.services.settings_service import SettingsService
+    gender_pref = SettingsService(db).get_setting("adult_gender_preference") or "all"
+    if gender_pref == "all":
+        return False
+
+    gender_int = None
+    if isinstance(gender, int):
+        gender_int = gender
+    elif isinstance(gender, str):
+        g_upper = gender.upper()
+        if "FEMALE" in g_upper:
+            gender_int = 1
+        elif "MALE" in g_upper:
+            gender_int = 2
+    elif gender is not None:
+        try:
+            gender_int = int(gender)
+        except (ValueError, TypeError) as e:
+            try:
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            except Exception:
+                pass
+            pass
+
+    if gender_pref == "female" and gender_int != 1:
+        return True
+    if gender_pref == "male" and gender_int != 2:
+        return True
+
+    return False
+
+
+def calculate_underage_threshold(birthday: Any) -> Optional[Any]:
+    """
+    Safely calculates the 18 years + 14 days child protection threshold date.
+    Handles leap years (February 29 births).
+    """
+    from app.core.date_utils import parse_date
+    dt = parse_date(birthday)
+    if not dt:
+        return None
+
+    from datetime import timedelta
+    try:
+        try:
+            threshold = dt.replace(year=dt.year + 18)
+        except ValueError:
+            # Leap year birth -> map to Feb 28 of target year
+            threshold = dt.replace(year=dt.year + 18, day=28)
+        return threshold + timedelta(days=14)
+    except Exception:
+        return None

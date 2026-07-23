@@ -240,7 +240,11 @@ class MediaItemService:
             try:
                 possible_id = int(item_id)
                 is_numeric = True
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
+                try:
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                except Exception:
+                    pass
                 pass
  
             if is_numeric and self.db.query(MediaItem).filter(MediaItem.id == possible_id).count() > 0:

@@ -26,6 +26,44 @@ def disable_lifespan():
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database():
+    from _pytest.monkeypatch import MonkeyPatch
+    mp = MonkeyPatch()
+    import app.core.database
+    mp.setattr(app.core.database, "CacheSessionLocal", TestCacheSessionLocal)
+    mp.setattr(app.core.database, "SessionLocal", TestSessionLocal)
+    
+    # Mock qBittorrent client requests during tests
+    from app.modules.torrent.services.qbittorrent_client import QBittorrentClient
+    
+    class MockResponse:
+        def __init__(self, status_code=200, text="Ok.", json_data=None):
+            self.status_code = status_code
+            self.text = text
+            self._json_data = json_data or {}
+            
+        def json(self):
+            return self._json_data
+
+    def mock_post(self, path, data=None, files=None, retried=False):
+        return MockResponse(status_code=200, text="Ok.")
+
+    def mock_get(self, path, params=None, retried=False):
+        if "/info" in path:
+            return MockResponse(status_code=200, json_data=[])
+        return MockResponse(status_code=200, text="Ok.")
+
+    def mock_login(self):
+        return True
+
+    mp.setattr(QBittorrentClient, "_post", mock_post)
+    mp.setattr(QBittorrentClient, "_get", mock_get)
+    mp.setattr(QBittorrentClient, "login", mock_login)
+    
+    # Pre-create in-memory cache tables
+    from app.core.database import CacheBase
+    import app.modules.scrapers.models
+    CacheBase.metadata.create_all(bind=test_cache_engine)
+
     # Force import models to register schemas on Base.metadata
     import app.modules.tasks.models
     import app.modules.history.models
@@ -51,10 +89,15 @@ def setup_test_database():
             session.add(default_user)
             session.commit()
     yield
+    mp.undo()
     Base.metadata.drop_all(bind=test_engine)
+    CacheBase.metadata.drop_all(bind=test_cache_engine)
 
 @pytest.fixture(autouse=True)
 def db_session_override():
+    from app.modules.settings.services.settings_service import clear_settings_cache
+    clear_settings_cache()
+
     # Create isolated transaction session per test case
     connection = test_engine.connect()
     transaction = connection.begin()
