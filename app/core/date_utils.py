@@ -15,8 +15,8 @@ def parse_datetime_utc(value: Any) -> datetime:
     try:
         normalized = str(value).strip().replace("Z", "+00:00")
         return datetime.fromisoformat(normalized)
-    except Exception as exc:
-        raise ValueError("Invalid datetime format") from exc
+    except Exception:
+        return datetime.now(timezone.utc)
 
 
 logger = logging.getLogger(__name__)

@@ -101,6 +101,32 @@ class MediaItem(Base):
         except ValueError:
             self.relative_path = os.path.normpath(val).replace("\\", "/")
 
+    @property
+    def technical_info(self) -> dict[str, Any]:
+        """Serializes media item technical info for API/frontend consumption."""
+        return {
+            "resolution": self.resolution,
+            "video_codec": self.video_codec,
+            "audio_codec": self.audio_codec,
+            "audio_channels": self.audio_channels,
+            "hdr_type": self.hdr_type,
+            "bit_depth": self.bit_depth,
+            "framerate": self.framerate,
+            "duration": self.duration,
+            "size_bytes": self.size,
+            "source": self.source.value if hasattr(self.source, "value") else str(self.source),
+            "edition": self.edition.value if hasattr(self.edition, "value") else str(self.edition),
+            "audio_type": self.audio_type.value if hasattr(self.audio_type, "value") else str(self.audio_type),
+        }
+
+    @property
+    def formatted_playback_logs(self) -> list[dict[str, Any]]:
+        """Returns sorted, serialized playback logs."""
+        return [
+            {"id": log.id, "watched_at": log.watched_at.isoformat()}
+            for log in sorted(self.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
+        ]
+
 class ExtraFile(Base):
     __tablename__ = "extra_files"
 

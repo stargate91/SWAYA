@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Optional
 from fastapi.responses import JSONResponse
-from app.core.gender_utils import map_gender_str_to_int
+from app.core.gender_utils import map_gender_str_to_int, map_gender_int_to_str
 from app.core.date_utils import parse_date
 
 
@@ -17,46 +17,25 @@ from app.modules.people.models import Person, ExternalSourceLink
 
 logger = logging.getLogger(__name__)
 
-def _extract_porndb_poster(data: dict) -> Optional[str]:
-    if not data or not isinstance(data, dict):
-        return None
-    for key in ("image", "poster_image", "poster", "front_image", "cover"):
-        val = data.get(key)
-        if isinstance(val, str) and val.startswith("http"):
-            return val
-        if isinstance(val, dict):
-            for k in ("large", "medium", "url", "original", "small"):
-                if isinstance(val.get(k), str) and val.get(k).startswith("http"):
-                    return val.get(k)
-    posters = data.get("posters")
-    if isinstance(posters, dict):
-        for k in ("large", "medium", "url", "original", "small"):
-            if isinstance(posters.get(k), str) and posters.get(k).startswith("http"):
-                return posters.get(k)
-    elif isinstance(posters, str) and posters.startswith("http"):
-        return posters
-    return None
 
-def _extract_porndb_backdrop(data: dict) -> Optional[str]:
-    if not data or not isinstance(data, dict):
-        return None
-    for key in ("backdrop", "backdrops", "banner", "fanart"):
-        val = data.get(key)
-        if isinstance(val, str) and val.startswith("http"):
-            return val
-        if isinstance(val, dict):
-            for k in ("large", "medium", "url", "original"):
-                if isinstance(val.get(k), str) and val.get(k).startswith("http"):
-                    return val.get(k)
-    return None
 
 class PornDbMovieFormatter(MovieDetailFormatter):
+    def __init__(self):
+        super().__init__()
+        from app.modules.library.services.detail.formatters.movie.movie_db_syncer import MovieDbSyncer
+        self.db_syncer = MovieDbSyncer()
+
+    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
+        from app.modules.media_assets.services.images import image_processing_service
+        return image_processing_service.resolve_image_url(path, subfolder, size)
+
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
-        try:
-            porndb_id = item_id.split("_")[-1]
-        except IndexError:
+        from app.core.identifier_utils import parse_identifier
+        parsed = parse_identifier(item_id)
+        if not parsed or parsed.provider != "porndb":
             print(f"[DEBUG] PornDbMovieFormatter.format: Invalid PornDB ID format: {item_id}")
             return JSONResponse(status_code=400, content={"error": "Invalid PornDB ID format"})
+        porndb_id = parsed.external_id
             
         print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
         from app.core.language import get_user_ui_language
@@ -90,7 +69,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                             "parent": {
                                 "id": person_obj.id,
                                 "name": person_obj.name,
-                                "gender": "female" if person_obj.gender == 1 else "male" if person_obj.gender == 2 else "",
+                                "gender": map_gender_int_to_str(person_obj.gender) or "",
                                 "profile_path": person_obj.local_profile_path or person_obj.profile_path
                             }
                         })
@@ -118,8 +97,9 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             UserOverride.custom_title == (movie_data.get("title") or "Unknown Movie")
         ).first()
             
+        date_str = movie_data.get("date")
         from app.core.date_utils import get_year_from_date
-        year = get_year_from_date(movie_data.get("date"))
+        year = get_year_from_date(date_str)
                 
         from app.modules.people.helpers import should_exclude_adult_performer
 
@@ -173,8 +153,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 "gender": mapped_gender
             })
             
-        raw_poster = _extract_porndb_poster(movie_data)
-        raw_backdrop = _extract_porndb_backdrop(movie_data)
+        raw_poster = porndb_scraper.extract_poster(movie_data) if porndb_scraper else None
+        raw_backdrop = porndb_scraper.extract_backdrop(movie_data) if porndb_scraper else None
         poster_url = raw_poster
         backdrop_url = raw_backdrop
 
@@ -208,6 +188,20 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 ).first()
 
         if match:
+            self.db_syncer.sync_db_metadata(
+                db=db,
+                match=match,
+                tmdb_data=movie_data,
+                release_date=date_str,
+                effective_backdrop=raw_backdrop,
+                ui_lang=ui_lang,
+                scrapers=scrapers,
+                effective_poster=raw_poster,
+            )
+
+        poster_url = raw_poster
+        backdrop_url = raw_backdrop
+        if match:
             from app.core.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
             if loc_db and loc_db.local_poster_path:
@@ -215,94 +209,6 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             elif loc_db and loc_db.poster_path:
                 poster_url = loc_db.poster_path
             backdrop_url = match.local_backdrop_path or match.backdrop_path or backdrop_url
-
-        if match:
-            db_updated = False
-            if not match.backdrop_path and raw_backdrop:
-                match.backdrop_path = raw_backdrop
-                db_updated = True
-            if not match.release_date and date_str:
-                parsed = parse_date(date_str)
-                if parsed:
-                    match.release_date = datetime(parsed.year, parsed.month, parsed.day)
-                    db_updated = True
-
-            if movie_data.get("rating") is not None and float(movie_data.get("rating")) > 0:
-                try:
-                    match.rating_porndb = float(movie_data.get("rating"))
-                    db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:97: {e}", exc_info=True)
-            
-            loc_db = next((x for x in match.localizations if x.locale == "en"), None)
-            if not loc_db:
-                from app.modules.metadata.models import MetadataLocalization
-                loc_db = MetadataLocalization(
-                    match_id=match.id,
-                    locale="en",
-                    title=movie_data.get("title") or "Unknown Movie",
-                    overview=movie_data.get("description"),
-                    poster_path=raw_poster
-                )
-                db.add(loc_db)
-                db_updated = True
-            else:
-                if not loc_db.title and movie_data.get("title"):
-                    loc_db.title = movie_data.get("title")
-                    db_updated = True
-                if not loc_db.overview and movie_data.get("description"):
-                    loc_db.overview = movie_data.get("description")
-                    db_updated = True
-                if not loc_db.poster_path and raw_poster:
-                    loc_db.poster_path = raw_poster
-                    db_updated = True
-
-            # Enqueue PornDB movie local asset downloads
-            try:
-                from app.modules.tasks.image_download_service import ImageDownloadService
-                from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-                import os
-                from urllib.parse import urlparse
-
-                image_downloader = ImageDownloadService()
-                clean_poster = raw_poster or loc_db.poster_path
-                if clean_poster and clean_poster.startswith(("http://", "https://")):
-                    raw_filename = os.path.basename(urlparse(clean_poster).path)
-                    if raw_filename:
-                        clean_filename = f"porndb_{porndb_id}_{raw_filename}"
-                        existing = image_path_resolver.find_existing_file_by_stem(
-                            image_processing_service.image_root, "original", "posters", clean_filename
-                        ) or image_path_resolver.find_existing_file_by_stem(
-                            image_processing_service.image_root, "thumbnails", "posters", clean_filename
-                        )
-                        if not existing:
-                            download_url = image_downloader.get_download_url(clean_poster, "posters") or clean_poster
-                            image_downloader.enqueue_download(download_url, "posters", clean_filename)
-                        if not loc_db.local_poster_path:
-                            loc_db.local_poster_path = f"posters/{clean_filename}"
-                            db_updated = True
-
-                clean_backdrop = raw_backdrop or match.backdrop_path
-                if clean_backdrop and clean_backdrop.startswith(("http://", "https://")):
-                    raw_filename = os.path.basename(urlparse(clean_backdrop).path)
-                    if raw_filename:
-                        clean_filename = f"porndb_{porndb_id}_{raw_filename}"
-                        existing = image_path_resolver.find_existing_file_by_stem(
-                            image_processing_service.image_root, "original", "backdrops", clean_filename
-                        ) or image_path_resolver.find_existing_file_by_stem(
-                            image_processing_service.image_root, "thumbnails", "backdrops", clean_filename
-                        )
-                        if not existing:
-                            download_url = image_downloader.get_download_url(clean_backdrop, "backdrops") or clean_backdrop
-                            image_downloader.enqueue_download(download_url, "backdrops", clean_filename)
-                        if not match.local_backdrop_path:
-                            match.local_backdrop_path = f"backdrops/{clean_filename}"
-                            db_updated = True
-            except Exception as err:
-                logger.warning(f"Failed to queue PornDB movie assets for {porndb_id}: {err}")
-            
-            if db_updated:
-                db.commit()
 
         metadata_override, physical_override = OverrideResolver.resolve_overrides(
             db, current_uid, match=match

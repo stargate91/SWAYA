@@ -43,8 +43,7 @@ class RatingsStatsService:
 
         # 2. TV (Series)
         # Find active parent TV show IDs in library matching adult status
-        parent_ids = set()
-        current_parents = {
+        initial_parents = {
             r[0] for r in self.db.query(MetadataMatch.parent_id).join(
                 MediaItem, MetadataMatch.media_item_id == MediaItem.id
             ).filter(
@@ -54,14 +53,8 @@ class RatingsStatsService:
                 MetadataMatch.is_adult == include_adult
             ).all()
         }
-        while current_parents:
-            parent_ids.update(current_parents)
-            current_parents = {
-                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents),
-                    MetadataMatch.parent_id.isnot(None)
-                ).all()
-            }
+        from app.modules.metadata.helpers import get_all_parent_match_ids
+        parent_ids = get_all_parent_match_ids(self.db, initial_parents)
 
         tv_data = []
         if parent_ids:

@@ -22,7 +22,7 @@ def parse_identifier(identifier: str) -> Optional[ParsedIdentifier]:
         return None
         
     provider = parts[0].lower()
-    known_providers = {"tmdb", "stashdb", "fansdb", "porndb", "tvdb", "imdb", "healthyceleb", "celebrityinside"}
+    known_providers = {"tmdb", "stashdb", "fansdb", "porndb", "tvdb", "imdb", "healthyceleb", "celebrityinside", "person"}
     if provider not in known_providers:
         return None
         

@@ -150,7 +150,7 @@ class PersonDetailCollator:
             if not has_been_enriched:
                 try:
                     from app.modules.people.services.people_enricher import PeopleEnricher
-                    enricher = PeopleEnricher(db, scrapers=self.scrapers)
+                    enricher = PeopleEnricher(db, scrapers=self.scrapers, image_downloader=self.image_downloader)
                     
                     link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
                     fetched_data = enricher.fetch_external_details(person.name, {}, link_data, is_adult=True)
@@ -211,41 +211,14 @@ class PersonDetailCollator:
                 profile_url = self.image_downloader.get_download_url(effective_profile, "people") or f"https://image.tmdb.org/t/p/h632{effective_profile}"
 
             if is_remote_profile and profile_url:
-                import os
-                ext = os.path.splitext(profile_url)[1].lower() or ".jpg"
-                if ext == ".jpeg":
-                    ext = ".jpg"
-
-                existing_file = None
-                tmdb_id = person.get_external_id("tmdb")
-                if tmdb_id:
-                    clean_path = effective_profile.lstrip("/")
-                    profile_filename = f"tmdb_{tmdb_id}_{clean_path}"
-                else:
-                    ext_id = person.id
-                    prov_val = "person"
-                    if person.external_links:
-                        for link in person.external_links:
-                            provider_val = getattr(link.provider, "value", link.provider)
-                            if provider_val and link.external_id:
-                                prov_val = provider_val
-                                ext_id = link.external_id
-                                break
-                    stem_filename = f"{prov_val}_{ext_id}"
-                    from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-                    existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
-                    if existing_file:
-                        profile_filename = existing_file.name
-                    else:
-                        profile_filename = f"{stem_filename}{ext}"
-
-                person.local_profile_path = f"people/{profile_filename}"
-                try:
-                    self.db.commit()
-                    if not existing_file:
-                        self.image_downloader.enqueue_download(profile_url, "people", profile_filename)
-                except Exception as e:
-                    logger.error(f"Failed to save and enqueue person profile image: {e}")
+                from app.modules.people.helpers import resolve_and_enqueue_person_profile_image
+                resolve_and_enqueue_person_profile_image(
+                    self.db,
+                    person,
+                    profile_url,
+                    self.image_downloader,
+                    fallback_prov_val="person"
+                )
 
         if effective_backdrop and self.image_downloader and not local_file_exists:
             is_remote = False

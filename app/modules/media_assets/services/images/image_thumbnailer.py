@@ -71,20 +71,8 @@ def generate_thumbnail(original_path: str | Path, thumbnail_path: str | Path, su
                 max_width = None
                 max_height = 780
             
-            if max_width and width > max_width:
-                ratio = max_width / float(width)
-                new_height = int(float(height) * ratio)
-                img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
-            elif max_height and height > max_height:
-                ratio = max_height / float(height)
-                new_width = int(float(width) * ratio)
-                img = img.resize((new_width, max_height), Image.Resampling.LANCZOS)
-            
-            # Convert modes if saving as JPEG (must not be RGBA)
-            if orig_format == "JPEG" and img.mode in ("RGBA", "LA", "P"):
-                img = img.convert("RGB")
-            elif orig_format == "JPEG" and img.mode != "RGB":
-                img = img.convert("RGB")
+            from app.modules.media_assets.services.images.image_helpers import resize_and_convert_image
+            img = resize_and_convert_image(img, max_width, max_height, orig_format)
 
             # Save using original format with default settings
             img.save(thumb_temp, orig_format)

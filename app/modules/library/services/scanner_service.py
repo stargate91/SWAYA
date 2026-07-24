@@ -43,6 +43,21 @@ class ScannerService:
         self.library_scanner = LibraryScanner(self)
         self.renamer_runner = RenamerRunner(self)
 
+    @classmethod
+    def create(cls, db: Session, scan_resolver_factory: Optional[Any] = None) -> "ScannerService":
+        from app.modules.library.filesystem.fs_utils import move_with_progress, send_to_trash
+        from app.modules.settings.services.formatter_config_service import build_formatter_from_db
+        if scan_resolver_factory is None:
+            from app.modules.scrapers.scan_resolver import ScanResolver
+            scan_resolver_factory = ScanResolver
+        return cls(
+            db,
+            scan_resolver_factory=scan_resolver_factory,
+            formatter_factory=build_formatter_from_db,
+            move_with_progress_fn=move_with_progress,
+            send_to_trash_fn=send_to_trash
+        )
+
     def get_scan_status(self) -> Dict[str, Any]:
         return self.status_coordinator.get_scan_status()
 

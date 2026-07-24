@@ -10,20 +10,29 @@ from app.modules.library.services.detail.formatters.base import MovieDetailForma
 from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
 from app.core.date_utils import get_year_from_date
 
+from app.modules.media_assets.services.images import image_processing_service
+
 logger = logging.getLogger(__name__)
 
 class TmdbMovieFormatter(MovieDetailFormatter):
     def __init__(self):
-        super().__init__()
         from app.modules.library.services.detail.formatters.movie.movie_credits_formatter import MovieCreditsFormatter
         from app.modules.library.services.detail.formatters.movie.movie_db_syncer import MovieDbSyncer
         self.credits_formatter = MovieCreditsFormatter()
         self.db_syncer = MovieDbSyncer()
 
+    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
+        from app.modules.media_assets.services.images import image_processing_service
+        return image_processing_service.resolve_image_url(path, subfolder, size)
+
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
+        from app.core.identifier_utils import parse_identifier
+        parsed = parse_identifier(item_id)
+        if not parsed or parsed.provider != "tmdb":
+            return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
         try:
-            tmdb_id = int(item_id.split("_")[1])
-        except (ValueError, IndexError):
+            tmdb_id = int(parsed.external_id)
+        except ValueError:
             return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
         
         from app.core.language import get_user_ui_language
@@ -106,7 +115,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             credits=credits,
             release_date=release_date,
             current_uid=current_uid,
-            resolve_img_fn=self._resolve_img
+            resolve_img_fn=image_processing_service.resolve_image_url
         )
         year = get_year_from_date(release_date)
         
@@ -141,15 +150,6 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         else:
             effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
 
-        # Enqueue local asset downloads for TMDB movie assets (poster, backdrop, logo, cast profiles)
-        try:
-            from app.modules.tasks.image_download_service import ImageDownloadService
-            image_downloader = ImageDownloadService()
-            self._queue_tmdb_movie_assets(image_downloader, tmdb_id, tmdb_data, effective_poster, effective_backdrop, effective_logo)
-        except Exception as err:
-            logger.warning(f"Failed to queue TMDB movie assets for {tmdb_id}: {err}")
-
-        imdb_id = tmdb_data.get("imdb_id")
         if match:
             self.db_syncer.sync_db_metadata(
                 db=db,
@@ -158,7 +158,9 @@ class TmdbMovieFormatter(MovieDetailFormatter):
                 release_date=release_date,
                 effective_backdrop=effective_backdrop,
                 ui_lang=ui_lang,
-                scrapers=scrapers
+                scrapers=scrapers,
+                effective_poster=effective_poster,
+                effective_logo=effective_logo,
             )
 
         belongs_to_col = tmdb_data.get("belongs_to_collection")
@@ -169,19 +171,15 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             collection_data = {
                 "tmdb_id": belongs_to_col.get("id"),
                 "title": belongs_to_col.get("name"),
-                "poster_path": self._resolve_img(col_loc.local_poster_path or col_loc.poster_path if col_loc else belongs_to_col.get("poster_path"), "posters"),
-                "backdrop_path": self._resolve_img(col_db.local_backdrop_path or col_db.backdrop_path if col_db else belongs_to_col.get("backdrop_path"), "backdrops"),
+                "poster_path": image_processing_service.resolve_image_url(col_loc.local_poster_path or col_loc.poster_path if col_loc else belongs_to_col.get("poster_path"), "posters"),
+                "backdrop_path": image_processing_service.resolve_image_url(col_db.local_backdrop_path or col_db.backdrop_path if col_db else belongs_to_col.get("backdrop_path"), "backdrops"),
             }
 
         keywords_list = [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])] if tmdb_data.get("keywords") else []
 
         videos = (tmdb_data.get("videos") or {}).get("results") or []
-        trailer_key = None
-        youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
-        if not youtube_trailers:
-            youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
-        if youtube_trailers:
-            trailer_key = youtube_trailers[0].get("key")
+        from app.core.string_utils import extract_youtube_trailer_key
+        trailer_key = extract_youtube_trailer_key(videos)
 
         is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
             metadata_override=metadata_override, physical_override=physical_override
@@ -210,10 +208,10 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             "vote_count_tmdb": tmdb_data.get("vote_count"),
             "budget": tmdb_data.get("budget") or (match.budget if match else None),
             "revenue": tmdb_data.get("revenue") or (match.revenue if match else None),
-            "companies": [{"name": c.get("name"), "logo_path": self._resolve_img(c.get("logo_path"), "logos")} for c in tmdb_data.get("production_companies", [])] if tmdb_data.get("production_companies") else [],
+            "companies": [{"name": c.get("name"), "logo_path": image_processing_service.resolve_image_url(c.get("logo_path"), "logos")} for c in tmdb_data.get("production_companies", [])] if tmdb_data.get("production_companies") else [],
             "networks": [],
-            "poster_path": self._resolve_img(effective_poster, "posters"),
-            "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
+            "poster_path": image_processing_service.resolve_image_url(effective_poster, "posters"),
+            "backdrop_path": image_processing_service.resolve_image_url(effective_backdrop, "backdrops", size="original"),
             "original_language": tmdb_data.get("original_language"),
             "type": "movie",
             "tmdb_id": tmdb_id,
@@ -258,57 +256,26 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         if not image_downloader or not tmdb_data:
             return
 
-        import os
-        from urllib.parse import urlparse
-        from typing import Optional
-        from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
+        from app.modules.media_assets.services.images import queue_img_download
 
-        def queue_img(path: str, subfolder: str, prefix: str) -> Optional[str]:
-            if not path:
-                return None
-            if path.startswith("/media/"):
-                return path
-
-            if path.startswith(("http://", "https://")):
-                url = path
-                raw_filename = os.path.basename(urlparse(path).path)
-            else:
-                url = image_downloader.get_download_url(path, subfolder) or f"https://image.tmdb.org/t/p/original{path}"
-                raw_filename = os.path.basename(path)
-
-            if not raw_filename:
-                return None
-
-            clean_filename = f"{prefix}_{raw_filename}"
-            existing = image_path_resolver.find_existing_file_by_stem(
-                image_processing_service.image_root, "original", subfolder, clean_filename
-            ) or image_path_resolver.find_existing_file_by_stem(
-                image_processing_service.image_root, "thumbnails", subfolder, clean_filename
-            )
-            if not existing:
-                image_downloader.enqueue_download(url, subfolder, clean_filename)
-            return f"{subfolder}/{clean_filename}"
-
-        # 1. Poster
         poster_path = effective_poster or tmdb_data.get("poster_path")
         if poster_path:
-            queue_img(poster_path, "posters", f"tmdb_{tmdb_id}")
+            queue_img_download(image_downloader, poster_path, "posters", f"tmdb_{tmdb_id}")
 
-        # 2. Backdrop
         b_path = effective_backdrop or tmdb_data.get("backdrop_path")
         if b_path:
-            queue_img(b_path, "backdrops", f"tmdb_{tmdb_id}")
+            queue_img_download(image_downloader, b_path, "backdrops", f"tmdb_{tmdb_id}")
 
-        # 3. Logo
         l_path = effective_logo or tmdb_data.get("logo_path")
         if l_path:
-            queue_img(l_path, "logos", f"tmdb_{tmdb_id}")
+            queue_img_download(image_downloader, l_path, "logos", f"tmdb_{tmdb_id}")
 
-        # 4. Cast & Crew Profiles
         credits = tmdb_data.get("credits", {})
         all_people = (credits.get("cast") or []) + (credits.get("crew") or [])
         for person in all_people:
             p_profile = person.get("profile_path")
             p_id = person.get("id")
             if p_profile and p_id:
-                queue_img(p_profile, "people", f"tmdb_{p_id}")
+                queue_img_download(image_downloader, p_profile, "people", f"tmdb_{p_id}")
+
+

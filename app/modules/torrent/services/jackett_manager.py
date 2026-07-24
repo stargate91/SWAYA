@@ -80,30 +80,33 @@ class JackettManager:
                 logger.error(f"Failed to read existing Jackett config: {e}")
 
     def start(self):
-        if not self.is_installed():
-            self.download_and_extract()
+        try:
+            if not self.is_installed():
+                self.download_and_extract()
+                
+            self.ensure_config()
             
-        self.ensure_config()
-        
-        # Find which executable to run
-        exe_to_run = self.jackett_dir / "Jackett" / "JackettConsole.exe"
-        if not exe_to_run.exists():
-            exe_to_run = self.jackett_dir / "Jackett" / "Jackett.exe"
-
-        logger.info(f"Starting Jackett from {exe_to_run} with DataFolder {self.config_dir}...")
-        
-        # Start Jackett Console as a background process redirecting output to NUL/DEVNULL on Windows
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        
-        self.process = subprocess.Popen(
-            [str(exe_to_run), "--DataFolder", str(self.config_dir), "--NoUpdates"],
-            startupinfo=startupinfo,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-        )
-        logger.info("Jackett process launched.")
+            # Find which executable to run
+            exe_to_run = self.jackett_dir / "Jackett" / "JackettConsole.exe"
+            if not exe_to_run.exists():
+                exe_to_run = self.jackett_dir / "Jackett" / "Jackett.exe"
+    
+            logger.info(f"Starting Jackett from {exe_to_run} with DataFolder {self.config_dir}...")
+            
+            # Start Jackett Console as a background process redirecting output to NUL/DEVNULL on Windows
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            
+            self.process = subprocess.Popen(
+                [str(exe_to_run), "--DataFolder", str(self.config_dir), "--NoUpdates"],
+                startupinfo=startupinfo,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            )
+            logger.info("Jackett process launched.")
+        except Exception as e:
+            logger.error(f"Failed to start Jackett manager: {e}", exc_info=True)
 
     def stop(self):
         if self.process:

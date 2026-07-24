@@ -137,15 +137,7 @@ class LibraryContentService:
             mtype = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
 
             # Resolve parent show match for TV shows / episodes to get show-level metadata
-            show_match = match
-            if mtype == "episode":
-                if match.parent and match.parent.parent:
-                    show_match = match.parent.parent
-                elif match.parent:
-                    show_match = match.parent
-            elif mtype == "season":
-                if match.parent:
-                    show_match = match.parent
+            show_match = match.parent_show or match
             
             loc = LanguageService.get_best_localization(show_match.localizations, pref_lang) if show_match.localizations else None
             title = loc.title if loc else (show_match.original_title or item.filename)

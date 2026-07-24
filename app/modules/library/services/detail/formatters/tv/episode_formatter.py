@@ -18,32 +18,41 @@ class TvEpisodeFormatter:
         current_uid: int,
         resolve_img_fn: Any
     ) -> List[Dict[str, Any]]:
+        # Batch query all MetadataMatch records for this show and season
+        episode_matches_db = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.TMDB,
+            MetadataMatch.media_type == MediaType.EPISODE,
+            MetadataMatch.season_number == season_number,
+            MetadataMatch.external_id == str(tv_tmdb_id_int)
+        ).all()
+        episode_match_map = {m.episode_number: m for m in episode_matches_db if m.episode_number is not None}
+
+        # Collect match IDs of all local items in this season
+        query_match_ids = {m.id for m in episode_matches_db}
+        for item in local_episodes_map.values():
+            if item:
+                query_match_ids.update(m.id for m in item.matches)
+        query_match_ids_list = list(query_match_ids)
+        local_item_ids = [item.id for item in local_episodes_map.values() if item]
+
+        # Batch query all UserOverrides for the match IDs and local item IDs
+        overrides_db = db.query(UserOverride).filter(
+            UserOverride.user_id == current_uid,
+            (UserOverride.metadata_match_id.in_(query_match_ids_list) if query_match_ids_list else False) |
+            (UserOverride.media_item_id.in_(local_item_ids) if local_item_ids else False)
+        ).all() if (query_match_ids_list or local_item_ids) else []
+
+        meta_override_map = {o.metadata_match_id: o for o in overrides_db if o.metadata_match_id}
+        phys_override_map = {o.media_item_id: o for o in overrides_db if o.media_item_id}
+
         episodes = []
         for ep in all_episodes[:ep_limit]:
             ep_num = ep.get("episode_number")
             local_item = local_episodes_map.get((season_number, ep_num))
             
-            metadata_override = None
-            episode_match = db.query(MetadataMatch).filter(
-                MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.media_type == MediaType.EPISODE,
-                MetadataMatch.season_number == season_number,
-                MetadataMatch.episode_number == ep_num,
-                MetadataMatch.external_id == str(tv_tmdb_id_int)
-            ).first()
-            
-            if episode_match:
-                metadata_override = db.query(UserOverride).filter(
-                    UserOverride.user_id == current_uid,
-                    UserOverride.metadata_match_id == episode_match.id
-                ).first()
-            
-            physical_override = None
-            if local_item:
-                physical_override = db.query(UserOverride).filter(
-                    UserOverride.user_id == current_uid,
-                    UserOverride.media_item_id == local_item.id
-                ).first()
+            episode_match = episode_match_map.get(ep_num)
+            metadata_override = meta_override_map.get(episode_match.id) if episode_match else None
+            physical_override = phys_override_map.get(local_item.id) if local_item else None
             
             from app.modules.library.services.detail.detail_mixins import OverrideResolver
             is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
@@ -57,11 +66,11 @@ class TvEpisodeFormatter:
                 siblings = [k for k, v in local_episodes_map.items() if v.id == local_item.id]
                 if len(siblings) > 1:
                     is_multi_episode = True
-                    match_ids = [m.id for m in local_item.matches]
-                    sibling_overrides = db.query(UserOverride).filter(
-                        UserOverride.user_id == current_uid,
-                        (UserOverride.media_item_id == local_item.id) | (UserOverride.metadata_match_id.in_(match_ids))
-                    ).all()
+                    sibling_match_ids = {m.id for m in local_item.matches}
+                    sibling_overrides = [
+                        o for o in overrides_db
+                        if o.media_item_id == local_item.id or o.metadata_match_id in sibling_match_ids
+                    ]
                     for sov in sibling_overrides:
                         if sov.is_watched:
                             is_watched = True
@@ -75,24 +84,8 @@ class TvEpisodeFormatter:
             playback_logs = []
             technical = None
             if local_item:
-                playback_logs = [
-                    {"id": log.id, "watched_at": log.watched_at.isoformat()}
-                    for log in sorted(local_item.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
-                ]
-                technical = {
-                    "resolution": local_item.resolution,
-                    "video_codec": local_item.video_codec,
-                    "audio_codec": local_item.audio_codec,
-                    "audio_channels": local_item.audio_channels,
-                    "hdr_type": local_item.hdr_type,
-                    "bit_depth": local_item.bit_depth,
-                    "framerate": local_item.framerate,
-                    "duration": local_item.duration,
-                    "size_bytes": local_item.size,
-                    "source": local_item.source.value if hasattr(local_item.source, "value") else str(local_item.source),
-                    "edition": local_item.edition.value if hasattr(local_item.edition, "value") else str(local_item.edition),
-                    "audio_type": local_item.audio_type.value if hasattr(local_item.audio_type, "value") else str(local_item.audio_type),
-                }
+                playback_logs = local_item.formatted_playback_logs
+                technical = local_item.technical_info
              
             still = None
             if episode_match:
@@ -102,29 +95,15 @@ class TvEpisodeFormatter:
 
             if still and not still.startswith("/media/"):
                 try:
-                    import os
-                    from urllib.parse import urlparse
                     from app.modules.tasks.image_download_service import ImageDownloadService
-                    from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-
-                    raw_fn = os.path.basename(urlparse(still).path or still)
-                    if raw_fn:
-                        filename = f"tmdb_tv_{tv_tmdb_id_int}_s{season_number}_e{ep_num}_{raw_fn}"
-                        existing = image_path_resolver.find_existing_file_by_stem(
-                            image_processing_service.image_root, "original", "stills", filename
-                        ) or image_path_resolver.find_existing_file_by_stem(
-                            image_processing_service.image_root, "thumbnails", "stills", filename
-                        )
-                        if not existing:
-                            adapter = ImageDownloadService()
-                            url = adapter.get_download_url(still, "stills") or f"https://image.tmdb.org/t/p/original{still}"
-                            adapter.enqueue_download(url, "stills", filename)
+                    from app.modules.media_assets.services.images import queue_img_download
+                    adapter = ImageDownloadService()
+                    queue_img_download(adapter, still, "stills", f"tmdb_tv_{tv_tmdb_id_int}_s{season_number}_e{ep_num}")
                 except Exception as e:
-                    try:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                    except Exception:
-                        pass
-                    pass
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+
+            from app.core.episode_utils import format_episode_code
+            disp_code = format_episode_code(season_number, ep_num)
 
             episodes.append({
                 "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
@@ -148,5 +127,6 @@ class TvEpisodeFormatter:
                 "is_multi_episode": is_multi_episode,
                 "playback_logs": playback_logs,
                 "technical": technical,
+                "display_episode_code": disp_code,
             })
         return episodes

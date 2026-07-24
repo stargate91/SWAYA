@@ -146,15 +146,8 @@ class SettingsService:
         # Auto-detect VLC path
         vlc_setting = self.get_user_setting_obj(self.user_id, "vlc_path")
         if not vlc_setting or not vlc_setting.value:
-            vlc_path = ""
-            which_vlc = shutil.which("vlc")
-            if which_vlc:
-                vlc_path = which_vlc
-            elif platform.system() == "Windows":
-                for p in [r"C:\Program Files\VideoLAN\VLC\vlc.exe", r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"]:
-                    if os.path.exists(p):
-                        vlc_path = p
-                        break
+            from app.modules.history.playback.player_detector import detect_vlc_path
+            vlc_path = detect_vlc_path()
             if not vlc_setting:
                 self.create_user_setting(self.user_id, "vlc_path", vlc_path)
             else:
@@ -164,15 +157,8 @@ class SettingsService:
         # Auto-detect MPC path
         mpc_setting = self.get_user_setting_obj(self.user_id, "mpc_path")
         if not mpc_setting or not mpc_setting.value:
-            mpc_path = ""
-            which_mpc = shutil.which("mpc-hc") or shutil.which("mpc-hc64")
-            if which_mpc:
-                mpc_path = which_mpc
-            elif platform.system() == "Windows":
-                for p in [r"C:\Program Files\MPC-HC\mpc-hc64.exe", r"C:\Program Files (x86)\MPC-HC\mpc-hc.exe"]:
-                    if os.path.exists(p):
-                        mpc_path = p
-                        break
+            from app.modules.history.playback.player_detector import detect_mpc_path
+            mpc_path = detect_mpc_path()
             if not mpc_setting:
                 self.create_user_setting(self.user_id, "mpc_path", mpc_path)
             else:
@@ -226,16 +212,11 @@ class SettingsService:
             new_enabled = bool(new_enabled)
 
         if new_enabled:
-            import socket
             import threading
             try:
                 from app.modules.torrent.services import jackett_manager, qbittorrent_watcher
+                from app.core.net_utils import is_port_in_use
                 
-                def is_port_in_use(port: int) -> bool:
-                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                        s.settimeout(1.0)
-                        return s.connect_ex(('127.0.0.1', port)) == 0
-
                 if not is_port_in_use(jackett_manager.port):
                     threading.Thread(target=jackett_manager.start, daemon=True).start()
                 

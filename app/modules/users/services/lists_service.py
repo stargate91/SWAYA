@@ -76,13 +76,7 @@ class ListsService:
             res["title"] = item.media_item.filename
             match = next((m for m in item.media_item.matches), None)
             if match and match.media_type == MediaType.EPISODE:
-                parent_show = None
-                if match.parent and match.parent.parent:
-                    parent_show = match.parent.parent
-                elif match.parent and match.parent.media_type == MediaType.TV:
-                    parent_show = match.parent
-                if parent_show:
-                    match = parent_show
+                match = match.parent_show or match
             if match:
                 res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
                 res["media_type"] = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
@@ -107,13 +101,7 @@ class ListsService:
         elif item.match:
             match = item.match
             if match and match.media_type == MediaType.EPISODE:
-                parent_show = None
-                if match.parent and match.parent.parent:
-                    parent_show = match.parent.parent
-                elif match.parent and match.parent.media_type == MediaType.TV:
-                    parent_show = match.parent
-                if parent_show:
-                    match = parent_show
+                match = match.parent_show or match
             res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
             res["media_type"] = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
             res["rating"] = match.rating_imdb or match.rating_tmdb
@@ -578,32 +566,30 @@ class ListsService:
         provider = default_adult if media_type == "scene" else Provider.TMDB
         external_id = str(tmdb_id) if tmdb_id else None
 
-        if isinstance(media_item_id, str):
-            if "_" in media_item_id:
-                try:
-                    provider, external_id = ProviderRegistry.clean_id(media_item_id)
-                    media_item_id = None
-                except ValueError:
-                    from app.modules.library.services.media_item_service import MediaItemService
-                    resolved_item_id, resolved_match_id = MediaItemService(self.db).resolve_ids(media_item_id, media_type)
-                    if resolved_item_id:
-                        media_item_id = resolved_item_id
-                    if resolved_match_id and not match_id:
-                        match_id = resolved_match_id
-                    
-                    if not resolved_item_id and isinstance(media_item_id, str) and media_item_id.isdigit():
-                        media_item_id = int(media_item_id)
-            elif media_item_id.isdigit():
+        parsed_id = parse_identifier(media_item_id) if isinstance(media_item_id, str) else None
+        if parsed_id:
+            provider = ProviderRegistry.get_provider_by_prefix(parsed_id.provider) or provider
+            external_id = parsed_id.external_id
+            media_item_id = None
+        elif isinstance(media_item_id, str):
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolved_item_id, resolved_match_id = MediaItemService(self.db).resolve_ids(media_item_id, media_type)
+            if resolved_item_id:
+                media_item_id = resolved_item_id
+            if resolved_match_id and not match_id:
+                match_id = resolved_match_id
+            
+            if not resolved_item_id and media_item_id.isdigit():
                 media_item_id = int(media_item_id)
+        elif isinstance(media_item_id, int):
+            pass
 
-        if tmdb_id and isinstance(tmdb_id, str):
-            if "_" in tmdb_id:
-                try:
-                    provider, external_id = ProviderRegistry.clean_id(tmdb_id)
-                except ValueError:
-                    external_id = tmdb_id
-            else:
-                external_id = tmdb_id
+        parsed_tmdb = parse_identifier(tmdb_id) if isinstance(tmdb_id, str) else None
+        if parsed_tmdb:
+            provider = ProviderRegistry.get_provider_by_prefix(parsed_tmdb.provider) or provider
+            external_id = parsed_tmdb.external_id
+        elif tmdb_id:
+            external_id = str(tmdb_id)
 
         if provider_name:
             p_enum = ProviderRegistry.get_provider_by_prefix(provider_name)
@@ -757,14 +743,10 @@ class ListsService:
                 resolved_person = find_by_direct_id(person_id)
                 
             if resolved_person is None and isinstance(person_id, str):
-                prefix = None
-                val = None
-                if ":" in person_id:
-                    prefix, val = person_id.split(":", 1)
-                elif "_" in person_id:
-                    prefix, val = person_id.split("_", 1)
-                    
-                if prefix and val:
+                parsed_p = parse_identifier(person_id)
+                if parsed_p:
+                    prefix = parsed_p.provider
+                    val = parsed_p.external_id
                     from app.modules.scrapers.support.registry import ProviderRegistry
                     p_enum = ProviderRegistry.get_provider_by_prefix(prefix)
                         
@@ -925,18 +907,15 @@ class ListsService:
         provider = None
         external_id = None
 
-        if item_id.startswith("person_"):
-            p_val = item_id.replace("person_", "")
-            if p_val.isdigit():
-                person_id = int(p_val)
+        parsed_id = parse_identifier(item_id) if isinstance(item_id, str) else None
+        if parsed_id:
+            if parsed_id.provider == "person":
+                p_val = parsed_id.external_id
+                person_id = int(p_val) if p_val.isdigit() else p_val
             else:
-                person_id = p_val
-        elif "_" in item_id:
-            from app.modules.scrapers.support.registry import ProviderRegistry
-            try:
-                provider, external_id = ProviderRegistry.clean_id(item_id)
-            except ValueError:
-                pass
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                provider = ProviderRegistry.get_provider_by_prefix(parsed_id.provider)
+                external_id = parsed_id.external_id
         else:
             try:
                 media_item_id = int(item_id)

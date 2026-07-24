@@ -432,3 +432,53 @@ class BaseStashGraphQLScraper(BaseScraper):
                         perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
         return data
 
+    def fetch_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
+        """Queries the Stash-compatible GraphQL endpoint for scene info."""
+        import re
+        if not re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", str(scene_id)):
+            logger.debug(f"Invalid UUID for {self.provider.value} fetch_scene: {scene_id}")
+            return None
+
+        pref = self.provider.value
+        endpoint_key = f"{pref}_endpoint"
+        api_key_name = f"{pref}_api_key"
+
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        config = ProviderRegistry.get_config(self.provider)
+        
+        endpoint = self.get_setting(endpoint_key)
+        if not endpoint and config:
+            endpoint = config.default_endpoint
+
+        api_token = self.get_setting(api_key_name)
+        if not api_token:
+            logger.warning(f"{self.provider.value.upper()} API key not configured.")
+            return None
+
+        cache_key = f"{pref}/scene/v4/{scene_id}"
+        cached_data = self.cache.get(self.provider, cache_key, force_refresh=force_refresh)
+        if cached_data:
+            if cached_data.get("cached_error"):
+                return None
+            return cached_data
+
+        headers = {"ApiKey": api_token, "Content-Type": "application/json"}
+        payload = {"query": self.STASH_FIND_SCENE_QUERY, "variables": {"id": scene_id}}
+
+        from app.core.constants import SCRAPER_REQUEST_TIMEOUT
+        from app.core.enums import MediaType
+
+        return self.get_json_cached(
+            self.provider,
+            cache_key,
+            endpoint,
+            method="POST",
+            json_data=payload,
+            headers=headers,
+            force_refresh=force_refresh,
+            media_type=MediaType.SCENE,
+            external_id=scene_id,
+            result_extractor=self.extract_and_map_measurements,
+            timeout=SCRAPER_REQUEST_TIMEOUT,
+        )
+

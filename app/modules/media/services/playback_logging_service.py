@@ -10,34 +10,9 @@ from app.modules.users.models import UserOverride
 from app.core.episode_utils import get_first_int
 from app.core.date_utils import parse_datetime_utc
 
-def parse_watched_at(value) -> datetime:
-    try:
-        return parse_datetime_utc(value)
-    except ValueError as exc:
-        raise ValueError("Invalid watched_at datetime format") from exc
-
 logger = logging.getLogger(__name__)
 
 class PlaybackLoggingService:
-    def add_watch_history_entry_core(self, db: Session, resolver: Any, playback_repo: Any, item_id: int, watched_at_raw: Any = None) -> Any:
-        item = resolver.get_item_by_id(item_id)
-        if not item:
-            raise NotFoundException("Item not found")
-
-        watched_at = parse_watched_at(watched_at_raw)
-        playback_repo.create_playback_log(item.id, watched_at)
-        db.refresh(item)
-        
-        # recalculate watch state
-        override = db.query(UserOverride).filter(UserOverride.media_item_id == item.id).first()
-        if not override:
-            override = db.query(UserOverride).filter(
-                UserOverride.media_item_id == item.id,
-                UserOverride.user_id == 1  # fallback
-            ).first()
-        
-        return item
-
     def get_watched_history(
         self,
         db: Session,
@@ -95,11 +70,7 @@ class PlaybackLoggingService:
             
             if active_match and active_match.media_type == MediaType.EPISODE:
                 episode_title = title
-                tv_match = None
-                if active_match.parent and active_match.parent.parent:
-                    tv_match = active_match.parent.parent
-                elif active_match.parent:
-                    tv_match = active_match.parent
+                tv_match = active_match.parent_show
                 
                 if tv_match:
                     from app.modules.users.models import UserOverride

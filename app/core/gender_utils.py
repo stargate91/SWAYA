@@ -28,3 +28,20 @@ def map_gender_str_to_int(gender_val: Any) -> int:
         return 2
         
     return 0
+
+
+def map_gender_int_to_str(gender_val: Any) -> str | None:
+    """
+    Maps internal gender integers to standard display strings:
+    - 1: "female"
+    - 2: "male"
+    - 3: "trans"
+    - default: None
+    """
+    if gender_val in (1, "1"):
+        return "female"
+    if gender_val in (2, "2"):
+        return "male"
+    if gender_val in (3, "3"):
+        return "trans"
+    return None

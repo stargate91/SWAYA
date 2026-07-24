@@ -115,6 +115,18 @@ class MetadataMatch(Base):
             return self.overrides.custom_backdrop
         return getattr(self, "local_backdrop_path", None) or getattr(self, "backdrop_path", None)
 
+    @property
+    def parent_show(self) -> Optional["MetadataMatch"]:
+        """Resolves the parent TV show match from an episode or season match."""
+        from app.core.enums import MediaType
+        if self.media_type == MediaType.EPISODE.value:
+            if self.parent and self.parent.media_type == MediaType.SEASON.value:
+                return self.parent.parent
+            return self.parent
+        elif self.media_type == MediaType.SEASON.value:
+            return self.parent
+        return None
+
 class MetadataLocalization(Base):
     __tablename__ = "metadata_localizations"
     __table_args__ = (UniqueConstraint("match_id", "locale", name="uq_match_locale"),)

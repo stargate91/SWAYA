@@ -116,26 +116,8 @@ class PeopleQueryBuilder:
             else_=func.coalesce(Person.popularity, 0.0)
         )
 
-        cup_order = case(
-            (Person.cup_size == 'A', 1),
-            (Person.cup_size == 'B', 2),
-            (Person.cup_size == 'C', 3),
-            (Person.cup_size == 'D', 4),
-            (Person.cup_size == 'DD', 5),
-            (Person.cup_size == 'DDD', 6),
-            (Person.cup_size == 'E', 7),
-            (Person.cup_size == 'EE', 8),
-            (Person.cup_size == 'F', 9),
-            (Person.cup_size == 'FF', 10),
-            (Person.cup_size == 'G', 11),
-            (Person.cup_size == 'GG', 12),
-            (Person.cup_size == 'H', 13),
-            (Person.cup_size == 'HH', 14),
-            (Person.cup_size == 'I', 15),
-            (Person.cup_size == 'J', 16),
-            (Person.cup_size == 'K', 17),
-            else_=0
-        )
+        from app.modules.people.helpers import get_cup_size_sql_order
+        cup_order = get_cup_size_sql_order(Person.cup_size)
 
         # Apply ordering in SQL
         if sort_by in ("library_count", "library_count_desc"):

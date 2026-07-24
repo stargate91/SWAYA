@@ -12,16 +12,20 @@ from app.core.genre_utils import split_genres as _split_genres
 from app.modules.library.schemas import MovieDetailResponse
 from app.modules.library.services.detail.formatters.base import MovieDetailFormatter
 from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
+from app.modules.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
 class LocalMovieFormatter(MovieDetailFormatter):
     def __init__(self):
-        super().__init__()
         from app.modules.library.services.detail.formatters.movie.local_credits_formatter import LocalCreditsFormatter
         from app.modules.library.services.detail.formatters.movie.local_metadata_resolver import LocalMetadataResolver
         self.credits_formatter = LocalCreditsFormatter()
         self.metadata_resolver = LocalMetadataResolver()
+
+    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
+        from app.modules.media_assets.services.images import image_processing_service
+        return image_processing_service.resolve_image_url(path, subfolder, size)
 
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         try:
@@ -61,20 +65,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             resolve_img_fn=self._resolve_img
         )
         
-        technical = {
-            "resolution": item.resolution,
-            "video_codec": item.video_codec,
-            "audio_codec": item.audio_codec,
-            "audio_channels": item.audio_channels,
-            "hdr_type": item.hdr_type,
-            "bit_depth": item.bit_depth,
-            "framerate": item.framerate,
-            "duration": item.duration,
-            "size_bytes": item.size,
-            "source": item.source.value if hasattr(item.source, "value") else str(item.source),
-            "edition": item.edition.value if hasattr(item.edition, "value") else str(item.edition),
-            "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
-        }
+        technical = item.technical_info
         
         metadata_override, physical_override = OverrideResolver.resolve_overrides(
             db, current_uid, match=active_match, media_item_id=item.id
@@ -92,8 +83,8 @@ class LocalMovieFormatter(MovieDetailFormatter):
             collection_data = {
                 "tmdb_id": int(col.external_id) if col.external_id.isdigit() else col.id,
                 "title": col_loc.title if col_loc else "Collection",
-                "poster_path": self._resolve_img(col_loc.local_poster_path or col_loc.poster_path if col_loc else None, "posters"),
-                "backdrop_path": self._resolve_img(col.local_backdrop_path or col.backdrop_path, "backdrops"),
+                "poster_path": image_processing_service.resolve_image_url(col_loc.local_poster_path or col_loc.poster_path if col_loc else None, "posters"),
+                "backdrop_path": image_processing_service.resolve_image_url(col.local_backdrop_path or col.backdrop_path, "backdrops"),
             }
 
         keywords_list, trailer_key = self.metadata_resolver.resolve_keywords_and_trailer(
@@ -121,10 +112,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             fallback_override=override
         )
 
-        playback_logs = [
-            {"id": log.id, "watched_at": log.watched_at.isoformat()}
-            for log in sorted(item.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
-        ]
+        playback_logs = item.formatted_playback_logs
 
         suggested_tags = active_match.suggested_tags if (active_match and active_match.suggested_tags) else keywords_list
 
@@ -138,11 +126,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             still_path = active_match.local_still_path or active_match.still_path
             
             # Resolve parent show title
-            tv_match = None
-            if active_match.parent and active_match.parent.parent:
-                tv_match = active_match.parent.parent
-            elif active_match.parent:
-                tv_match = active_match.parent
+            tv_match = active_match.parent_show
             if tv_match:
                 tv_loc = LanguageService.get_best_localization(tv_match.localizations, ui_lang) if tv_match.localizations else None
                 tv_title = tv_loc.title if tv_loc else tv_match.original_title
@@ -152,13 +136,13 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "title": title,
             "tv_title": tv_title,
             "episode_title": title,
-            "still_path": self._resolve_img(still_path, "stills") if still_path else None,
+            "still_path": image_processing_service.resolve_image_url(still_path, "stills") if still_path else None,
             "season_number": season_number,
             "episode_number": episode_number,
             "keywords": keywords_list,
             "trailer_key": trailer_key,
             "extras": extras_list,
-            "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
+            "logo_path": image_processing_service.resolve_image_url(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
             "original_title": active_match.original_title if active_match else None,
             "tagline": loc.tagline if loc else None,
             "overview": overview,

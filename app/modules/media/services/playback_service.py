@@ -22,12 +22,6 @@ from app.core.enums import Provider, MediaType
 logger = logging.getLogger(__name__)
 
 
-def parse_watched_at(value) -> datetime:
-    try:
-        return parse_datetime_utc(value)
-    except ValueError as exc:
-        raise ValueError("Invalid watched_at datetime format") from exc
-
 
 def recalculate_watch_state(playback_logs, override) -> None:
     logs = sorted(
@@ -69,13 +63,13 @@ class PlaybackService:
         resolver: Optional[Any] = None
     ):
         from app.modules.library.services.media_item_service import MediaItemService
-        from app.modules.history.services.playback_service import PlaybackService
+        from app.modules.history.services.playback_history_service import PlaybackHistoryService
         from app.modules.users.services.overrides_service import OverridesService
 
 
         self.db = db
         self.resolver = resolver or MediaItemService(db)
-        self.playback_repo = playback_repo or PlaybackService(db)
+        self.playback_repo = playback_repo or PlaybackHistoryService(db)
         self.overrides = overrides_service or OverridesService(db, self.resolver)
 
         from app.modules.settings.services.settings_service import SettingsService
@@ -131,7 +125,7 @@ class PlaybackService:
         if not item:
             raise NotFoundException("Item not found")
 
-        watched_at = parse_watched_at(watched_at_raw)
+        watched_at = parse_datetime_utc(watched_at_raw)
         self.playback_repo.create_playback_log(item.id, watched_at)
         self.db.refresh(item)
         self._recalculate_watch_state(item)
@@ -148,7 +142,7 @@ class PlaybackService:
         if not log:
             raise NotFoundException("Watch history entry not found")
 
-        new_watched_at = parse_watched_at(watched_at_raw)
+        new_watched_at = parse_datetime_utc(watched_at_raw)
         self.playback_repo.update_playback_log_watched_at(log.id, new_watched_at)
         self.db.refresh(item)
         self._recalculate_watch_state(item)

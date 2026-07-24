@@ -11,15 +11,14 @@ from app.modules.users.models import UserOverride
 
 
 from app.core.language import LanguageService
-from app.modules.library.services.detail._detail_formatter import DetailFormatter
 from app.core.date_utils import get_year_from_date
 from app.modules.library.schemas import CollectionDetailResponse
+from app.modules.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
-class CollectionDetailService(DetailFormatter):
+class CollectionDetailService:
     def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[Any] = None):
-        super().__init__()
         self.db = db
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
@@ -88,25 +87,16 @@ class CollectionDetailService(DetailFormatter):
             collection_loc.poster_path = tmdb_details.get("poster_path") or collection_loc.poster_path
             try:
                 if self.image_downloader:
-                    def queue_image(path: str, subfolder: str, prefix: str) -> Optional[str]:
-                        url = self.image_downloader.get_download_url(path, subfolder)
-                        if not url:
-                            return None
-                        import os
-                        import re
-                        from urllib.parse import urlparse
-                        basename = os.path.basename(urlparse(path).path)
-                        ext = os.path.splitext(basename)[1].lower() or ".jpg"
-                        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
-                        filename = f"{safe_prefix}_{basename}{ext}"
-                        self.image_downloader.enqueue_download(url, subfolder, filename)
-                        return f"{subfolder}/{filename}"
-                    
+                    from app.modules.media_assets.services.images import queue_img_download
                     asset_prefix = f"tmdb_{collection.external_id}"
                     if collection_loc.poster_path and not collection_loc.local_poster_path:
-                        collection_loc.local_poster_path = queue_image(collection_loc.poster_path, "posters", asset_prefix)
+                        collection_loc.local_poster_path = queue_img_download(
+                            self.image_downloader, collection_loc.poster_path, "posters", asset_prefix
+                        )
                     if collection.backdrop_path and not collection.local_backdrop_path:
-                        collection.local_backdrop_path = queue_image(collection.backdrop_path, "backdrops", asset_prefix)
+                        collection.local_backdrop_path = queue_img_download(
+                            self.image_downloader, collection.backdrop_path, "backdrops", asset_prefix
+                        )
             except Exception as e:
                 logger.error(f"Failed to queue image download for collection detail: {e}")
 
@@ -147,8 +137,8 @@ class CollectionDetailService(DetailFormatter):
                 "library_item_id": item.id,
                 "title": loc.title if loc else item.filename,
                 "year": active_match.release_date.year if active_match.release_date else None,
-                "poster_path": self._resolve_img(loc.poster_path if loc else None, "posters"),
-                "backdrop_path": self._resolve_img(active_match.backdrop_path, "backdrops"),
+                "poster_path": image_processing_service.resolve_image_url(loc.poster_path if loc else None, "posters"),
+                "backdrop_path": image_processing_service.resolve_image_url(active_match.backdrop_path, "backdrops"),
                 "rating": active_match.rating_porndb or active_match.rating_tmdb or 0.0,
                 "rating_imdb": active_match.rating_imdb,
                 "rating_tmdb": active_match.rating_tmdb,
@@ -172,8 +162,8 @@ class CollectionDetailService(DetailFormatter):
                 "library_item_id": None,
                 "title": part.get("title") or part.get("original_title") or f"Movie {part_tmdb_id}",
                 "year": year,
-                "poster_path": self._resolve_img(part.get("poster_path"), "posters"),
-                "backdrop_path": self._resolve_img(part.get("backdrop_path"), "backdrops"),
+                "poster_path": image_processing_service.resolve_image_url(part.get("poster_path"), "posters"),
+                "backdrop_path": image_processing_service.resolve_image_url(part.get("backdrop_path"), "backdrops"),
                 "rating": part.get("vote_average") or 0.0,
                 "rating_imdb": None,
                 "rating_tmdb": part.get("vote_average"),
@@ -206,27 +196,27 @@ class CollectionDetailService(DetailFormatter):
         local_poster = collection_loc.local_poster_path if collection_loc else None
         final_poster = None
         if local_poster:
-            final_poster = self._resolve_img(local_poster, "posters")
+            final_poster = image_processing_service.resolve_image_url(local_poster, "posters")
         if not final_poster:
             remote_poster = collection_loc.poster_path if collection_loc else tmdb_details.get("poster_path")
-            final_poster = self._resolve_img(remote_poster, "posters")
+            final_poster = image_processing_service.resolve_image_url(remote_poster, "posters")
 
         # Resolve final backdrop using local file, falling back to remote path if not found on disk
         local_backdrop = collection.local_backdrop_path if collection else None
         final_backdrop = None
         if local_backdrop:
-            final_backdrop = self._resolve_img(local_backdrop, "backdrops")
+            final_backdrop = image_processing_service.resolve_image_url(local_backdrop, "backdrops")
         if not final_backdrop:
             remote_backdrop = collection.backdrop_path if collection else tmdb_details.get("backdrop_path")
-            final_backdrop = self._resolve_img(remote_backdrop, "backdrops")
+            final_backdrop = image_processing_service.resolve_image_url(remote_backdrop, "backdrops")
 
         if col_override:
             if col_override.custom_poster:
-                custom_poster_resolved = self._resolve_img(col_override.custom_poster, "posters")
+                custom_poster_resolved = image_processing_service.resolve_image_url(col_override.custom_poster, "posters")
                 if custom_poster_resolved:
                     final_poster = custom_poster_resolved
             if col_override.custom_backdrop:
-                custom_backdrop_resolved = self._resolve_img(col_override.custom_backdrop, "backdrops")
+                custom_backdrop_resolved = image_processing_service.resolve_image_url(col_override.custom_backdrop, "backdrops")
                 if custom_backdrop_resolved:
                     final_backdrop = custom_backdrop_resolved
 

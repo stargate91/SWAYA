@@ -7,6 +7,34 @@ from typing import Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
+def detect_vlc_path() -> str:
+    which_vlc = shutil.which("vlc")
+    if which_vlc:
+        return which_vlc
+    elif platform.system() == "Windows":
+        vlc_paths = [
+            r"C:\Program Files\VideoLAN\VLC\vlc.exe",
+            r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
+        ]
+        for p in vlc_paths:
+            if os.path.exists(p):
+                return p
+    return ""
+
+def detect_mpc_path() -> str:
+    which_mpc = shutil.which("mpc-hc") or shutil.which("mpc-hc64")
+    if which_mpc:
+        return which_mpc
+    elif platform.system() == "Windows":
+        mpc_paths = [
+            r"C:\Program Files\MPC-HC\mpc-hc64.exe",
+            r"C:\Program Files (x86)\MPC-HC\mpc-hc.exe"
+        ]
+        for p in mpc_paths:
+            if os.path.exists(p):
+                return p
+    return ""
+
 def find_media_player(settings) -> Tuple[Optional[str], Optional[str]]:
     from app.core.user_context import get_current_user_id
     current_user_id = get_current_user_id()
@@ -31,21 +59,9 @@ def find_media_player(settings) -> Tuple[Optional[str], Optional[str]]:
     if vlc_path and os.path.exists(vlc_path):
         vlc_valid = True
     else:
-        which_vlc = shutil.which("vlc")
-        if which_vlc:
-            vlc_path = which_vlc
+        vlc_path = detect_vlc_path()
+        if vlc_path:
             vlc_valid = True
-        elif platform.system() == "Windows":
-            vlc_paths = [
-                r"C:\Program Files\VideoLAN\VLC\vlc.exe",
-                r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
-            ]
-            for p in vlc_paths:
-                if os.path.exists(p):
-                    vlc_path = p
-                    vlc_valid = True
-                    break
-        if vlc_valid and vlc_path:
             save_setting("vlc_path", vlc_path)
 
     # Detect MPC-HC
@@ -53,21 +69,9 @@ def find_media_player(settings) -> Tuple[Optional[str], Optional[str]]:
     if mpc_path and os.path.exists(mpc_path):
         mpc_valid = True
     else:
-        which_mpc = shutil.which("mpc-hc") or shutil.which("mpc-hc64")
-        if which_mpc:
-            mpc_path = which_mpc
+        mpc_path = detect_mpc_path()
+        if mpc_path:
             mpc_valid = True
-        elif platform.system() == "Windows":
-            mpc_paths = [
-                r"C:\Program Files\MPC-HC\mpc-hc64.exe",
-                r"C:\Program Files (x86)\MPC-HC\mpc-hc.exe"
-            ]
-            for p in mpc_paths:
-                if os.path.exists(p):
-                    mpc_path = p
-                    mpc_valid = True
-                    break
-        if mpc_valid and mpc_path:
             save_setting("mpc_path", mpc_path)
 
     # Preferred order based on settings

@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.modules.library.schemas import TvShowDetailResponse
-from app.modules.library.services.detail._detail_formatter import DetailFormatter
+from app.modules.media_assets.services.images import image_processing_service
 from app.modules.library.services.detail.formatters.tv.episode_formatter import TvEpisodeFormatter
 from app.modules.library.services.detail.formatters.tv.season_formatter import TvSeasonFormatter
 from app.modules.library.services.detail.formatters.tv.tv_local_resolver import TvLocalResolver
@@ -18,15 +18,18 @@ from app.core.genre_utils import split_genres as _split_genres
 
 logger = logging.getLogger(__name__)
 
-class TvShowFormatter(DetailFormatter):
+class TvShowFormatter:
     def __init__(self):
-        super().__init__()
         self.ep_formatter = TvEpisodeFormatter()
         self.season_formatter = TvSeasonFormatter()
         self.local_resolver = TvLocalResolver()
         self.playback_resolver = TvPlaybackResolver()
         self.credits_formatter = TvCreditsFormatter()
         self.metadata_resolver = TvShowMetadataResolver()
+
+    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
+        from app.modules.media_assets.services.images import image_processing_service
+        return image_processing_service.resolve_image_url(path, subfolder, size)
 
     def format(
         self,
@@ -39,9 +42,11 @@ class TvShowFormatter(DetailFormatter):
         omdb_scraper: Optional[Any] = None
     ):
         """Assembles the complete formatted details of a TV show, merging local and external data sources."""
+        from app.core.identifier_utils import parse_identifier
+        parsed = parse_identifier(tv_tmdb_id)
         try:
-            tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
-        except (ValueError, IndexError):
+            tv_tmdb_id_int = int(parsed.external_id) if parsed else int(tv_tmdb_id)
+        except (ValueError, TypeError):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
         from app.core.language import get_user_ui_language
@@ -254,9 +259,9 @@ class TvShowFormatter(DetailFormatter):
             "imdb_id": tmdb_data.get("external_ids", {}).get("imdb_id") or (series_match.imdb_id if series_match else None),
             "title": tmdb_data.get("name") or tmdb_data.get("original_name") or "Unknown TV Show",
             "tagline": loc_db.tagline if (loc_db and loc_db.tagline) else tmdb_data.get("tagline"),
-            "logo_path": self._resolve_img(effective_logo, "logos"),
-            "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
-            "poster_path": self._resolve_img(effective_poster, "posters"),
+            "logo_path": image_processing_service.resolve_image_url(effective_logo, "logos"),
+            "backdrop_path": image_processing_service.resolve_image_url(effective_backdrop, "backdrops", size="original"),
+            "poster_path": image_processing_service.resolve_image_url(effective_poster, "posters"),
             "year": get_year_from_date(tmdb_data.get("first_air_date")),
             "first_air_date": tmdb_data.get("first_air_date"),
             "last_air_date": tmdb_data.get("last_air_date"),
@@ -275,8 +280,8 @@ class TvShowFormatter(DetailFormatter):
             "writers": writers,
             "sound": sound,
             "seasons": seasons,
-            "companies": [{"name": c.get("name"), "logo_path": self._resolve_img(c.get("logo_path"), "logos")} for c in tmdb_data.get("production_companies", [])] if tmdb_data.get("production_companies") else [],
-            "networks": [{"name": n.get("name"), "logo_path": self._resolve_img(n.get("logo_path"), "logos")} for n in tmdb_data.get("networks", [])] if tmdb_data.get("networks") else [],
+            "companies": [{"name": c.get("name"), "logo_path": image_processing_service.resolve_image_url(c.get("logo_path"), "logos")} for c in tmdb_data.get("production_companies", [])] if tmdb_data.get("production_companies") else [],
+            "networks": [{"name": n.get("name"), "logo_path": image_processing_service.resolve_image_url(n.get("logo_path"), "logos")} for n in tmdb_data.get("networks", [])] if tmdb_data.get("networks") else [],
             "is_adult": tmdb_data.get("adult", False),
             "is_favorite": override.is_favorite if override else False,
             "user_rating": override.user_rating if override else None,
@@ -308,51 +313,22 @@ class TvShowFormatter(DetailFormatter):
         if not image_downloader or not tmdb_data:
             return
 
-        import os
-        from urllib.parse import urlparse
-        from typing import Optional
-        from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-
-        def queue_img(path: str, subfolder: str, prefix: str) -> Optional[str]:
-            if not path:
-                return None
-            if path.startswith("/media/"):
-                return path
-
-            if path.startswith(("http://", "https://")):
-                url = path
-                raw_filename = os.path.basename(urlparse(path).path)
-            else:
-                url = image_downloader.get_download_url(path, subfolder) or f"https://image.tmdb.org/t/p/original{path}"
-                raw_filename = os.path.basename(path)
-
-            if not raw_filename:
-                return None
-
-            clean_filename = f"{prefix}_{raw_filename}"
-            existing = image_path_resolver.find_existing_file_by_stem(
-                image_processing_service.image_root, "original", subfolder, clean_filename
-            ) or image_path_resolver.find_existing_file_by_stem(
-                image_processing_service.image_root, "thumbnails", subfolder, clean_filename
-            )
-            if not existing:
-                image_downloader.enqueue_download(url, subfolder, clean_filename)
-            return f"{subfolder}/{clean_filename}"
+        from app.modules.media_assets.services.images import queue_img_download
 
         # 1. Poster
         poster_path = effective_poster or tmdb_data.get("poster_path")
         if poster_path:
-            queue_img(poster_path, "posters", f"tmdb_{tv_tmdb_id}")
+            queue_img_download(image_downloader, poster_path, "posters", f"tmdb_{tv_tmdb_id}")
 
         # 2. Backdrop
         b_path = effective_backdrop or tmdb_data.get("backdrop_path")
         if b_path:
-            queue_img(b_path, "backdrops", f"tmdb_{tv_tmdb_id}")
+            queue_img_download(image_downloader, b_path, "backdrops", f"tmdb_{tv_tmdb_id}")
 
         # 3. Logo
         l_path = effective_logo or tmdb_data.get("logo_path")
         if l_path:
-            queue_img(l_path, "logos", f"tmdb_{tv_tmdb_id}")
+            queue_img_download(image_downloader, l_path, "logos", f"tmdb_{tv_tmdb_id}")
 
         # 4. Cast & Crew Profiles
         credits = tmdb_data.get("aggregate_credits") or tmdb_data.get("credits") or {}
@@ -361,11 +337,11 @@ class TvShowFormatter(DetailFormatter):
             p_profile = person.get("profile_path")
             p_id = person.get("id")
             if p_profile and p_id:
-                queue_img(p_profile, "people", f"tmdb_{p_id}")
+                queue_img_download(image_downloader, p_profile, "people", f"tmdb_{p_id}")
 
         # 5. Season Posters
         for season in tmdb_data.get("seasons", []) or []:
             s_poster = season.get("poster_path")
             s_num = season.get("season_number")
             if s_poster and s_num is not None:
-                queue_img(s_poster, "posters", f"tmdb_tv_{tv_tmdb_id}_season_{s_num}")
+                queue_img_download(image_downloader, s_poster, "posters", f"tmdb_tv_{tv_tmdb_id}_season_{s_num}")

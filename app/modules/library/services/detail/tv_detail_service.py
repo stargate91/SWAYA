@@ -4,8 +4,6 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.identifier_utils import parse_identifier
 
 
-from app.modules.library.services.detail._detail_formatter import DetailFormatter
-
 # Import strategy formatters
 from app.modules.library.services.detail.formatters.tv_show import TvShowFormatter
 from app.modules.library.services.detail.formatters.tv_season import TvSeasonFormatter
@@ -17,9 +15,8 @@ from app.modules.library.services.detail.detail_mixins import OverrideResolver
 
 logger = logging.getLogger(__name__)
 
-class TvDetailService(DetailFormatter):
+class TvDetailService:
     def __init__(self, db: Session, scrapers: Any):
-        super().__init__()
         self.db = db
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)

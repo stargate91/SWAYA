@@ -84,6 +84,44 @@ class OverrideResolver:
 
         return is_watched, watch_count, resume_position, last_watched_at_dt
 
+    @staticmethod
+    def resolve_and_merge_sibling_states(
+        db: Session,
+        current_uid: int,
+        media_item_id: int,
+        match_ids: List[int],
+        base_is_watched: bool,
+        base_watch_count: int,
+        base_resume_position: int,
+        base_last_watched_at: Optional[str]
+    ) -> Tuple[bool, int, int, Optional[str]]:
+        """
+        Queries and merges watch state overrides for sibling episodes/items.
+        """
+        sibling_overrides = db.query(UserOverride).filter(
+            UserOverride.user_id == current_uid,
+            (UserOverride.media_item_id == media_item_id) | (UserOverride.metadata_match_id.in_(match_ids))
+        ).all()
+        
+        is_watched = base_is_watched
+        watch_count = base_watch_count
+        resume_position = base_resume_position
+        last_watched_at = base_last_watched_at
+
+        for sov in sibling_overrides:
+            if sov.is_watched:
+                is_watched = True
+            if sov.watch_count and sov.watch_count > watch_count:
+                watch_count = sov.watch_count
+            if sov.resume_position and sov.resume_position > resume_position:
+                resume_position = sov.resume_position
+            if sov.last_watched_at:
+                sov_iso = sov.last_watched_at.isoformat()
+                if not last_watched_at or sov_iso > last_watched_at:
+                    last_watched_at = sov_iso
+
+        return is_watched, watch_count, resume_position, last_watched_at
+
 
 class PlaybackResolver:
     """Queries playback logs and peak moments for any media item."""

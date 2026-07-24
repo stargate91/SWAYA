@@ -298,7 +298,40 @@ def calculate_full_sha256(filepath: str) -> Optional[str]:
     except Exception as e:
         logger.error(f"Failed to calculate full SHA256 for {filepath}: {e}")
         return None
+def get_video_duration(filepath: str) -> float:
+    """Executes ffprobe to extract video duration in seconds. Returns 0.0 on failure."""
+    long_path = to_win_long_path(filepath)
+    cmd = [
+        'ffprobe',
+        '-v', 'error',
+        '-show_entries', 'format=duration',
+        '-of', 'default=noprint_wrappers=1:nokey=1',
+        long_path
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=10)
+        return float(result.stdout.strip())
+    except Exception as e:
+        logger.error(f"Failed to get video duration via ffprobe for {filepath}: {e}")
+        return 0.0
 
+def extract_video_still(video_path: str, target_image_path: str | Path, seek_seconds: float) -> bool:
+    """Extracts a still frame from a video file at the given timestamp using ffmpeg."""
+    long_path = to_win_long_path(video_path)
+    cmd_extract = [
+        'ffmpeg', '-y',
+        '-ss', f'{seek_seconds:.3f}',
+        '-i', long_path,
+        '-vframes', '1',
+        '-q:v', '2',
+        str(target_image_path)
+    ]
+    try:
+        subprocess.run(cmd_extract, capture_output=True, check=True, timeout=15)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to extract still at {seek_seconds}s for {video_path}: {e}")
+        return False
 
 
 class FileSystemService:
@@ -311,8 +344,8 @@ class FileSystemService:
     def calculate_oshash(self, file_path: str) -> str:
         return calculate_oshash(file_path)
 
-    def calculate_phash(self, file_path: str) -> str:
-        return calculate_phash(file_path)
+    def calculate_phash(self, file_path: str, duration_seconds: Optional[float] = None) -> Optional[str]:
+        return calculate_phash(file_path, duration_seconds)
 
     def calculate_full_md5(self, file_path: str) -> str:
         return calculate_full_md5(file_path)

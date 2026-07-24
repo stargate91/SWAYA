@@ -84,11 +84,7 @@ class LibraryListingService:
             
             if match and match.media_type == MediaType.EPISODE:
                 episode_title = title
-                tv_match = None
-                if match.parent and match.parent.parent:
-                    tv_match = match.parent.parent
-                elif match.parent:
-                    tv_match = match.parent
+                tv_match = match.parent_show
                 
                 if tv_match:
                     tv_override = self.db.query(UserOverride).filter(
@@ -158,20 +154,13 @@ class LibraryListingService:
         )
         
         # Unique TV shows count
-        parent_ids = set()
-        current_parents = {
+        initial_parents = {
             r[0] for r in self.db.query(MetadataMatch.parent_id).join(
                 MediaItem, MetadataMatch.media_item_id == MediaItem.id
             ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id.isnot(None)).all()
         }
-        while current_parents:
-            parent_ids.update(current_parents)
-            current_parents = {
-                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents),
-                    MetadataMatch.parent_id.isnot(None)
-                ).all()
-            }
+        from app.modules.metadata.helpers import get_all_parent_match_ids
+        parent_ids = get_all_parent_match_ids(self.db, initial_parents)
         tv_shows_count = self.db.query(MetadataMatch).filter(
             MetadataMatch.id.in_(parent_ids),
             MetadataMatch.media_type == MediaType.TV,

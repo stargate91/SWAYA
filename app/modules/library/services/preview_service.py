@@ -20,20 +20,8 @@ class PreviewService:
 
     def get_video_duration(self, filepath: str) -> float:
         """Executes ffprobe to extract duration in seconds."""
-        long_path = to_win_long_path(filepath)
-        cmd = [
-            'ffprobe',
-            '-v', 'error',
-            '-show_entries', 'format=duration',
-            '-of', 'default=noprint_wrappers=1:nokey=1',
-            long_path
-        ]
-        try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=10)
-            return float(result.stdout.strip())
-        except Exception as e:
-            logger.error(f"Failed to get video duration via ffprobe for {filepath}: {e}")
-            raise
+        from app.modules.library.filesystem.fs_utils import get_video_duration
+        return get_video_duration(filepath)
 
     def generate_preview(self, filepath: str, item_id: str, preview_duration: int = 16, resolution: int = 720) -> str:
         """

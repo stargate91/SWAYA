@@ -155,10 +155,8 @@ class PeopleQueryBuilder:
         elif params.sort_by == "birthday_asc":
             people_items.sort(key=lambda item: (item.birthday or "9999-99-99", (item.name or "").lower()))
         elif params.sort_by in ("cup_size_desc", "cup_size_asc"):
-            cup_order = {
-                'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'E': 5,
-                'DDD': 6, 'F': 6, 'DDDD': 7, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 'K': 11
-            }
+            from app.modules.people.helpers import CUP_SIZE_ORDER
+            cup_order = CUP_SIZE_ORDER
             def get_volume_score(item):
                 cup_str = str(item.cup_size or "").strip().upper()
                 cup_val = cup_order.get(cup_str, 0)
@@ -294,10 +292,8 @@ class PeopleQueryBuilder:
                     h = float(item.hip) if item.hip else 0.0
                     if w > 0 and h > 0:
                         lower_diff = (h - w) * 2.54
-                        cup_order = {
-                            'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,
-                            'G': 11, 'GG': 12, 'H': 13, 'HH': 14, 'I': 15, 'J': 16, 'K': 17
-                        }
+                        from app.modules.people.helpers import CUP_SIZE_ORDER
+                        cup_order = CUP_SIZE_ORDER
                         cup_val = cup_order.get(str(item.cup_size or "").strip().upper(), 0)
                         band_val = float(item.band_size) if item.band_size else 34.0
                         breast_score = (cup_val + (band_val - 30.0) / 2.0) if cup_val > 0 else 0.0

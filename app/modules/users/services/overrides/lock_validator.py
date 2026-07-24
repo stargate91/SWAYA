@@ -51,10 +51,3 @@ class LockValidator:
                 tags_list.append(tag_obj)
         return tags_list
 
-    def parse_watched_date(self, watched_at: Optional[Any]) -> datetime:
-        """Parses watched date safely, defaulting to current time if invalid."""
-        try:
-            return parse_datetime_utc(watched_at)
-        except ValueError as e:
-            logger.debug(f"Swallowed exception parsing watched date: {e}", exc_info=True)
-            return datetime.now(timezone.utc)

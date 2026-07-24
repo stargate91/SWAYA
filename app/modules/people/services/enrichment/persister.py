@@ -89,39 +89,10 @@ def apply_enriched_data(enricher, person: Person, data: dict):
 
     profile_path = person.profile_path
     if profile_path:
-        existing_file = None
-        tmdb_id = person.get_external_id("tmdb")
-        
-        from app.modules.media_assets.services.images import image_processing_service
-        url = image_processing_service.get_download_url(profile_path, "people") or profile_path
-        
-        if tmdb_id:
-            import os
-            clean_path = os.path.basename(profile_path)
-            filename = f"tmdb_{tmdb_id}_{clean_path}"
-        else:
-            import os
-            ext = os.path.splitext(profile_path)[1] or ".jpg"
-            if ext.lower() == ".jpeg":
-                ext = ".jpg"
-            ext_id = "unknown"
-            prov_val = "perf"
-            if person.external_links:
-                for link in person.external_links:
-                    provider_val = getattr(link.provider, "value", link.provider)
-                    if provider_val and link.external_id:
-                        prov_val = provider_val
-                        ext_id = link.external_id
-                        break
-            stem_filename = f"{prov_val}_{ext_id}"
-            from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-            existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
-            if existing_file:
-                filename = existing_file.name
-            else:
-                filename = f"{stem_filename}{ext}"
-
-        if enricher.image_downloader and not existing_file:
-            enricher.image_downloader.enqueue_download(url, "people", filename)
-        else:
-            logger.warning("No image_downloader available for profile image download")
+        from app.modules.people.helpers import resolve_and_enqueue_person_profile_image
+        resolve_and_enqueue_person_profile_image(
+            enricher.db,
+            person,
+            profile_path,
+            enricher.image_downloader
+        )

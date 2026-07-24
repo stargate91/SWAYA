@@ -122,11 +122,7 @@ class TvShowMetadataResolver:
                 keywords_list = [k["name"] for k in raw_kws.get("results", []) if isinstance(k, dict) and "name" in k]
 
         videos = (tmdb_data.get("videos") or {}).get("results") or []
-        trailer_key = None
-        youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
-        if not youtube_trailers:
-            youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
-        if youtube_trailers:
-            trailer_key = youtube_trailers[0].get("key")
+        from app.core.string_utils import extract_youtube_trailer_key
+        trailer_key = extract_youtube_trailer_key(videos)
 
         return keywords_list, trailer_key

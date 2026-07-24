@@ -28,15 +28,7 @@ router = APIRouter(prefix="/api/v1", tags=["Media Operations & Playback"])
 
 
 def _scanner_service(db: Session, scan_resolver_factory=None) -> ScannerService:
-    from app.modules.library.filesystem.fs_utils import move_with_progress, send_to_trash
-    from app.modules.settings.services.formatter_config_service import build_formatter_from_db
-    return ScannerService(
-        db,
-        scan_resolver_factory=scan_resolver_factory,
-        formatter_factory=build_formatter_from_db,
-        move_with_progress_fn=move_with_progress,
-        send_to_trash_fn=send_to_trash
-    )
+    return ScannerService.create(db, scan_resolver_factory=scan_resolver_factory)
 
 class ScanRequest(BaseModel):
     paths: List[str]

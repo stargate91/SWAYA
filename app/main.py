@@ -90,15 +90,10 @@ async def lifespan(app: FastAPI):
         with Session(engine) as session:
             settings = SettingsService(session)
             if settings.get_setting("torrent_enabled"):
-                import socket
                 import threading
                 from app.modules.torrent.services import jackett_manager, qbittorrent_watcher
+                from app.core.net_utils import is_port_in_use
                 
-                def is_port_in_use(port: int) -> bool:
-                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                        s.settimeout(1.0)
-                        return s.connect_ex(('127.0.0.1', port)) == 0
-
                 if not is_port_in_use(jackett_manager.port):
                     threading.Thread(target=jackett_manager.start, daemon=True).start()
                 

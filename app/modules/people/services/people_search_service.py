@@ -3,7 +3,7 @@ import logging
 from typing import Optional, List, Dict, Any
 from app.core.exceptions import NotFoundException, BadRequestException
 from sqlalchemy.orm import Session
-from app.core.gender_utils import map_gender_str_to_int
+from app.core.gender_utils import map_gender_str_to_int, map_gender_int_to_str
 
 
 from app.core.enums import Provider
@@ -269,7 +269,7 @@ class PeopleSearchService:
                     perf = {
                         "name": name,
                         "images": [{"url": profile_path}] if profile_path else [],
-                        "gender": "female" if gender == 1 else "male" if gender == 2 else "trans" if gender == 3 else None
+                        "gender": map_gender_int_to_str(gender)
                     }
                 else:
                     raise NotFoundException("Performer not found on provider and no details provided")
@@ -295,27 +295,16 @@ class PeopleSearchService:
             person.is_active = is_active
             db.commit()
             if profile_url:
-                try:
-                    import os
-                    from app.modules.tasks.image_download_service import ImageDownloadService
-                    from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-                    adapter = ImageDownloadService()
-                    ext = os.path.splitext(profile_url)[1].lower() or ".jpg"
-                    if ext == ".jpeg":
-                        ext = ".jpg"
-                    stem_filename = f"{provider_enum.value}_{uuid_str}"
-                    existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
-                    if existing_file:
-                        filename = existing_file.name
-                        person.local_profile_path = f"people/{filename}"
-                        db.commit()
-                    else:
-                        filename = f"{stem_filename}{ext}"
-                        person.local_profile_path = f"people/{filename}"
-                        db.commit()
-                        adapter.enqueue_download(profile_url, "people", filename)
-                except Exception as img_err:
-                    logger.warning(f"Failed to enqueue image download for adult performer {person.name}: {img_err}")
+                from app.modules.tasks.image_download_service import ImageDownloadService
+                from app.modules.people.helpers import resolve_and_enqueue_person_profile_image
+                resolve_and_enqueue_person_profile_image(
+                    db,
+                    person,
+                    profile_url,
+                    ImageDownloadService(),
+                    provider_name=provider_enum.value,
+                    external_id=uuid_str
+                )
             if is_active:
                 from app.modules.people.services.people_status_service import enqueue_person_enrichment
                 enqueue_person_enrichment(person.id)

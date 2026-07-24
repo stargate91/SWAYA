@@ -201,12 +201,7 @@ class LibraryStatsService:
             elif MediaType.is_adult_type(m.media_type):
                 unique_matches.append(m)
             elif m.media_type == MediaType.EPISODE:
-                tv_match = None
-                if m.parent and m.parent.parent:
-                    tv_match = m.parent.parent
-                elif m.parent:
-                    tv_match = m.parent
-                
+                tv_match = m.parent_show
                 if tv_match:
                     if tv_match.id not in seen_tv:
                         seen_tv.add(tv_match.id)

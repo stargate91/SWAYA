@@ -44,11 +44,8 @@ class LocalMetadataResolver:
         
         if not trailer_key and active_match and active_match.raw_metadata:
             raw_videos = active_match.raw_metadata.get("videos", {}).get("results", [])
-            youtube_trailers = [v for v in raw_videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
-            if not youtube_trailers:
-                youtube_trailers = [v for v in raw_videos if v.get("site") == "YouTube" and v.get("key")]
-            if youtube_trailers:
-                trailer_key = youtube_trailers[0].get("key")
+            from app.core.string_utils import extract_youtube_trailer_key
+            trailer_key = extract_youtube_trailer_key(raw_videos)
 
         if not trailer_key and active_match and active_match.provider == Provider.TMDB and active_match.external_id:
             try:
@@ -56,11 +53,8 @@ class LocalMetadataResolver:
                 tmdb_data = tmdb_scraper.get_details(tmdb_id_int, "movie", language=ui_lang)
                 if tmdb_data:
                     videos = (tmdb_data.get("videos") or {}).get("results") or []
-                    youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
-                    if not youtube_trailers:
-                        youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
-                    if youtube_trailers:
-                        trailer_key = youtube_trailers[0].get("key")
+                    from app.core.string_utils import extract_youtube_trailer_key
+                    trailer_key = extract_youtube_trailer_key(videos)
             except Exception as e:
                 logger.error(f"Failed to fetch live trailer fallback: {e}")
 

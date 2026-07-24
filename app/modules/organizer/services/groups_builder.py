@@ -166,35 +166,14 @@ class OrganizerGroupsBuilder:
                 target_image_path = self.img_service.get_original_path("scene_stills", image_filename)
                 
                 if not Path(target_image_path).exists() and Path(item.current_path).exists():
-                    from app.modules.library.filesystem.fs_utils import to_win_long_path
+                    from app.modules.library.filesystem.fs_utils import to_win_long_path, get_video_duration
                     import subprocess
                     long_path = to_win_long_path(item.current_path)
-                    
-                    cmd_duration = [
-                        'ffprobe', '-v', 'error',
-                        '-show_entries', 'format=duration',
-                        '-of', 'default=noprint_wrappers=1:nokey=1',
-                        long_path
-                    ]
-                    try:
-                        res_duration = subprocess.run(cmd_duration, capture_output=True, text=True, check=True, timeout=10)
-                        duration = float(res_duration.stdout.strip())
-                    except Exception:
-                        duration = 0.0
+                    duration = get_video_duration(item.current_path)
 
                     seek_seconds = duration * 0.5
-                    cmd_extract = [
-                        'ffmpeg', '-y',
-                        '-ss', f'{seek_seconds:.3f}',
-                        '-i', long_path,
-                        '-vframes', '1',
-                        '-q:v', '2',
-                        str(target_image_path)
-                    ]
-                    try:
-                        subprocess.run(cmd_extract, capture_output=True, check=True, timeout=15)
-                    except Exception as e:
-                        logger.error(f"Failed to dynamically extract still for offline video {item.id}: {e}")
+                    from app.modules.library.filesystem.fs_utils import extract_video_still
+                    extract_video_still(item.current_path, target_image_path, seek_seconds)
                 
                 resolved_img = self.img_service.resolve_image_url(f"scene_stills/{image_filename}", "scene_stills")
                 images_list = [{"path": resolved_img}] if resolved_img else []

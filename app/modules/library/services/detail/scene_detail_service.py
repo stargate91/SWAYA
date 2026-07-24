@@ -8,9 +8,9 @@ from app.modules.users.models import UserOverride
 from app.modules.scrapers.support.registry import ProviderRegistry
 
 from app.modules.metadata.models import Studio, MetadataMatch
-from app.modules.library.services.detail._detail_formatter import DetailFormatter
 from app.modules.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
 from app.core.date_utils import get_year_from_date
+from app.core.gender_utils import map_gender_int_to_str
 
 # Sub-services
 from app.modules.library.services.detail.scene.cast_builder import SceneCastBuilder
@@ -30,15 +30,18 @@ def _strip_provider_prefix(value: str) -> str:
         cleaned = rest
     return cleaned
 
-class SceneDetailService(DetailFormatter):
+class SceneDetailService:
     def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[Any] = None):
-        super().__init__()
         self.db = db
         self.scrapers = scrapers
         self.image_downloader = image_downloader
         self.cast_builder = SceneCastBuilder()
         self.playback_resolver = ScenePlaybackResolver()
         self.metadata_syncer = SceneMetadataSyncer()
+
+    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
+        from app.modules.media_assets.services.images import image_processing_service
+        return image_processing_service.resolve_image_url(path, subfolder, size)
 
     def get_scene_detail(self, item_id: str) -> Any:
         from app.modules.library.schemas import SceneDetailResponse
@@ -78,46 +81,26 @@ class SceneDetailService(DetailFormatter):
             prov_enum = ProviderRegistry.get_provider_by_prefix(provider_prefix)
         
         match = None
+        from sqlalchemy import or_, desc
+        query = db.query(MetadataMatch).filter(
+            MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
+        )
         if prov_enum:
-            from sqlalchemy import or_
-            match = db.query(MetadataMatch).filter(
-                MetadataMatch.provider == prov_enum,
+            query = query.filter(MetadataMatch.provider == prov_enum)
+        
+        if prov_enum == Provider.PORNDB or not prov_enum:
+            query = query.filter(
                 or_(
                     MetadataMatch.external_id == scene_uuid,
                     MetadataMatch.external_id == f"scene_{scene_uuid}"
-                ) if prov_enum == Provider.PORNDB else MetadataMatch.external_id == scene_uuid,
-                MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
-                MetadataMatch.media_item_id.isnot(None)
-            ).first()
-            if not match:
-                match = db.query(MetadataMatch).filter(
-                    MetadataMatch.provider == prov_enum,
-                    or_(
-                        MetadataMatch.external_id == scene_uuid,
-                        MetadataMatch.external_id == f"scene_{scene_uuid}"
-                    ) if prov_enum == Provider.PORNDB else MetadataMatch.external_id == scene_uuid,
-                    MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
-                ).first()
+                )
+            )
         else:
-            from sqlalchemy import or_
-            match = db.query(MetadataMatch).filter(
-                or_(
-                    MetadataMatch.external_id == scene_uuid,
-                    MetadataMatch.external_id == f"scene_{scene_uuid}"
-                ),
-                MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
-                MetadataMatch.media_item_id.isnot(None)
-            ).first()
-            if not match:
-                match = db.query(MetadataMatch).filter(
-                    or_(
-                        MetadataMatch.external_id == scene_uuid,
-                        MetadataMatch.external_id == f"scene_{scene_uuid}"
-                    ),
-                    MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
-                ).first()
-            if match:
-                prov_enum = match.provider
+            query = query.filter(MetadataMatch.external_id == scene_uuid)
+
+        match = query.order_by(desc(MetadataMatch.media_item_id.isnot(None))).first()
+        if match and not prov_enum:
+            prov_enum = match.provider
             
         from app.core.cache_service import CacheService
         cache_srv = CacheService()
@@ -140,7 +123,11 @@ class SceneDetailService(DetailFormatter):
                     scene_data = scraper.fetch_scene(scene_uuid)
                     if not scene_data and effective_provider == Provider.PORNDB:
                         scene_data = scraper.fetch_scene(f"scene_{scene_uuid}")
-                except Exception:
+                except Exception as e:
+                    import traceback
+                    print(f"[ERROR] SceneDetailService.get_scene_detail fetch_scene raised exception: {e}")
+                    traceback.print_exc()
+                    logger.exception("Failed to fetch scene from scraper")
                     scene_data = None
 
             # Store in APICache permanently if fetched successfully
@@ -203,7 +190,7 @@ class SceneDetailService(DetailFormatter):
                             "parent": {
                                 "id": person_obj.id,
                                 "name": person_obj.name,
-                                "gender": "female" if person_obj.gender == 1 else "male" if person_obj.gender == 2 else "",
+                                "gender": map_gender_int_to_str(person_obj.gender) or "",
                                 "profile_path": person_obj.local_profile_path or person_obj.profile_path
                             }
                         })

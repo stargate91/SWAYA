@@ -60,27 +60,15 @@ def finalize_file(temp_path: Path, target_path: Path, url: Optional[str] = None)
                 img.verify()
             
             from app.core.enums import MediaSubfolder
+            from app.modules.media_assets.services.images.image_helpers import resize_and_convert_image
             # Open again to process/resize if needed
             with Image.open(temp_path) as img:
                 img_format = img.format or "JPEG"
                 if MediaSubfolder.SCENE_STILLS in target_path.parts or MediaSubfolder.BACKDROPS in target_path.parts:
                     width, height = img.size
                     if width > 3840 or height > 3840:
-                        if width >= height:
-                            new_width = 3840
-                            new_height = int(height * (3840.0 / float(width)))
-                        else:
-                            new_height = 3840
-                            new_width = int(width * (3840.0 / float(height)))
-                        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-                        need_save = True
-
-                if need_save:
-                    if img_format == "JPEG" and img.mode in ("RGBA", "LA", "P"):
-                        img = img.convert("RGB")
-                    elif img_format == "JPEG" and img.mode != "RGB":
-                        img = img.convert("RGB")
-                    img.save(temp_path, img_format)
+                        img = resize_and_convert_image(img, 3840, 3840, img_format)
+                        img.save(temp_path, img_format)
         except Exception as e:
             logger.error(f"Image verification/processing failed: {e}")
             return None
@@ -89,7 +77,10 @@ def finalize_file(temp_path: Path, target_path: Path, url: Optional[str] = None)
         target_path = target_path.with_suffix(".svg")
 
     if target_path.exists():
-        target_path.unlink()
+        try:
+            target_path.unlink()
+        except Exception as e:
+            logger.warning(f"Could not delete existing target image path: {target_path} (it may be locked). Error: {e}")
     target_path.parent.mkdir(parents=True, exist_ok=True)
     temp_path.replace(target_path)
     return str(target_path)

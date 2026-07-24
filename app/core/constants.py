@@ -87,14 +87,14 @@ DATABASE_TIMEOUT_SECONDS = 30
 DEFAULT_VIDEO_EXTS = {'.mkv', '.mp4', '.avi', '.m4v', '.mov', '.wmv', '.mpg', '.mpeg'}
 DEFAULT_SUBTITLE_EXTS = {'.srt', '.sub', '.ass', '.ssa', '.idx', '.vtt'}
 DEFAULT_IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
-DEFAULT_AUDIO_EXTS = {'.ac3', '.dts', '.flac', '.mp3', '.aac', '.m4a'}
+DEFAULT_AUDIO_EXTS = {'.ac3', '.dts', '.flac', '.mp3', '.aac', '.m4a', '.mka', '.wav'}
 DEFAULT_META_EXTS = {'.nfo', '.xml', '.json', '.txt'}
 
-CATEGORIZER_VIDEO_EXTS = {'.mp4', '.mkv', '.avi', '.mov', '.wmv', '.m4v'}
-CATEGORIZER_SUBTITLE_EXTS = {'.srt', '.sub', '.ass', '.ssa', '.vtt'}
-CATEGORIZER_IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
-CATEGORIZER_AUDIO_EXTS = {'.mka', '.ac3', '.dts', '.mp3', '.flac', '.wav', '.m4a'}
-CATEGORIZER_META_EXTS = {'.nfo', '.xml', '.txt'}
+CATEGORIZER_VIDEO_EXTS = DEFAULT_VIDEO_EXTS - {'.mpg', '.mpeg'}
+CATEGORIZER_SUBTITLE_EXTS = DEFAULT_SUBTITLE_EXTS - {'.idx'}
+CATEGORIZER_IMAGE_EXTS = DEFAULT_IMAGE_EXTS
+CATEGORIZER_AUDIO_EXTS = DEFAULT_AUDIO_EXTS - {'.aac'}
+CATEGORIZER_META_EXTS = DEFAULT_META_EXTS - {'.json'}
 
 # Keyword mapping for automated subtype detection
 SCANNER_SUBTYPE_MAP = {

@@ -95,18 +95,9 @@ class QBittorrentCompletionWatcher:
         try:
             from app.core.database import SessionLocal
             from app.modules.library.services.scanner_service import ScannerService
-            from app.modules.scrapers.scan_resolver import ScanResolver
-            from app.modules.library.filesystem.fs_utils import move_with_progress, send_to_trash
-            from app.modules.settings.services.formatter_config_service import build_formatter_from_db
             
             db = SessionLocal()
-            scanner = ScannerService(
-                db,
-                scan_resolver_factory=ScanResolver,
-                formatter_factory=build_formatter_from_db,
-                move_with_progress_fn=move_with_progress,
-                send_to_trash_fn=send_to_trash
-            )
+            scanner = ScannerService.create(db)
             
             logger.info(f"Triggering auto-scan for completed torrent paths: {paths}")
             scanner.start_scan(paths=paths)

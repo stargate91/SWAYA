@@ -13,7 +13,7 @@ class PornDBScraper(BaseStashGraphQLScraper):
 
     def __init__(self, settings, cache_service=None):
         super().__init__(settings, cache_service, Provider.PORNDB)
-        self.client = PornDbClient(settings)
+        self.client = PornDbClient(settings, session=self.session)
 
     def _fetch_rating(
         self,
@@ -26,34 +26,24 @@ class PornDBScraper(BaseStashGraphQLScraper):
             "movie": MediaType.MOVIE,
         }.get(rating_type, MediaType.SCENE)
         cache_key = f"porndb/rating/{rating_type}/v1/{identifier}"
-        cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
-        if cached_data is not None:
-            if cached_data.get("cached_error"):
-                return None
-            rating = cached_data.get("rating")
+        url = f"{PORNDB_API_BASE}/{rating_type}s/{identifier}"
+        headers = self.client._get_headers()
+        
+        data = self.get_json_cached(
+            provider=Provider.PORNDB,
+            cache_key=cache_key,
+            url=url,
+            headers=headers,
+            force_refresh=force_refresh,
+            media_type=media_type,
+            external_id=str(identifier),
+            result_extractor=lambda x: x.get("data") if x else None,
+            timeout=SCRAPER_REQUEST_TIMEOUT
+        )
+        if data:
+            rating = data.get("rating")
             return float(rating) if rating is not None else None
-
-        rating = self.client.get_rating(rating_type, identifier)
-        if rating is not None:
-            self.cache.set(
-                Provider.PORNDB,
-                cache_key,
-                {"rating": rating},
-                status_code=200,
-                media_type=media_type,
-                external_id=str(identifier),
-            )
-            return rating
-        else:
-            self.cache.set(
-                Provider.PORNDB,
-                cache_key,
-                {"cached_error": True},
-                status_code=404,
-                media_type=media_type,
-                external_id=str(identifier),
-            )
-            return None
+        return None
 
     def fetch_performer_rating(self, performer_id: str, force_refresh: bool = False) -> Optional[float]:
         return self._fetch_rating(performer_id, "performer", force_refresh)
@@ -74,11 +64,30 @@ class PornDBScraper(BaseStashGraphQLScraper):
             scene["rating_porndb"] = self.fetch_scene_rating(str(scene["id"]))
         return scene
 
+    def fetch_performer_bio(self, performer_id: str, force_refresh: bool = False) -> Optional[dict]:
+        headers = self.client._get_headers()
+        if not headers:
+            return None
+        cache_key = f"porndb/performer/bio/v1/{performer_id}"
+        url = f"{PORNDB_API_BASE}/performers/{performer_id}"
+        
+        return self.get_json_cached(
+            provider=Provider.PORNDB,
+            cache_key=cache_key,
+            url=url,
+            headers=headers,
+            force_refresh=force_refresh,
+            media_type=MediaType.PERSON,
+            external_id=str(performer_id),
+            result_extractor=lambda x: x.get("data") if x else None,
+            timeout=SCRAPER_REQUEST_TIMEOUT
+        )
+
     def get_performer_details(self, performer_id: str) -> Optional[dict]:
         details = super().get_performer_details(performer_id)
         if details:
             details["rating_porndb"] = self.fetch_performer_rating(performer_id)
-            rest_data = self.client.get_performer_bio(performer_id)
+            rest_data = self.fetch_performer_bio(performer_id)
             if rest_data:
                 if rest_data.get("bio"):
                     details["details"] = rest_data["bio"]
@@ -99,37 +108,40 @@ class PornDBScraper(BaseStashGraphQLScraper):
         if not file_hash:
             return None
         cache_key = f"porndb/movie/hash/v1/{hash_type.lower()}/{file_hash}"
-        cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
-        if cached_data is not None:
-            return None if cached_data.get("cached_error") or not cached_data else cached_data
-
-        res_json = self.client.get_movie_by_hash(file_hash, hash_type)
-        data = res_json.get("data") if res_json else None
-        self.cache.set(
-            Provider.PORNDB,
-            cache_key,
-            data or {},
-            status_code=200 if data else 404,
+        url = f"{PORNDB_API_BASE}/movies/hash/{file_hash}"
+        headers = self.client._get_headers()
+        params = {"type": hash_type}
+        
+        data = self.get_json_cached(
+            provider=Provider.PORNDB,
+            cache_key=cache_key,
+            url=url,
+            method="GET",
+            params=params,
+            headers=headers,
+            force_refresh=force_refresh,
             media_type=MediaType.MOVIE,
-            external_id=str(data.get("id")) if data else None,
+            external_id=lambda x: str(x.get("id")) if x and x.get("id") else None,
+            result_extractor=lambda x: x.get("data") if x else None,
+            timeout=SCRAPER_REQUEST_TIMEOUT
         )
         return self.enrich_movie_ratings(data) if data else None
 
     def fetch_movie(self, movie_id: str, force_refresh: bool = False) -> Optional[dict]:
         cache_key = f"porndb/movie/v1/{movie_id}"
-        cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
-        if cached_data is not None:
-            return None if cached_data.get("cached_error") or not cached_data else cached_data
-
-        res_json = self.client.get_movie_details(movie_id)
-        data = res_json.get("data") if res_json else None
-        self.cache.set(
-            Provider.PORNDB,
-            cache_key,
-            data or {},
-            status_code=200 if data else 404,
+        url = f"{PORNDB_API_BASE}/movies/{movie_id}"
+        headers = self.client._get_headers()
+        
+        data = self.get_json_cached(
+            provider=Provider.PORNDB,
+            cache_key=cache_key,
+            url=url,
+            headers=headers,
+            force_refresh=force_refresh,
             media_type=MediaType.MOVIE,
             external_id=str(movie_id),
+            result_extractor=lambda x: x.get("data") if x else None,
+            timeout=SCRAPER_REQUEST_TIMEOUT
         )
         return self.enrich_movie_ratings(data) if data else None
 
@@ -138,27 +150,25 @@ class PornDBScraper(BaseStashGraphQLScraper):
         if not normalized_query:
             return []
 
-        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-        if not api_token:
-            logger.warning("PornDB API key not configured.")
-            return []
-
-        headers = {
-            "Authorization": f"Bearer {api_token}",
-            "Accept": "application/json",
-        }
         try:
-            resp = self.session.get(
-                f"{PORNDB_API_BASE}/performers",
-                params={"q": normalized_query, "page": page},
+            cache_key = f"porndb/performer/search/v1/{normalized_query.lower()}/{page}"
+            url = f"{PORNDB_API_BASE}/performers"
+            headers = self.client._get_headers()
+            params = {"q": normalized_query, "page": page}
+            
+            resp_json = self.get_json_cached(
+                provider=Provider.PORNDB,
+                cache_key=cache_key,
+                url=url,
+                params=params,
                 headers=headers,
-                timeout=SCRAPER_REQUEST_TIMEOUT,
+                media_type=MediaType.PERSON,
+                timeout=SCRAPER_REQUEST_TIMEOUT
             )
-            if resp.status_code != 200:
-                logger.error(f"PornDB REST performers search failed with status {resp.status_code}")
+            if not resp_json:
                 return super().search_performers(normalized_query)
 
-            performers = resp.json().get("data") or []
+            performers = resp_json.get("data") or []
             formatted = []
             for perf in performers:
                 parent = perf.get("parent") or perf
@@ -197,20 +207,24 @@ class PornDBScraper(BaseStashGraphQLScraper):
             return []
 
         cache_key = f"porndb/movie/search/v1/{normalized_query.lower()}/{year or 'all'}/{page}"
-        cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
-        if cached_data is not None:
-            return [] if cached_data.get("cached_error") else cached_data.get("data", [])
+        url = f"{PORNDB_API_BASE}/movies"
+        headers = self.client._get_headers()
+        params = {"q": normalized_query, "per_page": max(1, min(per_page, 25)), "page": page}
+        if year:
+            params["year"] = year
 
-        res_json = self.client.search_movies(normalized_query, year, per_page, page=page)
-        movies = res_json.get("data") or [] if res_json else []
-        self.cache.set(
-            Provider.PORNDB,
-            cache_key,
-            {"data": movies},
-            status_code=200 if res_json else 404,
+        cached_resp = self.get_json_cached(
+            provider=Provider.PORNDB,
+            cache_key=cache_key,
+            url=url,
+            params=params,
+            headers=headers,
+            force_refresh=force_refresh,
             media_type=MediaType.MOVIE,
+            result_extractor=lambda x: {"data": x.get("data") or []} if x else None,
+            timeout=SCRAPER_REQUEST_TIMEOUT
         )
-        return movies
+        return cached_resp.get("data", []) if cached_resp else []
 
     def fetch_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
         """Queries ThePornDB GraphQL endpoint for scene info. Always mapped to English locale."""
@@ -320,3 +334,38 @@ class PornDBScraper(BaseStashGraphQLScraper):
             "image": data.get("image")
         }
         return mapped
+
+    @staticmethod
+    def extract_poster(data: dict) -> Optional[str]:
+        if not data or not isinstance(data, dict):
+            return None
+        for key in ("image", "poster_image", "poster", "front_image", "cover"):
+            val = data.get(key)
+            if isinstance(val, str) and val.startswith("http"):
+                return val
+            if isinstance(val, dict):
+                for k in ("large", "medium", "url", "original", "small"):
+                    if isinstance(val.get(k), str) and val.get(k).startswith("http"):
+                        return val.get(k)
+        posters = data.get("posters")
+        if isinstance(posters, dict):
+            for k in ("large", "medium", "url", "original", "small"):
+                if isinstance(posters.get(k), str) and posters.get(k).startswith("http"):
+                    return posters.get(k)
+        elif isinstance(posters, str) and posters.startswith("http"):
+            return posters
+        return None
+
+    @staticmethod
+    def extract_backdrop(data: dict) -> Optional[str]:
+        if not data or not isinstance(data, dict):
+            return None
+        for key in ("backdrop", "backdrops", "banner", "fanart"):
+            val = data.get(key)
+            if isinstance(val, str) and val.startswith("http"):
+                return val
+            if isinstance(val, dict):
+                for k in ("large", "medium", "url", "original"):
+                    if isinstance(val.get(k), str) and val.get(k).startswith("http"):
+                        return val.get(k)
+        return None

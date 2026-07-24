@@ -687,14 +687,9 @@ class MediaItemService:
             except ValueError as e:
                 logger.debug(f"Swallowed exception in modules/library/media_repository.py:629: {e}", exc_info=True)
 
-        current_parents = {r[0] for r in parent_query.all()}
-        while current_parents:
-            parent_ids.update(current_parents)
-            current_parents = {
-                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id.isnot(None)
-                ).all()
-            }
+        initial_parents = {r[0] for r in parent_query.all()}
+        from app.modules.metadata.helpers import get_all_parent_match_ids
+        parent_ids = get_all_parent_match_ids(self.db, initial_parents)
             
         all_valid_match_ids = library_match_ids.union(parent_ids)
         return all_valid_match_ids
@@ -717,19 +712,13 @@ class MediaItemService:
         }
 
         # Traverse parent IDs to include TV show and season matches
-        parent_ids = set()
-        current_parents = {
+        initial_parents = {
             m.parent_id for m in self.db.query(MetadataMatch).join(MediaItem).filter(
                 MediaItem.status.in_(status_enums)
             ).filter(MetadataMatch.is_active, MetadataMatch.parent_id.isnot(None)).all()
         }
-        while current_parents:
-            parent_ids.update(current_parents)
-            current_parents = {
-                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id.isnot(None)
-                ).all()
-            }
+        from app.modules.metadata.helpers import get_all_parent_match_ids
+        parent_ids = get_all_parent_match_ids(self.db, initial_parents)
             
         all_valid_match_ids = list(matched_match_ids.union(parent_ids))
         return all_valid_match_ids

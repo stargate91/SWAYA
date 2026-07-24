@@ -39,6 +39,7 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
         tv_match.number_of_seasons = tv_details.get("number_of_seasons")
         tv_match.number_of_episodes = tv_details.get("number_of_episodes")
 
+        tv_first_air_date = tv_details.get("first_air_date")
         if tv_first_air_date:
             parsed = parse_date(tv_first_air_date)
             if parsed:

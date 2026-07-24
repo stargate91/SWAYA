@@ -65,26 +65,14 @@ class PerformerPersister:
             ext = ".jpg"
 
         re.sub(r"[^A-Za-z0-9_.-]+", "_", person.name).strip("_")
-        ext_id = "unknown"
-        prov_val = "perf"
-        if person.external_links:
-            for link in person.external_links:
-                provider_val = getattr(link.provider, "value", link.provider)
-                if provider_val and link.external_id:
-                    prov_val = provider_val
-                    ext_id = link.external_id
-                    break
-        stem_filename = f"{prov_val}_{ext_id}"
-        from app.modules.media_assets.services.images import image_processing_service
-        from app.modules.media_assets.services.images import image_path_resolver
-        existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
-        if existing_file:
-            person.local_profile_path = f"people/{existing_file.name}"
-            return
-
-        filename = f"{stem_filename}{ext}"
-        person.local_profile_path = f"people/{filename}"
-        self.image_downloader.enqueue_download(url, "people", filename)
+        from app.modules.people.helpers import resolve_and_enqueue_person_profile_image
+        resolve_and_enqueue_person_profile_image(
+            self.db,
+            person,
+            url,
+            self.image_downloader,
+            ext=ext
+        )
 
     def persist_performers(self, performers_info: List[Dict[str, Any]], match: MetadataMatch, limit_cast: int = 15):
         person_service = PersonService(self.db)
