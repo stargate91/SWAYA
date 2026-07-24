@@ -1,6 +1,8 @@
 import logging
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
+from app.core.date_utils import parse_date
+
 
 
 
@@ -133,20 +135,6 @@ class PeopleDetailService:
     def scrape_healthyceleb(self, person_id: Any, url: Optional[str] = None) -> Dict[str, Any]:
         return scrape_healthyceleb_data(self.db, person_id, url)
 
-        # Child protection check: filter out physical fields if underage (SFW < 18y + 2w)
-        if not person.is_adult:
-            effective_bday = person.birthday or extracted.get("date_of_birth")
-            if effective_bday:
-                from app.modules.people.helpers import calculate_underage_threshold
-                from datetime import date
-                today = date.today()
-                threshold = calculate_underage_threshold(effective_bday)
-                if threshold and threshold > today:
-                    for k in ["height", "weight", "hair_color", "eye_color", "measurements", "cup_size", "band_size", "waist", "hip", "breast_type", "butt_shape", "butt_size"]:
-                        extracted.pop(k, None)
-
-        return extracted
-
     def scrape_celebrityinside(self, person_id: Any) -> Dict[str, Any]:
         return scrape_celebrityinside_data(self.db, person_id)
 
@@ -157,19 +145,16 @@ def scrape_healthyceleb_data(db: Session, person_id: Any, url: Optional[str] = N
     import unicodedata
     from datetime import datetime
     from html.parser import HTMLParser
-    from fastapi import HTTPException
+    from app.core.string_utils import slugify_name
+    from app.core.exceptions import NotFoundException, BadRequestException, AppException
     from app.modules.people.models import Person
 
     person = db.query(Person).filter(Person.id == person_id).first()
     if not person:
-        raise HTTPException(status_code=404, detail="Person not found")
+        raise NotFoundException("Person not found")
 
     if not url:
-        # Clean name to form the slug
-        clean_name = person.name.lower().strip()
-        clean_name = "".join(c for c in unicodedata.normalize('NFD', clean_name) if unicodedata.category(c) != 'Mn')
-        clean_name = re.sub(r'[^a-z0-9\s-]', '', clean_name)
-        clean_name = re.sub(r'[\s-]+', '-', clean_name)
+        clean_name = slugify_name(person.name)
         url = f"https://healthyceleb.com/{clean_name}-height-weight-body-statistics/"
 
     headers = {
@@ -187,12 +172,12 @@ def scrape_healthyceleb_data(db: Session, person_id: Any, url: Optional[str] = N
                 alt_url = url + "/"
             res = requests.get(alt_url, headers=headers, timeout=10)
             if res.status_code != 200:
-                raise HTTPException(status_code=400, detail=f"HealthyCeleb page not found for {person.name} (Tried: {url} and {alt_url})")
+                raise BadRequestException(f"HealthyCeleb page not found for {person.name} (Tried: {url} and {alt_url})")
             url = alt_url
     except Exception as e:
-        if isinstance(e, HTTPException):
+        if isinstance(e, AppException):
             raise e
-        raise HTTPException(status_code=400, detail=f"Failed to connect to HealthyCeleb: {str(e)}")
+        raise BadRequestException(f"Failed to connect to HealthyCeleb: {str(e)}")
 
     html_content = res.text
 
@@ -350,15 +335,10 @@ def scrape_healthyceleb_data(db: Session, person_id: Any, url: Optional[str] = N
         raw_dob = data["date of birth"].strip()
         # Clean up text inside parentheses if any (e.g. "June 1, 1990 (age 30)")
         clean_dob = re.sub(r'\s*\([^)]*\)', '', raw_dob).strip()
-        parsed_date = None
-        for fmt in ("%B %d, %Y", "%d %B %Y", "%B %d %Y", "%Y-%m-%d"):
-            try:
-                parsed_date = datetime.strptime(clean_dob, fmt).date()
-                break
-            except ValueError:
-                continue
+        parsed_date = parse_date(clean_dob, formats=["%B %d, %Y", "%d %B %Y", "%B %d %Y", "%Y-%m-%d"])
         if parsed_date:
             extracted["date_of_birth"] = parsed_date
+
 
     extracted["source_url"] = url
 
@@ -380,18 +360,14 @@ def scrape_healthyceleb_data(db: Session, person_id: Any, url: Optional[str] = N
 def scrape_celebrityinside_data(db: Session, person_id: Any) -> Dict[str, Any]:
     import re
     import requests
-    import unicodedata
+    from app.core.string_utils import slugify_name
     from app.modules.people.models import Person
 
     person = db.query(Person).filter(Person.id == person_id).first()
     if not person:
         return {}
 
-    # Clean name to form the slug
-    clean_name = person.name.lower().strip()
-    clean_name = "".join(c for c in unicodedata.normalize('NFD', clean_name) if unicodedata.category(c) != 'Mn')
-    clean_name = re.sub(r'[^a-z0-9\s-]', '', clean_name)
-    clean_name = re.sub(r'[\s-]+', '-', clean_name)
+    clean_name = slugify_name(person.name)
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
@@ -418,10 +394,7 @@ def scrape_celebrityinside_data(db: Session, person_id: Any) -> Dict[str, Any]:
                     target_url = url
                     break
             except Exception as e:
-                try:
-                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                except Exception:
-                    pass
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
                 continue
         if html_content:
             break

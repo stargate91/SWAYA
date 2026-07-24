@@ -17,19 +17,19 @@ from app.modules.metadata.services.metadata_search_service import MetadataSearch
 logger = logging.getLogger(__name__)
 
 class MetadataService:
-    def __init__(self, db: Session, scrapers: Any, media_resolver: Optional[Any] = None):
+    def __init__(self, db: Session, scrapers: Optional[Any] = None, media_resolver: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
-        self.tmdb = scrapers.tmdb(db)
+        self.tmdb = scrapers.get_scraper(Provider.TMDB, db) if scrapers else None
         if media_resolver is None:
             from app.modules.library.services.media_item_service import MediaItemService
             media_resolver = MediaItemService(db)
         self.media_resolver = media_resolver
         
         # Instantiate sub-services
-        self.resolver = MetadataResolver(db, scrapers, self.tmdb, media_resolver=media_resolver, metadata_repo=self)
+        self.resolver = MetadataResolver(db, scrapers, self.tmdb, media_resolver=media_resolver, metadata_repo=self) if scrapers else None
         self.sync_service = MetadataSyncService()
-        self.search_service = MetadataSearchService(db, scrapers, self.tmdb, media_resolver=media_resolver)
+        self.search_service = MetadataSearchService(db, scrapers, self.tmdb, media_resolver=media_resolver) if scrapers else None
 
     def search_metadata(self, query: str, item_type: str = "movie", year: Optional[int] = None, language: Optional[str] = None, provider: Optional[str] = None, include_adult: bool = False, season: Optional[int] = None, episode: Optional[int] = None) -> List[Dict[str, Any]]:
         return self.search_service.search_metadata(

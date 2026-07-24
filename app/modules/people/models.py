@@ -281,95 +281,21 @@ class Person(Base):
         has_manual_butt_size = manual_link and manual_link.source_data and manual_link.source_data.get("butt_size")
         has_manual_breast_size = manual_link and manual_link.source_data and manual_link.source_data.get("breast_size")
         
+        from app.modules.people.helpers import calculate_butt_size, calculate_breast_size
+
         butt_size = None
         if not has_manual_butt_size:
             calc_height = height if height is not None else self.height
             calc_waist = waist if waist is not None else self.waist
             calc_hip = hip if hip is not None else self.hip
-            if calc_height is not None and calc_waist is not None and calc_hip is not None:
-                try:
-                    # Normalise to INCHES (since the scale 33/40/50 is calibrated for inches)
-                    w_in = float(calc_waist)
-                    if w_in >= 50:
-                        w_in /= 2.54
-                    h_in = float(calc_hip)
-                    if h_in >= 50:
-                        h_in /= 2.54
-                    
-                    height_in = float(calc_height) / 2.54
-                    fah = h_in / (height_in * 0.53)
-                    whr = w_in / h_in
-                    ccf = 0.72 / whr
-                    bcs = h_in * fah * ccf
-                    
-                    if bcs < 33:
-                        butt_size = "SMALL"
-                    elif bcs < 40:
-                        butt_size = "MEDIUM"
-                    elif bcs < 50:
-                        butt_size = "BIG"
-                    else:
-                        butt_size = "EXTRA_BIG"
-                except (ValueError, TypeError, ZeroDivisionError) as e:
-                    try:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                    except Exception:
-                        pass
-                    pass
+            butt_size = calculate_butt_size(calc_height, calc_waist, calc_hip)
 
         breast_size = None
         if not has_manual_breast_size:
             calc_cup = cup_size if cup_size is not None else self.cup_size
             calc_band = band_size if band_size is not None else self.band_size
             calc_height = height if height is not None else self.height
-
-            if calc_cup and calc_band:
-                try:
-                    cup_str = str(calc_cup).strip().upper()
-                    cup_map = {
-                        "A": 1, "B": 2, "C": 3, "D": 4, "DD": 5, "E": 5,
-                        "DDD": 6, "F": 6, "DDDD": 7, "G": 7, "H": 8, "I": 9, "J": 10, "K": 11
-                    }
-                    cup_val = cup_map.get(cup_str, 0)
-                    if cup_val == 0:
-                        if cup_str.startswith("A"):
-                            cup_val = 1
-                        elif cup_str.startswith("B"):
-                            cup_val = 2
-                        elif cup_str.startswith("C"):
-                            cup_val = 3
-                        elif cup_str.startswith("D"):
-                            cup_val = 4
-                        elif "E" in cup_str:
-                            cup_val = 5
-                        elif "F" in cup_str:
-                            cup_val = 6
-                        elif "G" in cup_str:
-                            cup_val = 7
-                        elif "H" in cup_str:
-                            cup_val = 8
-                        else:
-                            cup_val = 4
-
-                    band_val = float(calc_band)
-                    height_val = float(calc_height) if calc_height is not None else 165.0
-
-                    index = cup_val + (band_val - 32.0) * 0.5 - (height_val - 165.0) * 0.05
-
-                    if index < 2.5:
-                        breast_size = "SMALL"
-                    elif index < 4.5:
-                        breast_size = "MEDIUM"
-                    elif index < 6.5:
-                        breast_size = "BIG"
-                    else:
-                        breast_size = "EXTRA_BIG"
-                except (ValueError, TypeError) as e:
-                    try:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                    except Exception:
-                        pass
-                    pass
+            breast_size = calculate_breast_size(calc_cup, calc_band, calc_height)
 
         if butt_shape:
             self.butt_shape = butt_shape

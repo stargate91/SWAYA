@@ -7,6 +7,8 @@ from app.modules.metadata.models import MetadataMatch, MetadataLocalization
 from app.core.enums import Provider
 from app.core.language import LanguageService
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.date_utils import parse_date
+
 
 from app.modules.scrapers.enrichment.parsers import (
     enrich_movie,
@@ -47,13 +49,13 @@ class TMDBEnrichmentParser:
         match.popularity = details.get("popularity")
         match.rating_tmdb = details.get("vote_average")
         match.vote_count_tmdb = details.get("vote_count")
-        
         release_date = details.get("release_date") or details.get("first_air_date")
         if release_date:
-            try:
-                match.release_date = datetime.strptime(release_date, "%Y-%m-%d")
-            except Exception as e:
-                logger.debug(f"Swallowed exception in modules/scrapers/enrichment/tmdb_parser.py:55: {e}", exc_info=True)
+            parsed = parse_date(release_date)
+            if parsed:
+                match.release_date = datetime(parsed.year, parsed.month, parsed.day)
+
+
         
         ext_ids = details.get("external_ids", {})
         imdb_id = ext_ids.get("imdb_id") or match.imdb_id

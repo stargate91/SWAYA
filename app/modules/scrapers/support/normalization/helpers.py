@@ -17,13 +17,12 @@ def normalize_tag_names(raw_tags: Any) -> List[str]:
             names.setdefault(normalized.casefold(), normalized)
     return list(names.values())
 
+from app.core.date_utils import parse_date
+
 def safe_parse_date(date_str: Optional[str]) -> Optional[datetime]:
     """Safely parse date strings from APIs into datetime objects."""
-    if not date_str:
-        return None
-    for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%d %H:%M:%S"):
-        try:
-            return datetime.strptime(date_str[:10], "%Y-%m-%d")
-        except ValueError:
-            continue
+    parsed = parse_date(date_str)
+    if parsed:
+        return datetime(parsed.year, parsed.month, parsed.day)
     return None
+

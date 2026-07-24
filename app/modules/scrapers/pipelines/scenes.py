@@ -31,7 +31,8 @@ class StashDbSceneResolverPipeline(BaseResolverPipeline):
         language: str = DEFAULT_FALLBACK_LANGUAGE,
         task_id: Optional[int] = None,
     ):
-        self.adult.resolve_stashdb_scene_item(item, task_id)
+        from app.core.enums import Provider
+        self.adult.resolve_provider_scene_item(item, Provider.STASHDB, task_id)
 
 
 class FansDbSceneResolverPipeline(BaseResolverPipeline):
@@ -45,7 +46,8 @@ class FansDbSceneResolverPipeline(BaseResolverPipeline):
         language: str = DEFAULT_FALLBACK_LANGUAGE,
         task_id: Optional[int] = None,
     ):
-        self.adult.resolve_fansdb_scene_item(item, task_id)
+        from app.core.enums import Provider
+        self.adult.resolve_provider_scene_item(item, Provider.FANSDB, task_id)
 
 
 class PornDbSceneResolverPipeline(BaseResolverPipeline):
@@ -59,4 +61,5 @@ class PornDbSceneResolverPipeline(BaseResolverPipeline):
         language: str = DEFAULT_FALLBACK_LANGUAGE,
         task_id: Optional[int] = None,
     ):
-        self.adult.resolve_porndb_scene_item(item, task_id)
+        from app.core.enums import Provider
+        self.adult.resolve_provider_scene_item(item, Provider.PORNDB, task_id)

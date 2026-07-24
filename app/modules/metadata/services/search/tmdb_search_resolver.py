@@ -1,6 +1,7 @@
 import logging
 from typing import List, Dict, Any, Optional
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.date_utils import get_year_from_date
 
 logger = logging.getLogger(__name__)
 
@@ -46,12 +47,7 @@ class TmdbSearchResolver:
         formatted = []
         for r in results:
             release_date = r.get("release_date") or r.get("first_air_date")
-            year_val = None
-            if release_date:
-                try:
-                    year_val = int(release_date.split("-")[0])
-                except Exception as e:
-                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            year_val = get_year_from_date(release_date)
             formatted.append({
                 "id": r.get("id"),
                 "title": r.get("title") or r.get("name") or r.get("original_title") or r.get("original_name"),
@@ -108,16 +104,7 @@ class TmdbSearchResolver:
             if media_type not in ("movie", "tv", "person"):
                 continue
             release_date = r.get("release_date") or r.get("first_air_date")
-            year_val = None
-            if release_date:
-                try:
-                    year_val = int(release_date.split("-")[0])
-                except Exception as e:
-                    try:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                    except Exception:
-                        pass
-                    pass
+            year_val = get_year_from_date(release_date)
             formatted.append({
                 "id": r.get("id"),
                 "title": r.get("title") or r.get("name") or r.get("original_title") or r.get("original_name"),

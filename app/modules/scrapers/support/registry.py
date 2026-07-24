@@ -22,7 +22,9 @@ class ProviderConfig:
         priority: int = 0,
         web_base_url: Optional[str] = None,
         display_name: Optional[str] = None,
-        capabilities: Optional[set[ProviderCapability]] = None
+        capabilities: Optional[set[ProviderCapability]] = None,
+        resolver_loader: Optional[Any] = None,
+        scraper_loader: Optional[Any] = None
     ):
         self.provider = provider
         self.prefix = prefix
@@ -36,6 +38,8 @@ class ProviderConfig:
         self.web_base_url = web_base_url
         self.display_name = display_name or prefix.capitalize()
         self.capabilities = capabilities or set()
+        self.resolver_loader = resolver_loader
+        self.scraper_loader = scraper_loader
 
 class ProviderRegistry:
     _configs: Dict[Provider, ProviderConfig] = {}
@@ -113,6 +117,39 @@ class ProviderRegistry:
             
         return config.provider, val
 
+    @classmethod
+    def build_target_path(cls, media_type: str, provider: Optional[Any], external_id: Optional[Any]) -> Optional[str]:
+        """
+        Generates standard target paths for library items.
+        """
+        if not external_id:
+            return None
+
+        m_type = str(media_type).lower()
+        prov_str = (provider.value if hasattr(provider, "value") else str(provider or "")).lower()
+        config = cls._prefix_map.get(prov_str)
+
+        if m_type == "movie":
+            prefix = config.prefix if config else "tmdb"
+            return f"/library/movie/{prefix}_{external_id}"
+
+        elif m_type in ("tv", "episode", "season"):
+            return f"/library/tv/{external_id}"
+
+        elif m_type == "scene":
+            prefix = "stash"
+            if config:
+                prefix = "stash" if "stash" in config.aliases or config.prefix == "stashdb" else config.prefix
+            return f"/library/scene/{prefix}_{external_id}"
+
+        elif m_type == "video":
+            return f"/library/video/{external_id}"
+
+        elif m_type == "person":
+            return f"/library/people/{external_id}"
+
+        return None
+
 # Register default providers
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.TMDB,
@@ -122,7 +159,8 @@ ProviderRegistry.register(ProviderConfig(
     priority=4,
     web_base_url="https://www.themoviedb.org",
     display_name="TMDB",
-    capabilities={ProviderCapability.PERSON_DETAILS, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_ENRICHMENT}
+    capabilities={ProviderCapability.PERSON_DETAILS, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_ENRICHMENT},
+    scraper_loader=lambda: __import__("app.modules.scrapers.providers.tmdb", fromlist=["TMDBScraper"]).TMDBScraper
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.OMDB,
@@ -131,7 +169,8 @@ ProviderRegistry.register(ProviderConfig(
     id_pattern=r"^tt\d+$",
     priority=0,
     web_base_url="https://www.omdbapi.com",
-    display_name="OMDb"
+    display_name="OMDb",
+    scraper_loader=lambda: __import__("app.modules.scrapers.providers.omdb", fromlist=["OMDBScraper"]).OMDBScraper
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.STASHDB,
@@ -145,7 +184,9 @@ ProviderRegistry.register(ProviderConfig(
     priority=3,
     web_base_url="https://stashdb.org",
     display_name="StashDB",
-    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS}
+    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS},
+    resolver_loader=lambda: __import__("app.modules.scrapers.resolvers.adult.stashdb_resolver", fromlist=["StashDbResolver"]).StashDbResolver,
+    scraper_loader=lambda: __import__("app.modules.scrapers.providers.stashdb", fromlist=["StashDBScraper"]).StashDBScraper
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.FANSDB,
@@ -158,7 +199,9 @@ ProviderRegistry.register(ProviderConfig(
     priority=2,
     web_base_url="https://fansdb.cc",
     display_name="FansDB",
-    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS}
+    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS},
+    resolver_loader=lambda: __import__("app.modules.scrapers.resolvers.adult.fansdb_resolver", fromlist=["FansDbResolver"]).FansDbResolver,
+    scraper_loader=lambda: __import__("app.modules.scrapers.providers.fansdb", fromlist=["FansDBScraper"]).FansDBScraper
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.PORNDB,
@@ -171,7 +214,9 @@ ProviderRegistry.register(ProviderConfig(
     priority=1,
     web_base_url="https://theporndb.net",
     display_name="ThePornDB",
-    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS}
+    capabilities={ProviderCapability.PERSON_ENRICHMENT, ProviderCapability.PERSON_FILMOGRAPHY, ProviderCapability.PERSON_DETAILS},
+    resolver_loader=lambda: __import__("app.modules.scrapers.resolvers.adult.porndb_resolver", fromlist=["PornDbResolver"]).PornDbResolver,
+    scraper_loader=lambda: __import__("app.modules.scrapers.providers.porndb", fromlist=["PornDBScraper"]).PornDBScraper
 ))
 ProviderRegistry.register(ProviderConfig(
     provider=Provider.MANUAL,

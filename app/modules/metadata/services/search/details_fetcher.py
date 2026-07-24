@@ -1,7 +1,9 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from app.core.enums import MediaType
+from app.core.enums import MediaType, Provider
+from app.core.identifier_utils import parse_identifier
+
 from app.modules.metadata.models import MetadataMatch
 
 
@@ -61,22 +63,25 @@ class DetailsFetcher:
         is_tmdb_direct = False
         tmdb_id_int = None
         
-        if isinstance(item_id, str) and item_id.startswith("tmdb_"):
+        parsed = parse_identifier(item_id) if isinstance(item_id, str) else None
+        if parsed and parsed.provider == "tmdb":
             try:
-                tmdb_id_int = int(item_id.split("_")[1])
+                tmdb_id_int = int(parsed.external_id)
                 is_tmdb_direct = True
-            except (ValueError, IndexError) as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            except ValueError:
+                pass
         
         if not is_tmdb_direct and (media_type == "tv" or (isinstance(item_id, str) and "tv" in item_id)):
             try:
                 clean_id = str(item_id)
-                if clean_id.startswith("tmdb_"):
-                    clean_id = clean_id.split("_")[1]
+                parsed_clean = parse_identifier(clean_id)
+                if parsed_clean and parsed_clean.provider == "tmdb":
+                    clean_id = parsed_clean.external_id
                 tmdb_id_int = int(clean_id)
                 is_tmdb_direct = True
-            except (ValueError, IndexError) as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            except ValueError:
+                pass
+
 
         if is_tmdb_direct and tmdb_id_int is not None:
             details = {}
@@ -119,7 +124,7 @@ class DetailsFetcher:
         try:
             from app.modules.scrapers.support.registry import ProviderRegistry
             if ProviderRegistry.is_adult_provider(match.provider):
-                scraper = scrapers.adult(match.provider, db)
+                scraper = scrapers.get_scraper(match.provider, db)
 
                 if scraper:
                     details = scraper.fetch_scene(match.external_id) or {}

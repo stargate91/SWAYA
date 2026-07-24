@@ -4,7 +4,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.core.enums import MediaType, ItemStatus
+from app.core.enums import MediaType, ItemStatus, Provider
 from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch
 from app.modules.users.models import UserOverride
@@ -12,6 +12,7 @@ from app.modules.users.models import UserOverride
 
 from app.core.language import LanguageService
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
+from app.core.date_utils import get_year_from_date
 from app.modules.library.schemas import CollectionDetailResponse
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ class CollectionDetailService(DetailFormatter):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
-        self.tmdb_scraper = scrapers.tmdb(db)
+        self.tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
         self.image_downloader = image_downloader
 
     def get_collection_detail(self, collection_tmdb_id: str, language: str | None = None) -> CollectionDetailResponse:
@@ -163,12 +164,7 @@ class CollectionDetailService(DetailFormatter):
                 continue
             
             release_date = part.get("release_date")
-            year = None
-            if release_date:
-                try:
-                    year = int(release_date.split("-")[0])
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in app/modules/library/services/detail/collection_detail_service.py:165: {e}", exc_info=True)
+            year = get_year_from_date(release_date)
             
             movies.append({
                 "id": part_tmdb_id,

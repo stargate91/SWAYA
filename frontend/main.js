@@ -107,11 +107,13 @@ function writeElectronLog(level, message, details = null) {
   logQueue.push(line);
   processLogQueue();
 
-  const logFn = level === 'ERROR' ? console.error : level === 'WARN' ? console.warn : console.log;
-  if (details == null) {
-    logFn(`[electron-main] ${message}`);
-  } else {
-    logFn(`[electron-main] ${message}`, details);
+  const logFn = level === 'ERROR' ? console.error : level === 'WARN' ? console.warn : null;
+  if (logFn) {
+    if (details == null) {
+      logFn(`[electron-main] ${message}`);
+    } else {
+      logFn(`[electron-main] ${message}`, details);
+    }
   }
 }
 

@@ -1,6 +1,8 @@
 import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
+from app.core.identifier_utils import parse_identifier
+
 
 from app.modules.metadata.models import MetadataMatch
 from app.modules.users.schemas import (
@@ -550,10 +552,9 @@ class OverridePersister:
         tracked_parent_ids: Optional[set] = None
     ):
         tv_tmdb_id = None
-        if isinstance(item_id, str) and item_id.startswith("tmdb_"):
-            parts = item_id.split("_")
-            if len(parts) >= 3:
-                tv_tmdb_id = parts[1]
+        parsed = parse_identifier(item_id) if isinstance(item_id, str) else None
+        if parsed and parsed.provider == "tmdb" and parsed.season is not None:
+            tv_tmdb_id = parsed.external_id
         
         if not tv_tmdb_id:
             from app.core.enums import MediaType

@@ -63,7 +63,7 @@ def setup_logger(name: str = "swaya") -> logging.Logger:
             root_logger.removeHandler(handler)
 
         console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(logging.INFO)
+        console_handler.setLevel(logging.WARNING)
         console_handler.setFormatter(formatter)
         root_logger.addHandler(console_handler)
 
@@ -98,9 +98,13 @@ def setup_logger(name: str = "swaya") -> logging.Logger:
 
         root_logger._swaya_configured = True
 
-    for logger_name in (name, "uvicorn", "uvicorn.error", "uvicorn.access"):
+    for logger_name in (name, "uvicorn", "uvicorn.error"):
         named_logger = logging.getLogger(logger_name)
         named_logger.setLevel(logging.INFO)
         named_logger.propagate = True
+
+    access_logger = logging.getLogger("uvicorn.access")
+    access_logger.setLevel(logging.WARNING)
+    access_logger.propagate = True
 
     return logging.getLogger(name)

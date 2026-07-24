@@ -37,12 +37,12 @@ class TvEpisodeShifter:
                     ns_num = int(new_season) if new_season is not None and str(new_season).isdigit() else (int(parsed.get("season")) if str(parsed.get("season")).isdigit() else 1)
                     ne_num = int(new_episode) if new_episode is not None and str(new_episode).isdigit() else (int(parsed.get("episode")) if str(parsed.get("episode")).isdigit() else 1)
                     
-                    season_match = db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == tv_match.provider,
-                        MetadataMatch.parent_id == tv_match.id,
-                        MetadataMatch.media_type == MediaType.SEASON,
-                        MetadataMatch.season_number == ns_num
-                    ).first()
+                    from app.modules.metadata.services.metadata_service import MetadataService
+                    season_match = MetadataService(db).get_season_match(
+                        provider=tv_match.provider,
+                        parent_id=tv_match.id,
+                        season_number=ns_num
+                    )
                     if not season_match:
                         season_match = MetadataMatch(
                             provider=tv_match.provider,

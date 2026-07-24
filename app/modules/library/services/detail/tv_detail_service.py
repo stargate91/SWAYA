@@ -1,6 +1,8 @@
 import logging
 from typing import Any, Optional
 from sqlalchemy.orm import Session, joinedload
+from app.core.identifier_utils import parse_identifier
+
 
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
 
@@ -20,7 +22,7 @@ class TvDetailService(DetailFormatter):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
-        self.tmdb_scraper = scrapers.tmdb(db)
+        self.tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
         self.show_formatter = TvShowFormatter()
         self.season_formatter = TvSeasonFormatter()
 
@@ -32,7 +34,7 @@ class TvDetailService(DetailFormatter):
             seasons_limit=seasons_limit,
             initial_episodes_limit=initial_episodes_limit,
             language=language,
-            omdb_scraper=self.scrapers.omdb(self.db)
+            omdb_scraper=self.scrapers.get_scraper(Provider.OMDB, self.db)
         )
 
     def get_library_tv_season_detail(self, tv_tmdb_id: str, season_number: int):
@@ -44,10 +46,18 @@ class TvDetailService(DetailFormatter):
         )
 
     def get_next_episode(self, tv_tmdb_id: str, current_uid: int = 1) -> Optional[dict]:
-        try:
-            tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
-        except (ValueError, IndexError):
-            return None
+        parsed = parse_identifier(str(tv_tmdb_id))
+        if parsed:
+            try:
+                tv_tmdb_id_int = int(parsed.external_id)
+            except ValueError:
+                return None
+        else:
+            try:
+                tv_tmdb_id_int = int(tv_tmdb_id)
+            except ValueError:
+                return None
+
 
         # Fetch local items for this show's episodes
         local_items = self.db.query(MediaItem).options(

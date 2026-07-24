@@ -1,6 +1,7 @@
 import re
 from typing import List, Optional
 from app.core.enums import Provider
+from app.modules.people.domain.images import merge_images as _merge_images
 
 class EnrichmentHelpers:
     @staticmethod
@@ -38,28 +39,4 @@ class EnrichmentHelpers:
 
     @staticmethod
     def merge_images(existing: Optional[List[str]], new_images: List[str]) -> List[str]:
-        if not existing:
-            existing = []
-        seen = set()
-        res_list = []
-
-        def normalize_key(img: str) -> str:
-            if img.startswith(("http://", "https://")):
-                return img.split("?")[0].lower()
-            return img.split("/")[-1].split("?")[0].lower()
-
-        for img in existing:
-            if not img:
-                continue
-            norm = normalize_key(img)
-            if norm not in seen:
-                seen.add(norm)
-                res_list.append(img)
-        for img in new_images:
-            if not img:
-                continue
-            norm = normalize_key(img)
-            if norm not in seen:
-                seen.add(norm)
-                res_list.append(img)
-        return res_list
+        return _merge_images(existing, new_images)

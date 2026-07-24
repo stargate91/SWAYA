@@ -163,11 +163,7 @@ class DownloadWorker:
                     if header.startswith(b"<svg") or header.startswith(b"<?xml") or b"<svg" in header:
                         is_svg = True
             except Exception as e:
-                try:
-                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                except Exception:
-                    pass
-                pass
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
 
             if is_svg and not orig_path.name.lower().endswith(".svg"):
                 if orig_path.exists():

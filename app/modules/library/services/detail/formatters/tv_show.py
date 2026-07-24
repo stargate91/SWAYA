@@ -244,6 +244,7 @@ class TvShowFormatter(DetailFormatter):
 
         watched_episodes_count = len(watched_episodes_set)
 
+        from app.core.date_utils import get_year_from_date
         result = {
             "id": f"tmdb_{tv_tmdb_id_int}",
             "tv_tmdb_id": tv_tmdb_id_int,
@@ -256,7 +257,7 @@ class TvShowFormatter(DetailFormatter):
             "logo_path": self._resolve_img(effective_logo, "logos"),
             "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
             "poster_path": self._resolve_img(effective_poster, "posters"),
-            "year": int(tmdb_data.get("first_air_date", "").split("-")[0]) if tmdb_data.get("first_air_date") else None,
+            "year": get_year_from_date(tmdb_data.get("first_air_date")),
             "first_air_date": tmdb_data.get("first_air_date"),
             "last_air_date": tmdb_data.get("last_air_date"),
             "release_status": tmdb_data.get("status"),

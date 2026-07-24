@@ -36,8 +36,8 @@ class AdultResolver:
         """Delegates scene item resolution."""
         self.resolve_primary_scene_item(item, task_id)
 
-    def resolve_stashdb_scene_item(self, item: MediaItem, task_id: Optional[int] = None):
-        """Resolves scene item explicitly prioritizing StashDB."""
+    def resolve_provider_scene_item(self, item: MediaItem, provider: Provider, task_id: Optional[int] = None):
+        """Resolves adult scene item explicitly prioritizing a provider."""
         self.orchestrator.resolve_adult_item(
             db=self.db,
             scraper_gateway=self.scraper_gateway,
@@ -45,33 +45,10 @@ class AdultResolver:
             item=item,
             mode=ScanMode.SCENES,
             task_id=task_id,
-            preferred_provider=Provider.STASHDB
-        )
-
-    def resolve_fansdb_scene_item(self, item: MediaItem, task_id: Optional[int] = None):
-        """Resolves scene item explicitly prioritizing FansDB."""
-        self.orchestrator.resolve_adult_item(
-            db=self.db,
-            scraper_gateway=self.scraper_gateway,
-            scraper_log_repo=self.scraper_log_repo,
-            item=item,
-            mode=ScanMode.SCENES,
-            task_id=task_id,
-            preferred_provider=Provider.FANSDB
-        )
-
-    def resolve_porndb_scene_item(self, item: MediaItem, task_id: Optional[int] = None):
-        """Resolves scene item explicitly prioritizing PornDB."""
-        self.orchestrator.resolve_adult_item(
-            db=self.db,
-            scraper_gateway=self.scraper_gateway,
-            scraper_log_repo=self.scraper_log_repo,
-            item=item,
-            mode=ScanMode.SCENES,
-            task_id=task_id,
-            preferred_provider=Provider.PORNDB
+            preferred_provider=provider
         )
 
     def resolve_adult_item(self, item: MediaItem, mode: ScanMode = ScanMode.SCENES, task_id: Optional[int] = None):
         """Resolves the adult item by calling primary resolution."""
         self.resolve_primary_scene_item(item, task_id)
+

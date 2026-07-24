@@ -218,14 +218,11 @@ class OrganizerGroupsBuilder:
                 item_is_adult = active_match.is_adult if active_match else False
             parent_is_adults[item.id] = item_is_adult
 
-            parsed = item.parsed_info or {}
-            fn_data = parsed.get("fn") or {}
-            it_data = parsed.get("it") or {}
-            fd_data = parsed.get("fd") or {}
-            season_val = parsed.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
+            from app.core.episode_utils import extract_season_from_parsed_info, extract_episode_from_parsed_info
+            season_val = extract_season_from_parsed_info(item.parsed_info)
             if season_val is None and active_match:
                 season_val = active_match.season_number
-            episode_val = parsed.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
+            episode_val = extract_episode_from_parsed_info(item.parsed_info)
             if episode_val is None and active_match:
                 episode_val = active_match.episode_number
 

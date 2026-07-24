@@ -35,16 +35,11 @@ class RecommendationWatchlistService:
         if media_type and str(media_type).lower() == "scene":
             is_adult = True
         elif tmdb_id and isinstance(tmdb_id, str):
-            if ":" in tmdb_id:
-                prefix = tmdb_id.split(":")[0]
+            from app.core.identifier_utils import parse_identifier
+            parsed = parse_identifier(tmdb_id)
+            if parsed:
                 from app.modules.scrapers.support.registry import ProviderRegistry
-                prov = ProviderRegistry.resolve_prefix(prefix)
-                if prov and ProviderRegistry.is_adult_provider(prov):
-                    is_adult = True
-            elif "_" in tmdb_id:
-                prefix = tmdb_id.split("_")[0]
-                from app.modules.scrapers.support.registry import ProviderRegistry
-                prov = ProviderRegistry.resolve_prefix(prefix)
+                prov = ProviderRegistry.resolve_prefix(parsed.provider)
                 if prov and ProviderRegistry.is_adult_provider(prov):
                     is_adult = True
 

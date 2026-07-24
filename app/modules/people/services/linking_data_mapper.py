@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
+from app.core.enums import Provider
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class LinkingDataMapper:
         if source_lower == "tmdb":
             tmdb_details = None
             try:
-                tmdb_client = scrapers.tmdb(db)
+                tmdb_client = scrapers.get_scraper(Provider.TMDB, db)
                 tmdb_details = tmdb_client.get_person_details(int(external_id))
             except Exception as e:
                 logger.error(f"Error fetching tmdb details: {e}")
@@ -52,7 +53,7 @@ class LinkingDataMapper:
                 provider_enum = ProviderRegistry.resolve_prefix(source_lower)
                 if not provider_enum:
                     raise ValueError(f"Unsupported provider: {source_lower}")
-                scraper_client = scrapers.adult(provider_enum, db)
+                scraper_client = scrapers.get_scraper(provider_enum, db)
                 perf = scraper_client.get_performer_details(external_id)
             except Exception as e:
                 logger.error(f"Error fetching adult performer details: {e}")

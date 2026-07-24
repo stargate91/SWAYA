@@ -101,33 +101,13 @@ class LibraryListingService:
             active_set = self.active_sessions or set()
             is_active = item.id in active_set if item else False
 
-            def get_first_int(val):
-                if val is None:
-                    return None
-                if isinstance(val, (int, float)):
-                    return int(val)
-                if isinstance(val, list):
-                    return get_first_int(val[0]) if val else None
-                if isinstance(val, str):
-                    if val.isdigit():
-                        return int(val)
-                    import json
-                    try:
-                        parsed = json.loads(val)
-                        if isinstance(parsed, list):
-                            return get_first_int(parsed[0]) if parsed else None
-                        return int(parsed)
-                    except Exception as e:
-                        logger.debug(f"Swallowed exception in app/modules/library/services/library_listing_service.py:100: {e}", exc_info=True)
-                return None
-
             rp = int(o.resume_position) if o.resume_position else 0
             dur = int(item.duration) if (item and item.duration) else 0
             prog = round((rp / dur) * 100, 1) if dur > 0 else 0.0
             prog = min(100.0, prog)
             rem = max(0, dur - rp) if dur > 0 else 0
 
-            from app.core.episode_utils import format_episode_code
+            from app.core.episode_utils import format_episode_code, get_first_int
             disp_code = format_episode_code(match.season_number, match.episode_number) if (match and match.media_type == MediaType.EPISODE) else None
 
             results.append(ContinueWatchingItem(

@@ -135,7 +135,23 @@ def get_download_url(path: Optional[str], subfolder: str) -> Optional[str]:
                     size = TMDB_DOWNLOAD_SIZES.get(subfolder, "original")
                     return f"{parts[0]}/t/p/{size}/{subparts[1]}"
         return path
-    if path.startswith("/"):
+    if path.startswith("/") and not path.startswith("/media/"):
         size = TMDB_DOWNLOAD_SIZES.get(subfolder, "original")
         return f"{TMDB_IMAGE_BASE}{size}{path}"
     return None
+
+def resolve_snapshot_url(path: Optional[str], image_root) -> Optional[str]:
+    """
+    Consolidates snapshot URL prefix-rewriting logic:
+    - Ensures path starts with '/media/images/snapshots/' or '/media/images/'
+    - Resolves via local thumbnail / original file checks.
+    """
+    if not path:
+        return None
+    if not path.startswith("/media/"):
+        if path.startswith("snapshots/"):
+            path = f"/media/images/{path}"
+        else:
+            path = f"/media/images/snapshots/{path}"
+    return resolve_image_url(path, "snapshots", image_root)
+

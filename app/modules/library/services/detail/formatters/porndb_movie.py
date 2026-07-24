@@ -1,6 +1,10 @@
 import logging
 from typing import Any, Optional
 from fastapi.responses import JSONResponse
+from app.core.gender_utils import map_gender_str_to_int
+from app.core.date_utils import parse_date
+
+
 
 from app.core.enums import Provider, MediaType
 from app.modules.users.models import UserOverride
@@ -68,7 +72,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
         ).first()
 
         movie_data = None
-        porndb_scraper = scrapers.adult(Provider.PORNDB, db)
+        porndb_scraper = scrapers.get_scraper(Provider.PORNDB, db)
         try:
             movie_data = porndb_scraper.fetch_movie(porndb_id)
         except Exception:
@@ -114,13 +118,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             UserOverride.custom_title == (movie_data.get("title") or "Unknown Movie")
         ).first()
             
-        date_str = movie_data.get("date")
-        year = None
-        if date_str:
-            try:
-                year = int(date_str.split("-")[0])
-            except Exception as e:
-                logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:37: {e}", exc_info=True)
+        from app.core.date_utils import get_year_from_date
+        year = get_year_from_date(movie_data.get("date"))
                 
         from app.modules.people.helpers import should_exclude_adult_performer
 
@@ -130,12 +129,9 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             perf_name = p_info.get("name")
             if not perf_name:
                 continue
-            gender_str = str(p_info.get("gender") or p_info.get("extras", {}).get("gender") or p_info.get("extra", {}).get("gender") or "").upper()
-            mapped_gender = 0
-            if "FEMALE" in gender_str:
-                mapped_gender = 1
-            elif "MALE" in gender_str:
-                mapped_gender = 2
+            p_gender = p_info.get("gender") or p_info.get("extras", {}).get("gender") or p_info.get("extra", {}).get("gender")
+            mapped_gender = map_gender_str_to_int(p_gender)
+
             
             if should_exclude_adult_performer(db, mapped_gender, is_adult=True):
                 continue
@@ -187,14 +183,10 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 from datetime import datetime
                 rel_date = None
                 if date_str:
-                    try:
-                        rel_date = datetime.strptime(date_str, "%Y-%m-%d")
-                    except Exception as e:
-                        try:
-                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                        except Exception:
-                            pass
-                        pass
+                    parsed = parse_date(date_str)
+                    if parsed:
+                        rel_date = datetime(parsed.year, parsed.month, parsed.day)
+
                 with db.begin_nested():
                     match = MetadataMatch(
                         provider=Provider.PORNDB,
@@ -230,12 +222,11 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 match.backdrop_path = raw_backdrop
                 db_updated = True
             if not match.release_date and date_str:
-                from datetime import datetime
-                try:
-                    match.release_date = datetime.strptime(date_str, "%Y-%m-%d")
+                parsed = parse_date(date_str)
+                if parsed:
+                    match.release_date = datetime(parsed.year, parsed.month, parsed.day)
                     db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:91: {e}", exc_info=True)
+
             if movie_data.get("rating") is not None and float(movie_data.get("rating")) > 0:
                 try:
                     match.rating_porndb = float(movie_data.get("rating"))

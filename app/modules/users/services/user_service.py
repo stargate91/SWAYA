@@ -150,7 +150,8 @@ class UserService:
                 item_id_int = int(item_id)
                 res.update(service.update_item_status(item_id_int, status))
             except ValueError as e:
-                logger.debug(f"Swallowed exception in app/modules/users/services/user_service.py:149: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+
 
         has_overrides = any(
             field in model_fields_set

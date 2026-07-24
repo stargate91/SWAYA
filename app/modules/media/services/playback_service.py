@@ -8,6 +8,7 @@ from app.modules.media.services.playback_logging_service import PlaybackLoggingS
 from typing import Optional, Any, List, Tuple
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
+from app.core.date_utils import parse_datetime_utc
 
 from app.modules.media_assets.services.images import image_processing_service
 from app.core.exceptions import NotFoundException
@@ -22,14 +23,9 @@ logger = logging.getLogger(__name__)
 
 
 def parse_watched_at(value) -> datetime:
-    if not value:
-        return datetime.now(timezone.utc)
-    if isinstance(value, datetime):
-        return value
     try:
-        normalized = str(value).strip().replace("Z", "+00:00")
-        return datetime.fromisoformat(normalized)
-    except Exception as exc:
+        return parse_datetime_utc(value)
+    except ValueError as exc:
         raise ValueError("Invalid watched_at datetime format") from exc
 
 

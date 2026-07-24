@@ -4,7 +4,7 @@ from typing import List, Any
 
 from app.core.database import get_db
 from app.modules.scrapers.support.gateway import scraper_gateway
-from app.modules.people.services.people_status_service import PeopleStatusService, _enrichment_queue
+from app.modules.people.services.people_status_service import PeopleStatusService
 from app.modules.people.services.linking_data_mapper import LinkingDataMapper
 from app.modules.people.services.person_linker_service import PersonLinkerService
 from app.modules.people.schemas import (
@@ -19,7 +19,6 @@ from app.modules.people.schemas import (
 )
 from app.modules.users.schemas import ImageOverrideUpdate
 
-_enrichment_queue.configure(scraper_gateway)
 
 # Set up routers
 router = APIRouter(prefix="/api/v1/people", tags=["General People"])
@@ -102,7 +101,29 @@ def search_people_tmdb(
 
 @router.get("/enrichment-status")
 def get_enrichment_status():
-    return _enrichment_queue.get_status()
+    from app.modules.tasks import task_manager
+    worker = task_manager.people_enrich_worker
+    active = bool(worker and worker._pending_person_ids)
+    current_name = None
+    if active and worker and worker.session_factory:
+        db = worker.session_factory()
+        try:
+            first_id = next(iter(worker._pending_person_ids), None)
+            if first_id:
+                from app.modules.people.models import Person
+                p = db.query(Person.name).filter(Person.id == first_id).first()
+                current_name = p[0] if p else None
+        except Exception:
+            pass
+        finally:
+            db.close()
+            
+    return {
+        "active": active,
+        "current_name": current_name,
+        "total": worker.total_queued if worker else 0,
+        "completed": worker.completed_count if worker else 0,
+    }
 
 @router.post("/enrich")
 def enrich_people(match_ids: List[int], db: Session = Depends(get_db)):

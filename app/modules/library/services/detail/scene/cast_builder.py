@@ -1,6 +1,8 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session, joinedload
+from app.core.gender_utils import map_gender_str_to_int
+
 
 from app.core.enums import Provider
 from app.modules.people.models import Person, MediaPersonLink, ExternalSourceLink
@@ -71,14 +73,8 @@ class SceneCastBuilder:
 
             p_images = perf.get("images") or []
             p_img = p_images[0].get("url") if p_images else None
-            gender_str = str(perf.get("gender") or "").upper()
-            mapped_gender = 0
-            if "FEMALE" in gender_str:
-                mapped_gender = 1
-            elif "MALE" in gender_str:
-                mapped_gender = 2
-            elif gender_str:
-                mapped_gender = 3
+            mapped_gender = map_gender_str_to_int(perf.get("gender"))
+
 
             if should_exclude_adult_performer(db, mapped_gender, is_adult=True):
                 continue

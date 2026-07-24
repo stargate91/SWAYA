@@ -1,5 +1,6 @@
 from typing import Dict, Any, Callable, Optional
 from sqlalchemy.orm import Session
+from app.core.enums import Provider
 
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
@@ -13,7 +14,7 @@ class TMDBEnricher:
         temp_db = self.get_temp_db()
         details = None
         try:
-            tmdb = self.scrapers.tmdb(temp_db)
+            tmdb = self.scrapers.get_scraper(Provider.TMDB, temp_db)
             details = tmdb.get_person_details(int(external_id))
         finally:
             if self.close_temp_db:

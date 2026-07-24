@@ -8,6 +8,7 @@ from app.core.genre_utils import split_genres as _split_genres
 from app.modules.library.schemas import MovieDetailResponse
 from app.modules.library.services.detail.formatters.base import MovieDetailFormatter
 from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
+from app.core.date_utils import get_year_from_date
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         ).first()
 
         tmdb_data = None
-        tmdb_scraper = scrapers.tmdb(db)
+        tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
         try:
             tmdb_data = tmdb_scraper.get_details(tmdb_id, "movie", language=ui_lang)
         except Exception:
@@ -107,12 +108,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             current_uid=current_uid,
             resolve_img_fn=self._resolve_img
         )
-        year = None
-        if release_date:
-            try:
-                year = int(release_date.split("-")[0])
-            except Exception as e:
-                logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/tmdb_movie.py:143: {e}", exc_info=True)
+        year = get_year_from_date(release_date)
         
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,

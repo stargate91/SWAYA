@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.modules.library.models import MediaItem
 from app.core.enums import Provider
-from app.modules.settings.models import SystemSetting, UserSetting
+from app.core.date_utils import get_year_from_date
+
 
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
@@ -27,7 +28,7 @@ class MainstreamResolver:
         from app.modules.scrapers.scraper_service import ScraperService
         from app.modules.scrapers.support.gateway import scraper_gateway as default_gateway
         self.scraper_gateway = scraper_gateway or default_gateway
-        self.api = self.scraper_gateway.tmdb(db_session)
+        self.api = self.scraper_gateway.get_scraper(Provider.TMDB, db_session)
         self.scraper_log_repo = ScraperService(db_session)
 
         # Helper instances
@@ -75,30 +76,19 @@ class MainstreamResolver:
         candidates: Dict[int, Dict[str, Any]] = {}
 
         if include_adult is None:
-            from app.core.user_context import get_current_user_id
-            current_user_id = get_current_user_id()
-            include_adult_setting = self.db.query(UserSetting).filter(
-                UserSetting.user_id == current_user_id,
-                UserSetting.key == "include_adult",
-            ).first()
-            if not include_adult_setting:
-                include_adult_setting = self.db.query(SystemSetting).filter(SystemSetting.key == "include_adult").first()
-            include_adult = False
-            if include_adult_setting and include_adult_setting.value:
-                val = str(include_adult_setting.value).lower()
-                include_adult = val == "true" or val == "1"
+            from app.modules.settings.services.settings_service import SettingsService
+            val = SettingsService(self.db).get_setting("include_adult")
+            include_adult = str(val).lower() in ("true", "1")
 
         parsed = item.parsed_info or {}
         fn_data = parsed.get("fn") or {}
         it_data = parsed.get("it") or {}
         fd_data = parsed.get("fd") or {}
 
-        fn_season = fn_data.get("season")
-        fd_season = fd_data.get("season")
-        it_season = it_data.get("season")
+        from app.core.episode_utils import extract_season_from_parsed_info
+        target_season = extract_season_from_parsed_info(item.parsed_info)
 
         def filter_by_season_support(tv_results: list) -> list:
-            target_season = fn_season or fd_season or it_season
             if not target_season:
                 return tv_results
             
@@ -143,12 +133,9 @@ class MainstreamResolver:
                     or (details.get("first_air_date") if details else None)
                 )
                 if target_year and date_str:
-                    try:
-                        c_year = int(str(date_str).split("-")[0])
-                        if abs(c_year - target_year) <= 1:
-                            year_match = True
-                    except Exception as e:
-                        logger.debug(f"Swallowed exception in modules/scrapers/resolvers/mainstream_resolver.py:150: {e}", exc_info=True)
+                    c_year = get_year_from_date(date_str)
+                    if c_year is not None and abs(c_year - target_year) <= 1:
+                        year_match = True
                 else:
                     year_match = True
                 

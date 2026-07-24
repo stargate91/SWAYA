@@ -8,6 +8,8 @@ from app.modules.metadata.models import MetadataMatch
 from app.modules.people.models import Person
 from app.core.enums import Provider, MediaType, CustomListType
 from app.core.exceptions import NotFoundException, BadRequestException
+from app.core.identifier_utils import parse_identifier
+
 from app.modules.users.schemas import (
     CustomListItemResponse,
     CustomListResponse,
@@ -206,52 +208,29 @@ class ListsService:
             res["poster_path"] = image_processing_service.resolve_image_url(res["poster_path"], subfolder)
 
         # Calculate target_path
-        target_path = None
+        from app.modules.scrapers.support.registry import ProviderRegistry
         m_type = res["media_type"]
-        if m_type == "movie":
-            prefix = "porndb_" if res["provider"] == "porndb" else "tmdb_"
-            ext_id = res["external_id"] or res["tmdb_id"] or item.match_id or item.media_item_id
-            if ext_id:
-                target_path = f"/library/movie/{prefix}{ext_id}"
-        elif m_type in ("tv", "episode", "season"):
-            ext_id = res["external_id"] or res["tmdb_id"] or item.match_id or item.media_item_id
-            if ext_id:
-                target_path = f"/library/tv/{ext_id}"
+        if m_type == "person":
+            ext_id = item.person_id or res["id"]
         elif m_type == "scene":
-            prefix = "porndb" if res["provider"] == "porndb" else ("fansdb" if res["provider"] == "fansdb" else "stash")
             ext_id = res["external_id"] or item.match_id
-            if ext_id:
-                target_path = f"/library/scene/{prefix}_{ext_id}"
         elif m_type == "video":
             ext_id = res["external_id"] or item.media_item_id or item.match_id
-            if ext_id:
-                target_path = f"/library/video/{ext_id}"
-        elif m_type == "person":
-            target_path = f"/library/people/{item.person_id or res['id']}"
-            
-        res["target_path"] = target_path
+        else:
+            ext_id = res["external_id"] or res["tmdb_id"] or item.match_id or item.media_item_id
+
+        res["target_path"] = ProviderRegistry.build_target_path(
+            media_type=m_type,
+            provider=res.get("provider"),
+            external_id=ext_id
+        )
 
         return CustomListItemResponse(**res)
 
     def _adult_access_enabled(self) -> bool:
-        from app.modules.settings.models import SystemSetting, UserSetting
-        
-        # Check user setting
-        us = self.db.query(UserSetting).filter(
-            UserSetting.user_id == 1,  # Default user ID
-            UserSetting.key == "include_adult"
-        ).first()
-        if us:
-            return us.value.lower() in ("true", "1", "yes") if isinstance(us.value, str) else bool(us.value)
-            
-        # Fallback to system setting
-        ss = self.db.query(SystemSetting).filter(
-            SystemSetting.key == "include_adult"
-        ).first()
-        if ss:
-            return ss.value.lower() in ("true", "1", "yes") if isinstance(ss.value, str) else bool(ss.value)
-            
-        return False
+        from app.modules.settings.services.settings_service import SettingsService
+        val = SettingsService(self.db).get_setting("include_adult", user_id=1)
+        return str(val).lower() in ("true", "1", "yes")
 
     def _is_item_adult(self, item: CustomListItem) -> bool:
         if item.media_item:
@@ -868,13 +847,13 @@ class ListsService:
             result.already_exists = True
             return result
 
-        from datetime import datetime
+        from datetime import datetime, timezone
         item = CustomListItem(
             list_id=list_id,
             media_item_id=media_item_id,
             match_id=match_id,
             person_id=person_id,
-            added_at=datetime.utcnow()
+            added_at=datetime.now(timezone.utc)
         )
         self.db.add(item)
         self.db.commit()
@@ -947,7 +926,7 @@ class ListsService:
         external_id = None
 
         if item_id.startswith("person_"):
-            p_val = item_id.split("_")[1]
+            p_val = item_id.replace("person_", "")
             if p_val.isdigit():
                 person_id = int(p_val)
             else:
@@ -1078,8 +1057,9 @@ class ListsService:
 
         updated_ids = []
         for raw_id in ids:
-            if str(raw_id).startswith("tmdb_"):
-                tmdb_id = str(raw_id).split("_")[1]
+            parsed = parse_identifier(str(raw_id))
+            if parsed and parsed.provider == "tmdb":
+                tmdb_id = parsed.external_id
                 match = self.db.query(MetadataMatch).filter(MetadataMatch.provider == Provider.TMDB, MetadataMatch.external_id == tmdb_id).first()
                 if match:
                     override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == match.id).first()

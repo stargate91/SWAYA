@@ -1,42 +1,18 @@
-from typing import Any, Optional
+from typing import Any
 
-from app.core.enums import MediaType, Provider
-
-from app.modules.scrapers.providers.fansdb import FansDBScraper
+from app.core.enums import Provider
 from app.modules.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
-from app.modules.scrapers.support.normalizer import ScraperNormalizer
-from app.modules.scrapers.support.persistence import ScraperPersister
-from app.modules.scrapers.providers.porndb import PornDBScraper
-from app.modules.scrapers.providers.stashdb import StashDBScraper
-from app.modules.scrapers.providers.tmdb import TMDBScraper
 
 
 class ScraperGateway:
     def get_scraper(self, provider: Provider, db_session: Any) -> Any:
-        if provider == Provider.TMDB:
-            return self.tmdb(db_session)
-        elif provider == Provider.OMDB:
-            return self.omdb(db_session)
-        else:
-            return self.adult(provider, db_session)
-
-    def tmdb(self, db_session: Any) -> TMDBScraper:
-        return TMDBScraper(db_session)
-
-    def omdb(self, db_session: Any) -> Any:
-        from app.modules.scrapers.providers.omdb import OMDBScraper
-        return OMDBScraper(db_session)
-
-    def adult(self, provider: Provider, db_session: Any) -> Any:
-        scrapers = {
-            Provider.STASHDB: StashDBScraper,
-            Provider.PORNDB: PornDBScraper,
-            Provider.FANSDB: FansDBScraper,
-        }
-        scraper_type = scrapers.get(provider)
-        if scraper_type is None:
-            raise ValueError(f"Unsupported adult metadata provider: {provider}")
-        return scraper_type(db_session)
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        config = ProviderRegistry.get_config(provider)
+        scraper_loader = config.scraper_loader if config else None
+        if scraper_loader:
+            scraper_class = scraper_loader()
+            return scraper_class(db_session)
+        raise ValueError(f"Unsupported metadata provider: {provider}")
 
     def enrich_mainstream(
         self,
@@ -50,30 +26,6 @@ class ScraperGateway:
             item,
             language=language,
             commit=commit,
-        )
-
-    def normalize_adult_scene(self, provider: Provider, raw_data: dict) -> dict:
-        return ScraperNormalizer.normalize_adult_scene(provider.value, raw_data)
-
-    def normalize_porndb_movie(self, raw_data: dict) -> dict:
-        return ScraperNormalizer.normalize_porndb_movie(raw_data)
-
-    def persist_adult_scene(
-        self,
-        db_session: Any,
-        provider: Provider,
-        external_id: str,
-        normalized: dict,
-        *,
-        media_type: Optional[MediaType] = None,
-        media_item_id: Optional[int] = None,
-    ) -> Any:
-        return ScraperPersister(db_session).persist_normalized_scene(
-            provider,
-            external_id,
-            normalized,
-            media_type=media_type or MediaType.SCENE,
-            media_item_id=media_item_id,
         )
 
 

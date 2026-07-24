@@ -9,7 +9,6 @@ from sqlalchemy.exc import OperationalError
 
 from app.modules.library.models import MediaItem
 from app.core.enums import ItemStatus, ScanMode
-from app.modules.settings.models import UserSetting, SystemSetting
 from app.modules.scrapers.scan_resolution_pipelines import get_scan_resolution_pipeline
 from app.core.database import SessionLocal
 from app.core.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LANGUAGE
@@ -33,8 +32,6 @@ class ScanResolver:
         self.include_adult = include_adult
         self.provider = provider
         self.task_monitor = task_monitor
-        import threading
-        self._db_write_lock = threading.Lock()
         if resolver is None:
             from app.modules.library.services.media_item_service import MediaItemService
             self.resolver = MediaItemService(db_session)
@@ -77,93 +74,57 @@ class ScanResolver:
         primary_lang = DEFAULT_FALLBACK_LANGUAGE
         fallback_lang = None
         try:
-            pl = self.db.query(UserSetting).filter(UserSetting.key == "primary_metadata_language").first()
-            if not pl:
-                pl = self.db.query(SystemSetting).filter(SystemSetting.key == "primary_metadata_language").first()
-            fl = self.db.query(UserSetting).filter(UserSetting.key == "fallback_metadata_language").first()
-            if not fl:
-                fl = self.db.query(SystemSetting).filter(SystemSetting.key == "fallback_metadata_language").first()
-            
-            if pl and pl.value:
-                primary_lang = pl.value
-            if fl and fl.value and fl.value != "none":
-                fallback_lang = fl.value
+            from app.modules.settings.services.settings_service import SettingsService
+            settings_service = SettingsService(self.db)
+            primary_lang = settings_service.get_setting("primary_metadata_language") or DEFAULT_FALLBACK_LANGUAGE
+            fallback_lang_val = settings_service.get_setting("fallback_metadata_language")
+            fallback_lang = fallback_lang_val if fallback_lang_val and fallback_lang_val != "none" else None
         except Exception as settings_ex:
             logger.warning(f"Failed to load metadata language settings before resolution: {settings_ex}")
 
         def resolve_task(item_id: int):
             nonlocal current_completed
-            max_attempts = 10
             try:
-                for attempt in range(max_attempts):
+                if self._stop_requested(task_id):
+                    return
+                from app.modules.tasks import task_manager
+                with task_manager.transaction() as local_db:
+                    from app.modules.library.services.media_item_service import MediaItemService
+                    local_repo = MediaItemService(local_db)
+                    item = local_repo.get_item_by_id(item_id)
+                    if not item:
+                        return
+
                     if self._stop_requested(task_id):
                         return
-                    local_db = SessionLocal()
-                    try:
-                        from app.modules.library.services.media_item_service import MediaItemService
-                        local_repo = MediaItemService(local_db)
-                        item = local_repo.get_item_by_id(item_id)
-                        if not item:
-                            return
-
-                        if self._stop_requested(task_id):
-                            return
-                        pipeline = get_scan_resolution_pipeline(
-                            local_db,
-                            mode=self.mode,
-                            include_adult=self.include_adult,
-                            provider=self.provider,
-                            media_resolver=local_repo,
-                        )
-                        pipeline.resolve_and_enrich(
-                            item,
-                            primary_language=primary_lang,
-                            fallback_language=fallback_lang,
-                            task_id=task_id,
-                            stop_requested=lambda: self._stop_requested(task_id),
-                        )
-                        with self._db_write_lock:
-                            local_db.commit()
-                        return
-                    except OperationalError as e:
-                        local_db.rollback()
-                        if "database is locked" not in str(e).lower() or attempt == max_attempts - 1:
-                            raise
-                        import random
-                        wait_seconds = 0.5 * (attempt + 1) + random.uniform(0.1, 0.5)
-                        logger.warning(f"Database was locked while resolving item ID {item_id}; retrying in {wait_seconds:.2f}s")
-                        time.sleep(wait_seconds)
-                    finally:
-                        local_db.close()
+                    pipeline = get_scan_resolution_pipeline(
+                        local_db,
+                        mode=self.mode,
+                        include_adult=self.include_adult,
+                        provider=self.provider,
+                        media_resolver=local_repo,
+                    )
+                    pipeline.resolve_and_enrich(
+                        item,
+                        primary_language=primary_lang,
+                        fallback_language=fallback_lang,
+                        task_id=task_id,
+                        stop_requested=lambda: self._stop_requested(task_id),
+                    )
             except Exception as e:
                 import traceback
                 logger.error(f"Error resolving item ID {item_id}: {e}")
                 logger.error(traceback.format_exc())
-                for attempt in range(3):
-                    local_db = SessionLocal()
-                    try:
+                try:
+                    from app.modules.tasks import task_manager
+                    with task_manager.transaction() as local_db:
                         from app.modules.library.services.media_item_service import MediaItemService
                         local_repo = MediaItemService(local_db)
                         db_item = local_repo.get_item_by_id(item_id)
                         if db_item:
-                            with self._db_write_lock:
-                                local_repo.set_item_status(item_id, ItemStatus.ERROR)
-                                local_db.commit()
-                        break
-                    except OperationalError as status_ex:
-                        local_db.rollback()
-                        if "database is locked" in str(status_ex).lower() and attempt < 2:
-                            import random
-                            time.sleep(0.5 * (attempt + 1) + random.uniform(0.05, 0.25))
-                            continue
-                        logger.error(f"Failed to set ERROR status for item ID {item_id}: {status_ex}")
-                        break
-                    except Exception as status_ex:
-                        local_db.rollback()
-                        logger.error(f"Failed to set ERROR status for item ID {item_id}: {status_ex}")
-                        break
-                    finally:
-                        local_db.close()
+                            local_repo.set_item_status(item_id, ItemStatus.ERROR)
+                except Exception as status_ex:
+                    logger.error(f"Failed to set ERROR status for item ID {item_id}: {status_ex}")
             finally:
                 current_completed += 1
                 if progress_callback:

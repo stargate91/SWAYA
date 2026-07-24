@@ -147,7 +147,7 @@ class TMDBScraper(BaseScraper):
                     params.pop("append_to_response", None)
                     details = self._call_api(endpoint, params, force_refresh=force_refresh)
                 except Exception as ex:
-                    logger.debug(f"Swallowed exception in modules/scrapers/providers/tmdb.py:170: {ex}", exc_info=True)
+                    logger.debug(f"Swallowed exception: {ex}", exc_info=True)
                     raise e
 
         # If details were fetched successfully and images are requested, fetch them separately incorporating original_language
@@ -212,7 +212,7 @@ class TMDBScraper(BaseScraper):
                     params.pop("append_to_response", None)
                     return self._call_api(endpoint, params, force_refresh=force_refresh)
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in modules/scrapers/providers/tmdb.py:219: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
             
             # If all original language attempts failed, try English fallback
             normalized_lang = str(language or DEFAULT_FALLBACK_LANGUAGE).split("-", 1)[0].strip() or DEFAULT_FALLBACK_LANGUAGE
@@ -230,7 +230,7 @@ class TMDBScraper(BaseScraper):
                             params.pop("append_to_response", None)
                             return self._call_api(endpoint, params, force_refresh=force_refresh)
                         except Exception as e:
-                            logger.debug(f"Swallowed exception in modules/scrapers/providers/tmdb.py:237: {e}", exc_info=True)
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
             raise e
 
     def fetch_movie(self, movie_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:

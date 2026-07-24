@@ -4,6 +4,7 @@ import concurrent.futures
 from typing import List, Tuple, Dict, Any
 from app.modules.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
 from app.core.enums import Provider
+from app.core.date_utils import get_year_from_date
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
         total_items = 0
 
         try:
-            scraper = self.scrapers.adult(Provider.PORNDB, self.db)
+            scraper = self.scrapers.get_scraper(Provider.PORNDB, self.db)
             api_token = scraper.get_setting("porndb_api_key") or scraper.get_setting("porndb_api_token")
             if api_token:
                 headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
@@ -36,16 +37,7 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
                         xid = x.get("id")
                         title = x.get("title") or "Unknown"
                         date_str = x.get("date")
-                        year = None
-                        if date_str:
-                            try:
-                                year = int(date_str.split("-")[0])
-                            except Exception as e:
-                                try:
-                                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                                except Exception:
-                                    pass
-                                pass
+                        year = get_year_from_date(date_str)
                         studio_name = x.get("site", {}).get("name") if x.get("site") else None
                         poster_val = x.get("poster")
                         if isinstance(poster_val, dict):
@@ -154,16 +146,7 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
             xid = x.get("id")
             title = x.get("title") or "Unknown"
             date_str = x.get("date")
-            year = None
-            if date_str:
-                try:
-                    year = int(date_str.split("-")[0])
-                except Exception as e:
-                    try:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                    except Exception:
-                        pass
-                    pass
+            year = get_year_from_date(date_str)
             studio_name = x.get("site", {}).get("name") if x.get("site") else None
             poster_val = x.get("poster")
             if isinstance(poster_val, dict):

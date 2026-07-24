@@ -1,6 +1,7 @@
 import logging
 from typing import List, Dict, Any, Optional, Union
 from sqlalchemy.orm import Session
+from app.core.enums import Provider
 
 
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 class RecommendationsService:
     def __init__(self, db: Session, scrapers: Any, settings: Optional[Any] = None):
         self.db = db
-        self.scraper = scrapers.tmdb(db)
+        self.scraper = scrapers.get_scraper(Provider.TMDB, db)
         from app.modules.settings.services.settings_service import SettingsService
         self.settings = settings or SettingsService(db)
         
@@ -126,15 +127,12 @@ class RecommendationsService:
         clean_discover_adult = []
         if discover_adult_pool:
             import random
-            from datetime import datetime
+            from datetime import datetime, timezone
             import math
             
             # Fetch settings
-            blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
-
-            from app.modules.recommendations.services.tag_safety import expand_tags, has_word_match
-
-            blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
+            from app.modules.recommendations.services.tag_safety import get_expanded_blacklist, has_word_match
+            blacklist = get_expanded_blacklist(self.settings)
 
             def get_score(x):
                 pop = float(x.get("popularity") or 0.0)
@@ -161,7 +159,7 @@ class RecommendationsService:
             filtered_adult_pool.sort(key=get_score, reverse=True)
             top_pool = filtered_adult_pool[:40]
             
-            day_str = datetime.utcnow().strftime("%Y-%m-%d")
+            day_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             seed_val = int(day_str.replace("-", ""))
             rng = random.Random(seed_val)
             rng.shuffle(top_pool)

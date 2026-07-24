@@ -2,7 +2,7 @@ import logging
 import os
 import uuid
 from typing import Dict, Any, Optional
-from fastapi import HTTPException
+from app.core.exceptions import NotFoundException, BadRequestException
 from sqlalchemy.orm import Session
 
 from app.modules.people.models import Person
@@ -42,7 +42,7 @@ class PerformerAssetManager:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+            raise NotFoundException("Person not found")
 
         user_id = get_current_user_id() or 1
         
@@ -118,7 +118,7 @@ class PerformerAssetManager:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+            raise NotFoundException("Person not found")
 
         user_id = get_current_user_id() or 1
 
@@ -132,7 +132,7 @@ class PerformerAssetManager:
 
         saved_path = img_service.write_upload(original_path, file_stream)
         if not saved_path:
-            raise HTTPException(status_code=400, detail="Failed to save uploaded image")
+            raise BadRequestException("Failed to save uploaded image")
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "backdrops")
 
@@ -152,7 +152,7 @@ class PerformerAssetManager:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+            raise NotFoundException("Person not found")
 
         user_id = get_current_user_id() or 1
         
@@ -225,7 +225,7 @@ class PerformerAssetManager:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+            raise NotFoundException("Person not found")
 
         user_id = get_current_user_id() or 1
 
@@ -239,7 +239,7 @@ class PerformerAssetManager:
 
         saved_path = img_service.write_upload(original_path, file_stream)
         if not saved_path:
-            raise HTTPException(status_code=400, detail="Failed to save uploaded image")
+            raise BadRequestException("Failed to save uploaded image")
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "people")
 

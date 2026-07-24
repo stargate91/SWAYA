@@ -1,5 +1,6 @@
 import logging
 import datetime
+from datetime import timezone
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -7,6 +8,7 @@ from sqlalchemy import func
 from app.modules.people.models import Person, ExternalSourceLink, MediaPersonLink
 from app.modules.users.models import UserOverride, Tag
 from app.core.enums import Provider, RoleType
+from app.core.exceptions import BadRequestException
 from app.modules.scrapers.support.gateway import scraper_gateway
 
 logger = logging.getLogger(__name__)
@@ -30,8 +32,7 @@ class PersonLinkerService:
         try:
             provider_enum = Provider(source)
         except ValueError:
-            from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=f"Unsupported source: {source}")
+            raise BadRequestException(f"Unsupported source: {source}")
 
         existing_link = db.query(ExternalSourceLink).filter(
             ExternalSourceLink.provider == provider_enum,
@@ -85,7 +86,7 @@ class PersonLinkerService:
                 override_rec.is_favorite = bool(overrides["is_favorite"])
             if "user_rating" in overrides:
                 override_rec.user_rating = overrides["user_rating"]
-                override_rec.user_rating_at = datetime.datetime.utcnow()
+                override_rec.user_rating_at = datetime.datetime.now(timezone.utc)
             if "user_comment" in overrides:
                 override_rec.user_comment = overrides["user_comment"]
             if "custom_tags" in overrides:
@@ -190,8 +191,7 @@ class PersonLinkerService:
         try:
             provider_enum = Provider(source)
         except ValueError:
-            from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail=f"Unsupported source: {source}")
+            raise BadRequestException(f"Unsupported source: {source}")
 
         link = db.query(ExternalSourceLink).filter(
             ExternalSourceLink.person_id == person.id,

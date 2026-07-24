@@ -1,6 +1,8 @@
 import logging
 from typing import Dict, Any, Optional
 from app.modules.scrapers.support.normalization.helpers import safe_parse_date, normalize_tag_names
+from app.core.gender_utils import map_gender_str_to_int
+
 
 logger = logging.getLogger(__name__)
 
@@ -180,8 +182,8 @@ class AdultSceneNormalizer:
                 cast_member["extra"].get("gender") or 
                 ""
             )
-            p_gender = str(p_gender).upper()
-            gender_int = 1 if "FEMALE" in p_gender else (2 if "MALE" in p_gender else None)
+            gender_int = map_gender_str_to_int(p_gender) or None
+
             
             p_image = cast_member.get("image_path") or cast_member.get("image") or cast_member.get("photo")
             if not p_image and cast_member.get("images"):

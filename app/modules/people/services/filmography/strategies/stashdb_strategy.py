@@ -2,6 +2,7 @@ import logging
 from typing import List, Tuple, Dict, Any
 from app.modules.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
 from app.core.enums import Provider
+from app.core.date_utils import get_year_from_date
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ class StashDbFilmographyStrategy(BaseFilmographyStrategy):
 
         try:
             prov_enum = Provider(source.lower())
-            scraper = self.scrapers.adult(prov_enum, self.db)
+            scraper = self.scrapers.get_scraper(prov_enum, self.db)
             query = """
             query QueryScenes($input: SceneQueryInput!) {
               queryScenes(input: $input) {
@@ -57,12 +58,7 @@ class StashDbFilmographyStrategy(BaseFilmographyStrategy):
                     sid = s.get("id")
                     title = s.get("title") or "Unknown"
                     date_str = s.get("date")
-                    year = None
-                    if date_str:
-                        try:
-                            year = int(date_str.split("-")[0])
-                        except Exception as e:
-                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                    year = get_year_from_date(date_str)
                     studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
                     poster_url = s["images"][0].get("url") if s.get("images") else None
                     

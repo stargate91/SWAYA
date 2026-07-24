@@ -3,16 +3,12 @@ from typing import List, Any, Optional, Tuple
 from sqlalchemy.orm import Session
 from app.core.enums import Provider
 
-from app.modules.scrapers.resolvers.adult.stashdb_resolver import StashDbResolver
-from app.modules.scrapers.resolvers.adult.porndb_resolver import PornDbResolver
-from app.modules.scrapers.resolvers.adult.fansdb_resolver import FansDbResolver
-
 logger = logging.getLogger(__name__)
 
 class AdultResolverFactory:
     def _configured_scene_provider_order(self, db: Session, scraper_gateway: Any) -> List[Provider]:
         """Loads provider hierarchy order preference from stash settings."""
-        stash_scraper = scraper_gateway.adult(Provider.STASHDB, db)
+        stash_scraper = scraper_gateway.get_scraper(Provider.STASHDB, db)
         order_setting = stash_scraper.get_setting('scenes_scraper_order') or 'stashdb,porndb,fansdb'
         order = []
         from app.modules.scrapers.support.registry import ProviderRegistry
@@ -33,12 +29,10 @@ class AdultResolverFactory:
         
         resolvers = {}
         for provider in ProviderRegistry.get_adult_providers():
-            scraper = scraper_gateway.adult(provider, db)
-            resolver_class = {
-                Provider.STASHDB: StashDbResolver,
-                Provider.PORNDB: PornDbResolver,
-                Provider.FANSDB: FansDbResolver,
-            }.get(provider)
+            scraper = scraper_gateway.get_scraper(provider, db)
+            config = ProviderRegistry.get_config(provider)
+            resolver_loader = config.resolver_loader if config else None
+            resolver_class = resolver_loader() if resolver_loader else None
             if resolver_class:
                 resolvers[provider] = (resolver_class(scraper), provider)
 

@@ -12,6 +12,7 @@ from app.modules.scrapers.providers.omdb import OMDBScraper
 from app.modules.scrapers.support.persistence import ScraperPersister
 
 from app.modules.scrapers.resolver import normalize_title
+from app.core.date_utils import get_year_from_date
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class PornDBMovieResolver:
         from app.modules.scrapers.scraper_service import ScraperService
         from app.modules.scrapers.support.gateway import scraper_gateway as default_gateway
         self.scraper_gateway = scraper_gateway or default_gateway
-        self.scraper = self.scraper_gateway.adult(Provider.PORNDB, db_session)
+        self.scraper = self.scraper_gateway.get_scraper(Provider.PORNDB, db_session)
         self.scraper_log_repo = ScraperService(db_session)
 
     def _log_search(self, task_id: Optional[int], media_item_id: Optional[int], provider: Provider, search_query: str, result_count: int, details: dict) -> None:
@@ -164,12 +165,7 @@ class PornDBMovieResolver:
                 ).ratio()
 
                 candidate_date = movie.get("date")
-                candidate_year = None
-                if candidate_date:
-                    try:
-                        candidate_year = int(str(candidate_date).split("-")[0])
-                    except (TypeError, ValueError) as e:
-                        logger.debug(f"Swallowed exception in modules/scrapers/resolvers/porndb_movie_resolver.py:168: {e}", exc_info=True)
+                candidate_year = get_year_from_date(candidate_date)
                 
                 if year and candidate_year:
                     if year != candidate_year:

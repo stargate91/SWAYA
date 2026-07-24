@@ -2,6 +2,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.core.enums import Provider
+from app.core.date_utils import get_year_from_date
 
 logger = logging.getLogger(__name__)
 
@@ -15,19 +16,11 @@ def _provider_source_name(prov_enum: Provider) -> str:
     return cfg.prefix if cfg else prov_enum.value
 
 
+from app.core.gender_utils import map_gender_str_to_int
+
 def _map_performer_gender(gender_val) -> int:
-    if gender_val in (1, "1"):
-        return 1
-    if gender_val in (2, "2"):
-        return 2
-    gender_str = str(gender_val or "").upper()
-    if "FEMALE" in gender_str:
-        return 1
-    if "MALE" in gender_str:
-        return 2
-    if gender_str:
-        return 3
-    return 0
+    return map_gender_str_to_int(gender_val)
+
 
 
 class AdultSearchResolver:
@@ -43,7 +36,7 @@ class AdultSearchResolver:
     ) -> List[Dict[str, Any]]:
         """Handles searches on adult metadata providers (StashDB, PornDB, FansDB) for movies and scenes."""
         from app.modules.scrapers.support.registry import ProviderRegistry
-        scraper = scrapers.adult(prov_enum, db) if ProviderRegistry.is_adult_provider(prov_enum) else None
+        scraper = scrapers.get_scraper(prov_enum, db) if ProviderRegistry.is_adult_provider(prov_enum) else None
 
         if not scraper:
             return []
@@ -85,7 +78,7 @@ class AdultSearchResolver:
                         "title": m.get("title"),
                         "original_title": None,
                         "release_date": m.get("date"),
-                        "year": int(str(m["date"]).split("-")[0]) if m.get("date") else None,
+                        "year": get_year_from_date(m.get("date")),
                         "overview": m.get("synopsis") or m.get("description"),
                         "poster_path": poster,
                         "backdrop_path": backdrop,
@@ -150,7 +143,7 @@ class AdultSearchResolver:
                             "title": s.get("title"),
                             "original_title": None,
                             "release_date": s.get("date"),
-                            "year": int(str(s["date"]).split("-")[0]) if s.get("date") else None,
+                            "year": get_year_from_date(s.get("date")),
                             "overview": s.get("description") or s.get("details"),
                             "poster_path": poster,
                             "backdrop_path": backdrop,
@@ -215,7 +208,7 @@ class AdultSearchResolver:
                     "title": s.get("title"),
                     "original_title": None,
                     "release_date": s.get("date"),
-                    "year": int(s["date"].split("-")[0]) if s.get("date") else None,
+                    "year": get_year_from_date(s.get("date")),
                     "overview": s.get("details"),
                     "poster_path": s.get("images", [{}])[0].get("url") if s.get("images") else None,
                     "backdrop_path": None,
@@ -240,7 +233,7 @@ class AdultSearchResolver:
 
     def search_performers(self, db: Session, scrapers: Any, query: str, prov_enum: Provider, page: int = 1) -> List[Dict[str, Any]]:
         """Handles performer searches on adult metadata providers."""
-        scraper = scrapers.adult(prov_enum, db)
+        scraper = scrapers.get_scraper(prov_enum, db)
         if not scraper:
             return []
         try:

@@ -21,7 +21,7 @@ class LocalMetadataResolver:
             if isinstance(raw_kws, dict):
                 keywords_list = [k["name"] for k in raw_kws.get("keywords", []) if isinstance(k, dict) and "name" in k]
         
-        tmdb_scraper = scrapers.tmdb(db)
+        tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
         if not keywords_list and active_match and active_match.provider == Provider.TMDB and active_match.external_id:
             try:
                 tmdb_id_int = int(active_match.external_id)

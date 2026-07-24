@@ -2,13 +2,13 @@ import logging
 from typing import Optional
 
 from app.core.enums import Provider, MediaType
-from app.modules.scrapers.support.base import BaseScraper
+from app.modules.scrapers.support.base import BaseStashGraphQLScraper
 from app.modules.scrapers.providers.porndb_client import PornDbClient
 from app.core.constants import PORNDB_DEFAULT_ENDPOINT, PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
-class PornDBScraper(BaseScraper):
+class PornDBScraper(BaseStashGraphQLScraper):
     """ThePornDB-specific metadata retriever and parser utilizing GraphQL and ScraperNormalizer."""
 
     def __init__(self, settings, cache_service=None):
@@ -222,83 +222,10 @@ class PornDBScraper(BaseScraper):
                 return None
             return cached_data
 
-        query = """
-        query FindScene($id: ID!) {
-          findScene(id: $id) {
-            id
-            title
-            details
-            date
-            duration
-            tags {
-              name
-            }
-            studio {
-              id
-              name
-              images {
-                url
-              }
-              parent {
-                id
-                name
-                images {
-                  url
-                }
-              }
-            }
-            performers {
-              performer {
-                id
-                name
-                gender
-                scene_count
-                birth_date
-                images {
-                  url
-                }
-                ethnicity
-                hair_color
-                eye_color
-                height
-                band_size
-                cup_size
-                waist_size
-                hip_size
-                urls {
-                  url
-                  site {
-                    id
-                    name
-                  }
-                }
-                career_start_year
-                career_end_year
-                death_date
-                country
-              }
-            }
-            images {
-              url
-            }
-          }
-        }
-        """
-        result = self.client.get_scene_graphql(endpoint, query, scene_id)
+        result = self.client.get_scene_graphql(endpoint, self.STASH_FIND_SCENE_QUERY, scene_id)
         if result:
-            data = result.get("data", {}).get("findScene")
+            data = self.extract_and_map_measurements(result)
             if data:
-                for p_entry in data.get("performers") or []:
-                    perf = p_entry.get("performer")
-                    if perf:
-                        perf["measurements"] = {
-                            "band_size": perf.get("band_size"),
-                            "cup_size": perf.get("cup_size"),
-                            "waist": perf.get("waist_size"),
-                            "hip": perf.get("hip_size"),
-                        }
-                        if "urls" in perf and isinstance(perf["urls"], list):
-                            perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
                 data = self.enrich_scene_ratings(data)
                 self.cache.set(Provider.PORNDB, cache_key, data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
                 return data

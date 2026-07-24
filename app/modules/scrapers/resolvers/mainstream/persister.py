@@ -7,6 +7,7 @@ from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch, MetadataLocalization
 from app.core.enums import Provider, MediaType, ItemStatus
 from app.modules.scrapers.resolver import normalize_title
+from app.core.date_utils import get_year_from_date, parse_date
 
 logger = logging.getLogger(__name__)
 
@@ -95,12 +96,9 @@ class MatchPersister:
             title_rank, best_title = get_title_rank_and_best_title(x, candidate_type)
             noise_penalty = self.candidate_scorer.candidate_noise_penalty(best_title, get_candidate_titles(x, candidate_type))
             if target_year and date_str:
-                try:
-                    c_year = int(date_str.split("-")[0])
-                    if abs(c_year - target_year) <= 1:
-                        year_match = 1
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in modules/scrapers/resolvers/mainstream/persister.py:102: {e}", exc_info=True)
+                c_year = get_year_from_date(date_str)
+                if c_year is not None and abs(c_year - target_year) <= 1:
+                    year_match = 1
             return (title_rank, source_priority, year_match, -noise_penalty)
 
         sorted_candidates = sorted(candidates.values(), key=get_candidate_score, reverse=True)
@@ -117,18 +115,17 @@ class MatchPersister:
         for i, data in enumerate(limited_candidates):
             tmdb_id = data.get("id")
             date_str = data.get("release_date") or data.get("first_air_date")
-            release_date = None
             if date_str:
-                try:
-                    release_date = datetime.strptime(date_str, "%Y-%m-%d")
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in modules/scrapers/resolvers/mainstream/persister.py:124: {e}", exc_info=True)
+                parsed = parse_date(date_str)
+                if parsed:
+                    release_date = datetime(parsed.year, parsed.month, parsed.day)
+
 
             raw_type = data.get("item_type") or data.get("media_type", "movie")
             itype = MediaType.TV if raw_type == "tv" else MediaType.MOVIE
-            
-            s_num = fn_data.get("season") or fd_data.get("season") or it_data.get("season")
-            ep_num = fn_data.get("episode") or fd_data.get("episode") or it_data.get("episode")
+            from app.core.episode_utils import extract_season_from_parsed_info, extract_episode_from_parsed_info
+            s_num = extract_season_from_parsed_info(item.parsed_info)
+            ep_num = extract_episode_from_parsed_info(item.parsed_info)
 
             details = details_cache.get(tmdb_id)
             last_air_date = None
@@ -137,14 +134,10 @@ class MatchPersister:
                 release_status = details.get("status")
                 last_air_date_str = details.get("last_air_date")
                 if last_air_date_str:
-                    try:
-                        last_air_date = datetime.strptime(last_air_date_str, "%Y-%m-%d")
-                    except Exception as e:
-                        try:
-                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                        except Exception:
-                            pass
-                        pass
+                    parsed = parse_date(last_air_date_str)
+                    if parsed:
+                        last_air_date = datetime(parsed.year, parsed.month, parsed.day)
+
 
             match = MetadataMatch(
                 media_item_id=item.id,
@@ -185,13 +178,8 @@ class MatchPersister:
                         candidate_date = candidate.get("release_date") or candidate.get("first_air_date")
                         if not candidate_date:
                             continue
-                        try:
-                            candidate_year = int(str(candidate_date).split("-")[0])
-                        except Exception as e:
-                            try:
-                                logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                            except Exception:
-                                pass
+                        candidate_year = get_year_from_date(candidate_date)
+                        if candidate_year is None:
                             continue
                         if abs(candidate_year - target_year) <= 1:
                             ambiguous_exact_candidates += 1

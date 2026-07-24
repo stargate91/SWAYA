@@ -51,7 +51,7 @@ def test_adult_search_resolver_porndb():
         "scene_count": 10
     }]
     
-    scrapers_mock.adult.return_value = scraper_mock
+    scrapers_mock.get_scraper.return_value = scraper_mock
     
     # Test movie search
     movies = resolver.search_metadata(

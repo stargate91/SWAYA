@@ -7,16 +7,13 @@ from app.core.exceptions import NotFoundException
 from app.core.language import LanguageService
 from app.modules.media.schemas import WatchedHistoryResponse
 from app.modules.users.models import UserOverride
+from app.core.episode_utils import get_first_int
+from app.core.date_utils import parse_datetime_utc
 
 def parse_watched_at(value) -> datetime:
-    if not value:
-        return datetime.now(timezone.utc)
-    if isinstance(value, datetime):
-        return value
     try:
-        normalized = str(value).strip().replace("Z", "+00:00")
-        return datetime.fromisoformat(normalized)
-    except Exception as exc:
+        return parse_datetime_utc(value)
+    except ValueError as exc:
         raise ValueError("Invalid watched_at datetime format") from exc
 
 logger = logging.getLogger(__name__)
@@ -115,25 +112,6 @@ class PlaybackLoggingService:
                     if tv_loc and tv_loc.poster_path:
                         tv_poster_path = resolve_img_fn(tv_loc.poster_path, "posters")
 
-            def get_first_int(val):
-                if val is None:
-                    return None
-                if isinstance(val, (int, float)):
-                    return int(val)
-                if isinstance(val, list):
-                    return get_first_int(val[0]) if val else None
-                if isinstance(val, str):
-                    if val.isdigit():
-                        return int(val)
-                    import json
-                    try:
-                        parsed = json.loads(val)
-                        if isinstance(parsed, list):
-                            return get_first_int(parsed[0]) if parsed else None
-                        return int(parsed)
-                    except Exception as e:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                return None
 
             results.append({
                 "id": log.id,

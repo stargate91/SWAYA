@@ -72,11 +72,7 @@ class ProfileMerger:
                                 selected_scene = item
                                 break
                         except Exception as e:
-                            try:
-                                logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                            except Exception:
-                                pass
-                            pass
+                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
             
             # Fallback to the first one with an image
             if not selected_scene:

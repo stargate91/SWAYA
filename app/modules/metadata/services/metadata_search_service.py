@@ -58,19 +58,7 @@ class MetadataSearchService:
                 page=page
             )
 
-        from app.modules.media_assets.services.images import image_processing_service
-        for r in results:
-            m_type = r.get("media_type") or item_type
-            if r.get("poster_path"):
-                subfolder = "people" if m_type == "person" else ("scene_stills" if m_type == "scene" else "posters")
-                r["poster_path"] = image_processing_service.resolve_image_url(r["poster_path"], subfolder)
-            if r.get("backdrop_path"):
-                subfolder = "scene_stills" if m_type == "scene" else "backdrops"
-                r["backdrop_path"] = image_processing_service.resolve_image_url(r["backdrop_path"], subfolder)
-            if r.get("profile_path"):
-                r["profile_path"] = image_processing_service.resolve_image_url(r["profile_path"], "people")
-
-        return results
+        return self._resolve_result_images(results, default_media_type=item_type)
 
     def get_seasons(self, tmdb_id: int) -> List[Dict[str, Any]]:
         """Retrieves seasons list for a TV show."""
@@ -114,35 +102,19 @@ class MetadataSearchService:
         # 1. Post-process to calculate and append target_path
         from app.modules.media_assets.services.images import image_processing_service
         for r in results:
-            target_path = None
+            from app.modules.scrapers.support.registry import ProviderRegistry
             m_type = r.get("media_type")
             prov = r.get("provider") or source_lower
             r_id = r.get("id")
-            
-            if m_type == "movie":
-                prefix = "porndb_" if prov == "porndb" else "tmdb_"
-                target_path = f"/library/movie/{prefix}{r_id}"
-            elif m_type == "tv":
-                target_path = f"/library/tv/{r_id}"
-            elif m_type == "person":
-                target_path = f"/library/people/{r_id}"
-            elif m_type == "scene":
-                prefix = "porndb" if prov == "porndb" else ("fansdb" if prov == "fansdb" else "stash")
-                target_path = f"/library/scene/{prefix}_{r_id}"
-            elif m_type == "video":
-                target_path = f"/library/video/{r_id}"
-                
-            r["target_path"] = target_path
+
+            r["target_path"] = ProviderRegistry.build_target_path(
+                media_type=m_type,
+                provider=prov,
+                external_id=r_id
+            )
 
             # Resolve image paths
-            if r.get("poster_path"):
-                subfolder = "people" if m_type == "person" else ("scene_stills" if m_type == "scene" else "posters")
-                r["poster_path"] = image_processing_service.resolve_image_url(r["poster_path"], subfolder)
-            if r.get("backdrop_path"):
-                subfolder = "scene_stills" if m_type == "scene" else "backdrops"
-                r["backdrop_path"] = image_processing_service.resolve_image_url(r["backdrop_path"], subfolder)
-            if r.get("profile_path"):
-                r["profile_path"] = image_processing_service.resolve_image_url(r["profile_path"], "people")
+        self._resolve_result_images(results)
 
         # 2. Post-process to filter by performer gender preference
         if source_lower != "tmdb" and type_lower == "person":
@@ -165,3 +137,17 @@ class MetadataSearchService:
             language=language,
             media_resolver=self.media_resolver
         )
+
+    def _resolve_result_images(self, results: list, default_media_type: str = None) -> list:
+        from app.modules.media_assets.services.images import image_processing_service
+        for r in results:
+            m_type = r.get("media_type") or default_media_type
+            if r.get("poster_path"):
+                subfolder = "people" if m_type == "person" else ("scene_stills" if m_type == "scene" else "posters")
+                r["poster_path"] = image_processing_service.resolve_image_url(r["poster_path"], subfolder)
+            if r.get("backdrop_path"):
+                subfolder = "scene_stills" if m_type == "scene" else "backdrops"
+                r["backdrop_path"] = image_processing_service.resolve_image_url(r["backdrop_path"], subfolder)
+            if r.get("profile_path"):
+                r["profile_path"] = image_processing_service.resolve_image_url(r["profile_path"], "people")
+        return results

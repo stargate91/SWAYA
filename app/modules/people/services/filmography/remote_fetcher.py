@@ -8,6 +8,7 @@ from app.modules.people.models import Person, MediaPersonLink
 
 
 from app.modules.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
+from app.core.date_utils import get_year_from_date
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class RemoteCreditsFetcher:
             try:
                 from app.core.enums import Provider
                 prov_enum = Provider(source.lower())
-                scraper = self.scrapers.adult(prov_enum, db)
+                scraper = self.scrapers.get_scraper(prov_enum, db)
                 query = """
                 query QueryScenes($input: SceneQueryInput!) {
                   queryScenes(input: $input) {
@@ -83,16 +84,7 @@ class RemoteCreditsFetcher:
                         sid = s.get("id")
                         title = s.get("title") or "Unknown"
                         date_str = s.get("date")
-                        year = None
-                        if date_str:
-                            try:
-                                year = int(date_str.split("-")[0])
-                            except Exception as e:
-                                try:
-                                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                                except Exception:
-                                    pass
-                                pass
+                        year = get_year_from_date(date_str)
                         studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
                         poster_url = s["images"][0].get("url") if s.get("images") else None
                         img_width = s["images"][0].get("width") if s.get("images") else None

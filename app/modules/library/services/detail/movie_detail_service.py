@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 from sqlalchemy.orm import Session
+from app.core.identifier_utils import parse_identifier
+
 
 
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
@@ -26,14 +28,13 @@ class MovieDetailService(DetailFormatter):
         current_uid = get_current_user_id()
 
         # Resolve TV Episode string (e.g. tmdb_1863_1_1) to local media item ID if possible
-        if isinstance(item_id, str) and "_" in item_id:
-            parts = item_id.split("_")
-            if len(parts) >= 4 and parts[0] in ("tmdb", "tv"):
-                from app.modules.history.services.playback_service import PlaybackService
-                playback_repo = PlaybackService(self.db)
-                resolved_id = playback_repo.resolve_item_id_from_external(item_id)
-                if resolved_id:
-                    item_id = resolved_id
+        parsed = parse_identifier(item_id) if isinstance(item_id, str) else None
+        if parsed and parsed.episode is not None and parsed.provider in ("tmdb", "tv"):
+            from app.modules.history.services.playback_service import PlaybackService
+            playback_repo = PlaybackService(self.db)
+            resolved_id = playback_repo.resolve_item_id_from_external(item_id)
+            if resolved_id:
+                item_id = resolved_id
 
         # Tracked / External PornDB Movie Detail
         if isinstance(item_id, str) and item_id.startswith("porndb_"):

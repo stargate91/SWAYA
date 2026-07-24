@@ -233,6 +233,69 @@ class PeopleEnrichWorker:
             if person:
                 enricher.db = db
                 enricher.apply_enriched_data(person, fetched_data)
+                
+                # Automatic HealthyCeleb enrichment for SFW performers
+                if not person.is_adult:
+                    try:
+                        from app.modules.people.services.people_detail_service import scrape_healthyceleb_data
+                        hc_data = scrape_healthyceleb_data(db, person.id)
+                        
+                        # Birthday-based underage check
+                        from app.core.date_utils import parse_date
+                        person_bday = parse_date(person.birthday) if person.birthday else None
+                        hc_bday = parse_date(hc_data.get("date_of_birth")) if hc_data.get("date_of_birth") else None
+                        
+                        if hc_bday and person_bday and hc_bday != person_bday:
+                            logger.warning(f"HC birthday mismatch for {person.name}: HC={hc_bday}, DB={person_bday} — applying data anyway")
+
+                        if hc_bday and not person.birthday:
+                            person.birthday = hc_bday.isoformat()
+
+                        effective_bday = person.birthday or hc_data.get("date_of_birth")
+                        from app.modules.people.helpers import is_underage_performer
+                        is_underage = is_underage_performer(effective_bday)
+
+                        if not is_underage:
+                            fields_to_update = [
+                                ("height", 100),
+                                ("weight", 20),
+                                ("hair_color", None),
+                                ("eye_color", None),
+                                ("waist", None),
+                                ("hip", None),
+                                ("cup_size", None),
+                                ("band_size", None),
+                            ]
+                            for field, min_val in fields_to_update:
+                                val = hc_data.get(field)
+                                if val:
+                                    curr = getattr(person, field)
+                                    if not curr or (min_val is not None and isinstance(curr, (int, float)) and curr < min_val):
+                                        setattr(person, field, val)
+
+                            from app.modules.people.helpers import calculate_butt_size, calculate_breast_size
+
+                            # Auto-calculate butt_size from height/waist/hip
+                            if person.height and person.waist and person.hip and not person.butt_size:
+                                butt_val = calculate_butt_size(person.height, person.waist, person.hip)
+                                if butt_val:
+                                    person.butt_size = butt_val
+
+                            # Auto-calculate breast_size from cup_size/band_size/height
+                            if person.cup_size and person.band_size and not person.breast_size:
+                                breast_val = calculate_breast_size(person.cup_size, person.band_size, person.height)
+                                if breast_val:
+                                    person.breast_size = breast_val
+
+                        for field in ("ethnicity", "place_of_birth"):
+                            val = hc_data.get(field)
+                            if val and not getattr(person, field):
+                                setattr(person, field, val)
+                        
+                        logger.info(f"Successfully auto-enriched SFW performer {person.name} from HealthyCeleb.")
+                    except Exception as e:
+                        logger.warning(f"Auto-HealthyCeleb enrichment skipped/failed for {person.name}: {e}")
+
                 db.commit()
                 return True
         except Exception as e:

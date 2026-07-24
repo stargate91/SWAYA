@@ -62,20 +62,17 @@ class MetadataResolver:
         # Promote TV show match to EPISODE if the item is an episode or we have season/episode numbers
         inferred_type = str((item.parsed_info or {}).get("type") or "").lower()
         if mtype == MediaType.TV and (inferred_type == "episode" or season_number is not None or episode_number is not None):
-            parsed = item.parsed_info or {}
-            fn_data = parsed.get("fn") or {}
-            it_data = parsed.get("it") or {}
-            fd_data = parsed.get("fd") or {}
+            from app.core.episode_utils import extract_season_from_parsed_info, extract_episode_from_parsed_info
             if season_number is None:
-                season_number = parsed.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
+                season_number = extract_season_from_parsed_info(item.parsed_info)
             if episode_number is None:
-                episode_number = parsed.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
+                episode_number = extract_episode_from_parsed_info(item.parsed_info)
             
             if season_number is not None:
                 try:
                     season_number = int(season_number)
                 except (ValueError, TypeError) as e:
-                    logger.debug(f"Swallowed exception in app/modules/metadata/services/metadata_resolver.py:62: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
             if episode_number is not None:
                 try:
                     if isinstance(episode_number, list):
@@ -83,18 +80,21 @@ class MetadataResolver:
                     elif str(episode_number).isdigit():
                         episode_number = int(episode_number)
                 except (ValueError, TypeError) as e:
-                    logger.debug(f"Swallowed exception in app/modules/metadata/services/metadata_resolver.py:70: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
 
             if season_number is not None and episode_number is not None:
                 mtype = MediaType.EPISODE
 
         from app.modules.scrapers.support.registry import ProviderRegistry
         if ProviderRegistry.is_adult_provider(provider):
-            scraper = self.scrapers.adult(provider, db)
+            scraper = self.scrapers.get_scraper(provider, db)
 
             if not scraper:
                 from app.core.exceptions import BadRequestException
                 raise BadRequestException("Selected adult scraper is not configured")
+
+            from app.modules.scrapers.support.normalizer import ScraperNormalizer
+            from app.modules.scrapers.support.persistence import ScraperPersister
 
             if provider == Provider.PORNDB and mtype == MediaType.MOVIE:
                 movie_data = scraper.fetch_movie(str(external_id))
@@ -102,9 +102,9 @@ class MetadataResolver:
                     from app.core.exceptions import BadRequestException
                     raise BadRequestException(f"Failed to fetch movie details from {provider.value}")
 
-                normalized = self.scrapers.normalize_porndb_movie(movie_data)
-                match = self.scrapers.persist_adult_scene(
-                    db, provider, str(movie_data["id"]), normalized, media_type=MediaType.MOVIE, media_item_id=item.id
+                normalized = ScraperNormalizer.normalize_porndb_movie(movie_data)
+                match = ScraperPersister(db).persist_normalized_scene(
+                    provider, str(movie_data["id"]), normalized, media_type=MediaType.MOVIE, media_item_id=item.id
                 )
                 item.status = ItemStatus.MATCHED
                 db.commit()
@@ -115,8 +115,8 @@ class MetadataResolver:
                 from app.core.exceptions import BadRequestException
                 raise BadRequestException(f"Failed to fetch scene details from {provider.value}")
 
-            normalized = self.scrapers.normalize_adult_scene(provider, scene_data)
-            match = self.scrapers.persist_adult_scene(db, provider, str(scene_data["id"]), normalized, media_item_id=item.id)
+            normalized = ScraperNormalizer.normalize_adult_scene(provider.value, scene_data)
+            match = ScraperPersister(db).persist_normalized_scene(provider, str(scene_data["id"]), normalized, media_type=MediaType.SCENE, media_item_id=item.id)
             item.status = ItemStatus.MATCHED
             db.commit()
             return {"status": "success", "item_id": item.id, "match_id": match.id}

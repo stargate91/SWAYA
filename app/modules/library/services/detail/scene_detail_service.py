@@ -10,6 +10,7 @@ from app.modules.scrapers.support.registry import ProviderRegistry
 from app.modules.metadata.models import Studio, MetadataMatch
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
 from app.modules.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
+from app.core.date_utils import get_year_from_date
 
 # Sub-services
 from app.modules.library.services.detail.scene.cast_builder import SceneCastBuilder
@@ -134,7 +135,7 @@ class SceneDetailService(DetailFormatter):
 
         if not scene_data:
             if effective_provider and effective_provider != Provider.MANUAL:
-                scraper = self.scrapers.adult(effective_provider, db)
+                scraper = self.scrapers.get_scraper(effective_provider, db)
                 try:
                     scene_data = scraper.fetch_scene(scene_uuid)
                     if not scene_data and effective_provider == Provider.PORNDB:
@@ -247,12 +248,7 @@ class SceneDetailService(DetailFormatter):
         poster_url = images[0].get("url") if images else None
         
         date_str = scene_data.get("date")
-        year = None
-        if date_str:
-            try:
-                year = int(date_str.split("-")[0])
-            except Exception as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+        year = get_year_from_date(date_str)
         
         duration_raw = scene_data.get("duration")
         duration_sec = None

@@ -19,7 +19,7 @@ def safe_int(val) -> Optional[int]:
             try:
                 return int(digits)
             except ValueError as e:
-                logger.debug(f"Swallowed exception in app/modules/people/services/enrichment/adult.py:22: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
     return None
 
 class AdultEnricher:
@@ -39,7 +39,7 @@ class AdultEnricher:
         temp_db = self.get_temp_db()
         perf = None
         try:
-            scraper = self.scrapers.adult(provider, temp_db)
+            scraper = self.scrapers.get_scraper(provider, temp_db)
             perf = scraper.get_performer_details(external_id)
         except Exception as e:
             logger.error(f"Error calling get_performer_details on {provider.value}: {e}")

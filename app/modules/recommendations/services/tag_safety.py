@@ -69,3 +69,11 @@ def has_word_match(text: str, word_set: Set[str]) -> bool:
                 if norm_w.startswith(b_word) or (len(norm_w) >= 4 and b_word.startswith(norm_w)):
                     return True
     return False
+
+def get_expanded_blacklist(settings) -> Set[str]:
+    """
+    Retrieves the raw adult_tag_blacklist setting, parses it, and expands it with synonyms.
+    """
+    blacklist_setting = settings.get_setting("adult_tag_blacklist") or ""
+    return expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
+

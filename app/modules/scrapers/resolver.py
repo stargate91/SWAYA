@@ -4,7 +4,7 @@ from typing import Any, Optional
 from sqlalchemy.orm import Session
 from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch, MetadataLocalization
-from app.modules.settings.models import SystemSetting, UserSetting
+
 from app.core.enums import MediaType, ItemStatus, ScanMode
 from app.modules.scrapers.resolve_pipelines import get_resolver_pipeline
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
@@ -86,15 +86,9 @@ class Resolver:
         )
 
     def _adult_access_enabled(self, user_id: int = 1) -> bool:
-        setting = self.db.query(UserSetting).filter(
-            UserSetting.user_id == user_id,
-            UserSetting.key == "include_adult",
-        ).first()
-        if not setting:
-            setting = self.db.query(SystemSetting).filter(
-                SystemSetting.key == "include_adult"
-            ).first()
-        return str(setting.value).strip().lower() in ("true", "1") if setting else False
+        from app.modules.settings.services.settings_service import SettingsService
+        val = SettingsService(self.db).get_setting("include_adult", user_id=user_id)
+        return str(val).strip().lower() in ("true", "1")
 
     def _resolve_adult_item(self, item: MediaItem, mode: ScanMode, task_id: Optional[int] = None):
         """Resolves adult items by delegating to AdultResolver."""
@@ -125,13 +119,9 @@ class Resolver:
             self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == sib.id).delete()
             
             # Create new match
-            parsed = sib.parsed_info or {}
-            fn_data = parsed.get("fn") or {}
-            it_data = parsed.get("it") or {}
-            fd_data = parsed.get("fd") or {}
-            
-            s_num = fn_data.get("season") or it_data.get("season") or fd_data.get("season") or active_match.season_number
-            ep_num = fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode") or active_match.episode_number
+            from app.core.episode_utils import extract_season_from_parsed_info, extract_episode_from_parsed_info
+            s_num = extract_season_from_parsed_info(sib.parsed_info) or active_match.season_number
+            ep_num = extract_episode_from_parsed_info(sib.parsed_info) or active_match.episode_number
 
             new_match = MetadataMatch(
                 media_item_id=sib.id,

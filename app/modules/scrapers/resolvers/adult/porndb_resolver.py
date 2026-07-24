@@ -1,25 +1,18 @@
 import logging
-from typing import Optional, List, Tuple
+from typing import Optional, Tuple
 from app.core.enums import Provider, ItemStatus
 from app.modules.library.models import MediaItem
 from app.core.constants import PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
-from app.modules.scrapers.resolvers.adult.stashdb_resolver import SEARCH_QUERY
+from app.modules.scrapers.resolvers.adult.base_resolver import BaseStashGraphQLResolver
 
 logger = logging.getLogger(__name__)
 
-class PornDbResolver:
+class PornDbResolver(BaseStashGraphQLResolver):
     """
     Submodule to resolve matches from PornDB API.
     """
     def __init__(self, scraper):
-        self.scraper = scraper
-        self.provider = Provider.PORNDB
-
-    def is_configured(self) -> bool:
-        return bool(
-            self.scraper.get_setting('porndb_api_key') or
-            self.scraper.get_setting('porndb_api_token')
-        )
+        super().__init__(scraper, Provider.PORNDB, ['porndb_api_key', 'porndb_api_token'])
 
     def resolve_by_hash(
         self,
@@ -66,17 +59,3 @@ class PornDbResolver:
 
         return None, None
 
-    def search_by_text(self, search_title: str) -> List[dict]:
-        cache_key_search = f'{self.provider.value}/scenes/search/v4/{search_title.strip().lower()}'
-        cached_search = self.scraper.cache.get(self.provider, cache_key_search)
-        if cached_search is not None:
-            return cached_search
-
-        try:
-            res = self.scraper.execute_query(SEARCH_QUERY, {'q': search_title})
-            scenes = res.get('searchScene', []) if res else []
-            self.scraper.cache.set(self.provider, cache_key_search, scenes or [])
-            return scenes or []
-        except Exception as exc:
-            logger.error('Text query failed for provider %s: %s', self.provider.value, exc)
-            return []

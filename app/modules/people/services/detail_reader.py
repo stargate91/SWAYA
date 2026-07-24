@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 
 from app.modules.people.models import Person
+from app.core.enums import Provider
 
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
@@ -27,7 +28,7 @@ class PerformerDetailReader:
     def __init__(self, db: Session, scrapers: Any, resolver: Optional[Any] = None, image_service: Any = None, filmography_service: FilmographyService = None, image_downloader: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
-        self.tmdb = scrapers.tmdb(db)
+        self.tmdb = scrapers.get_scraper(Provider.TMDB, db)
         if resolver is None:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)

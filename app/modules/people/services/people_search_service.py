@@ -1,9 +1,12 @@
 import hashlib
 import logging
 from typing import Optional, List, Dict, Any
-from fastapi import HTTPException
+from app.core.exceptions import NotFoundException, BadRequestException
 from sqlalchemy.orm import Session
+from app.core.gender_utils import map_gender_str_to_int
 
+
+from app.core.enums import Provider
 from app.modules.people.models import Person, ExternalSourceLink, MediaPersonLink
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
@@ -13,7 +16,7 @@ class PeopleSearchService:
     def __init__(self, db: Session, scrapers: Any, resolver: Optional[Any] = None, image_service: Optional[Any] = None, people_repo: Any = None):
         self.db = db
         self.scrapers = scrapers
-        self.tmdb = scrapers.tmdb(db)
+        self.tmdb = scrapers.get_scraper(Provider.TMDB, db)
         if resolver is None:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
@@ -53,7 +56,7 @@ class PeopleSearchService:
                     if not provider_enum:
                         continue
                     try:
-                        scraper_client = self.scrapers.adult(provider_enum, db)
+                        scraper_client = self.scrapers.get_scraper(provider_enum, db)
                     except Exception:
                         scraper_client = None
                     if not scraper_client:
@@ -65,15 +68,8 @@ class PeopleSearchService:
                         if not uuid_str:
                             continue
 
-                        gender_str = str(perf.get("gender") or "").upper()
-                        if "FEMALE" in gender_str:
-                            mapped_gender = 1
-                        elif "MALE" in gender_str:
-                            mapped_gender = 2
-                        elif gender_str:
-                            mapped_gender = 3
-                        else:
-                            mapped_gender = 0
+                        mapped_gender = map_gender_str_to_int(perf.get("gender"))
+
 
                         from app.modules.people.helpers import should_exclude_adult_performer
                         if should_exclude_adult_performer(db, mapped_gender, is_adult=True):
@@ -258,9 +254,9 @@ class PeopleSearchService:
                     db.commit()
                 return {"status": "success", "id": person.id, "name": person.name}
 
-            scraper_client = self.scrapers.adult(provider_enum, db)
+            scraper_client = self.scrapers.get_scraper(provider_enum, db)
             if not scraper_client:
-                raise HTTPException(status_code=400, detail=f"Provider {source_name} not available")
+                raise BadRequestException(f"Provider {source_name} not available")
                 
             perf = None
             try:
@@ -276,17 +272,10 @@ class PeopleSearchService:
                         "gender": "female" if gender == 1 else "male" if gender == 2 else "trans" if gender == 3 else None
                     }
                 else:
-                    raise HTTPException(status_code=404, detail="Performer not found on provider and no details provided")
+                    raise NotFoundException("Performer not found on provider and no details provided")
                 
-            gender_str = str(perf.get("gender") or "").upper()
-            if "FEMALE" in gender_str:
-                mapped_gender = 1
-            elif "MALE" in gender_str:
-                mapped_gender = 2
-            elif gender_str:
-                mapped_gender = 3
-            else:
-                mapped_gender = 0
+            mapped_gender = map_gender_str_to_int(perf.get("gender"))
+
                 
             images = perf.get("images") or []
             profile_url = images[0].get("url") if images else None
@@ -336,7 +325,7 @@ class PeopleSearchService:
             try:
                 tmdb_id = int(db_id_or_external)
             except (TypeError, ValueError):
-                raise HTTPException(status_code=400, detail="Invalid person ID format")
+                raise BadRequestException("Invalid person ID format")
 
             from app.core.enums import Provider
             person_query = db.query(Person).join(ExternalSourceLink).filter(
@@ -373,7 +362,7 @@ class PeopleSearchService:
                         "adult": bool(is_adult)
                     }
                 else:
-                    raise HTTPException(status_code=404, detail="Person not found on TMDB and no details provided")
+                    raise NotFoundException("Person not found on TMDB and no details provided")
                 
             resolved_is_adult = is_adult if is_adult is not None else bool(tmdb_details.get("adult"))
             

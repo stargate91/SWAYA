@@ -19,30 +19,71 @@ class ScraperService:
             
         self.cache = cache_service or CacheService()
         from app.core.enums import Provider
+        from app.modules.scrapers.support.registry import ProviderRegistry
         from app.modules.scrapers.support.gateway import scraper_gateway
-        self.tmdb = scraper_gateway.get_scraper(Provider.TMDB, self.settings_service)
-        self.omdb = scraper_gateway.get_scraper(Provider.OMDB, self.settings_service)
-        self.stashdb = scraper_gateway.get_scraper(Provider.STASHDB, self.settings_service)
-        self.porndb = scraper_gateway.get_scraper(Provider.PORNDB, self.settings_service)
-        self.fansdb = scraper_gateway.get_scraper(Provider.FANSDB, self.settings_service)
+        
+        self.scrapers = {}
+        for provider in ProviderRegistry.get_all_providers():
+            try:
+                self.scrapers[provider] = scraper_gateway.get_scraper(provider, self.settings_service)
+            except Exception:
+                # Some registered providers may not have scraper classes (e.g. Provider.MANUAL)
+                pass
+
+    @property
+    def tmdb(self):
+        from app.core.enums import Provider
+        return self.scrapers.get(Provider.TMDB)
+
+    @property
+    def omdb(self):
+        from app.core.enums import Provider
+        return self.scrapers.get(Provider.OMDB)
+
+    @property
+    def stashdb(self):
+        from app.core.enums import Provider
+        return self.scrapers.get(Provider.STASHDB)
+
+    @property
+    def porndb(self):
+        from app.core.enums import Provider
+        return self.scrapers.get(Provider.PORNDB)
+
+    @property
+    def fansdb(self):
+        from app.core.enums import Provider
+        return self.scrapers.get(Provider.FANSDB)
+
+    def get_scraper(self, provider: Provider) -> Optional[Any]:
+        return self.scrapers.get(provider)
+
+    def fetch_scene(self, provider: Provider, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
+        scraper = self.get_scraper(provider)
+        if scraper and hasattr(scraper, "fetch_scene"):
+            return scraper.fetch_scene(scene_id, force_refresh=force_refresh)
+        return None
 
     def fetch_tmdb_movie(self, movie_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:
-        return self.tmdb.fetch_movie(movie_id, language, force_refresh)
+        return self.tmdb.fetch_movie(movie_id, language, force_refresh) if self.tmdb else None
 
     def fetch_tmdb_tv(self, tv_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:
-        return self.tmdb.fetch_tv(tv_id, language, force_refresh)
+        return self.tmdb.fetch_tv(tv_id, language, force_refresh) if self.tmdb else None
 
     def fetch_omdb(self, imdb_id: str, force_refresh: bool = False) -> Optional[dict]:
-        return self.omdb.fetch_omdb(imdb_id, force_refresh)
+        return self.omdb.fetch_omdb(imdb_id, force_refresh) if self.omdb else None
 
     def fetch_stashdb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
-        return self.stashdb.fetch_scene(scene_id, force_refresh)
+        from app.core.enums import Provider
+        return self.fetch_scene(Provider.STASHDB, scene_id, force_refresh)
 
     def fetch_porndb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
-        return self.porndb.fetch_scene(scene_id, force_refresh)
+        from app.core.enums import Provider
+        return self.fetch_scene(Provider.PORNDB, scene_id, force_refresh)
 
     def fetch_fansdb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
-        return self.fansdb.fetch_scene(scene_id, force_refresh)
+        from app.core.enums import Provider
+        return self.fetch_scene(Provider.FANSDB, scene_id, force_refresh)
 
     def log_search(
         self,

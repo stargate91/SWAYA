@@ -67,6 +67,11 @@ class ImageProcessingService:
         """Resolves the image path/URL for the frontend."""
         return image_url_resolver.resolve_image_url(path, subfolder, self.image_root, size)
 
+    def resolve_snapshot_url(self, path: Optional[str]) -> Optional[str]:
+        """Resolves snapshot path relative or absolute URL."""
+        return image_url_resolver.resolve_snapshot_url(path, self.image_root)
+
+
     def pick_logo_path(self, raw_data: dict, preferred_language: Optional[str] = None) -> Optional[str]:
         """Analyzes and selects the best logo from TMDB metadata images."""
         return image_selectors.pick_logo_path(

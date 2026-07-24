@@ -4,6 +4,8 @@ import json as _json
 from collections import Counter
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
+from app.core.gender_utils import map_gender_str_to_int
+
 from sqlalchemy import text
 
 from app.core.enums import Provider as ProviderEnum
@@ -43,7 +45,7 @@ class AdultDiscoveryService:
             # Query trending scenes from the scraper gateway
             from app.modules.scrapers.support.gateway import scraper_gateway
             try:
-                scraper = scraper_gateway.adult(provider_enum, self.db)
+                scraper = scraper_gateway.get_scraper(provider_enum, self.db)
             except Exception as e:
                 logger.error(f"Failed to get {provider} scraper: {e}")
                 return []
@@ -212,9 +214,8 @@ class AdultDiscoveryService:
         in_library_ids = {m.external_id for m in matches}
 
         # 3. Fetch blacklist settings
-        blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
-
-        blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
+        from app.modules.recommendations.services.tag_safety import get_expanded_blacklist
+        blacklist = get_expanded_blacklist(self.settings)
 
         # 4. Filter and score scenes
         scored_scenes = []
@@ -292,10 +293,8 @@ class AdultDiscoveryService:
                 p = p_outer.get("performer")
                 if p:
                     p_gender = p.get("gender")
-                    gender_int = None
-                    if p_gender:
-                        p_gender_str = str(p_gender).upper()
-                        gender_int = 1 if "FEMALE" in p_gender_str else (2 if "MALE" in p_gender_str else None)
+                    gender_int = map_gender_str_to_int(p_gender) or None
+
                     
                     from app.modules.people.helpers import should_exclude_adult_performer
                     if should_exclude_adult_performer(self.db, gender_int, is_adult=True):

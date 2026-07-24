@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Any, Tuple
 from app.modules.people.helpers import select_known_for
 from app.modules.people.services.filmography.prioritizer import CreditsPrioritizer
 
-logger = logging.getLogger(__name__)
+from app.core.date_utils import get_year_from_date
 
 class CombinedFilmographyResolver:
     def __init__(self, prioritizer: CreditsPrioritizer, resolve_img_fn: Any):
@@ -81,12 +81,7 @@ class CombinedFilmographyResolver:
 
             if key not in combined_credits:
                 date_str = credit.get("release_date") if media_type == "movie" else credit.get("first_air_date")
-                year = None
-                if date_str:
-                    try:
-                        year = int(str(date_str).split("-")[0])
-                    except Exception as e:
-                        logger.debug(f"Swallowed exception in combined_resolver: {e}", exc_info=True)
+                year = get_year_from_date(date_str)
 
                 title = credit.get("title") if media_type == "movie" else credit.get("name")
                 in_library = False

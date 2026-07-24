@@ -2,6 +2,8 @@ import logging
 from typing import Optional, Any
 from sqlalchemy.orm import Session
 from app.modules.users.models import UserOverride
+from app.core.identifier_utils import parse_identifier
+
 
 logger = logging.getLogger(__name__)
 
@@ -220,7 +222,8 @@ class TitleLockReader:
 
     def get_or_create_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
         if isinstance(item_id, str) and item_id.startswith("collection_"):
-            collection_tmdb_id = item_id.split("_")[1]
+            parsed = parse_identifier(item_id.replace("collection_", "tmdb_"))
+            collection_tmdb_id = parsed.external_id if parsed else item_id.split("_")[1]
             collection_id = self.resolver.get_or_create_collection_id(collection_tmdb_id, "tmdb")
             
             def query_coll():

@@ -71,13 +71,8 @@ def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
         if backdrop_path:
             resolved_backdrop = image_processing_service.resolve_image_url(backdrop_path, "backdrops")
         if getattr(log, "snapshot_path", None):
-            snap_path = log.snapshot_path
-            if not snap_path.startswith("/media/"):
-                if snap_path.startswith("snapshots/"):
-                    snap_path = f"/media/images/{snap_path}"
-                else:
-                    snap_path = f"/media/images/snapshots/{snap_path}"
-            resolved_snapshot = image_processing_service.resolve_image_url(snap_path, "snapshots")
+            resolved_snapshot = image_processing_service.resolve_snapshot_url(log.snapshot_path)
+
             
         results.append({
             "id": log.id,
@@ -107,7 +102,7 @@ def get_action_history(db: Session = Depends(get_db), limit: int = 50):
 
 async def run_undo_coroutine(task_id: int, batch_id: int):
     import logging
-    from app.modules.media.services.renamer_engine import RenamerEngine
+    from app.modules.library.services.renamer_engine import RenamerEngine
     from app.core.database import SessionLocal
     from app.modules.tasks import task_manager
 

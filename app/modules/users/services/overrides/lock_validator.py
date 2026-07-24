@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.modules.users.models import Tag
 from app.modules.metadata.models import MetadataMatch
+from app.core.date_utils import parse_datetime_utc
 
 logger = logging.getLogger(__name__)
 
@@ -52,10 +53,8 @@ class LockValidator:
 
     def parse_watched_date(self, watched_at: Optional[Any]) -> datetime:
         """Parses watched date safely, defaulting to current time if invalid."""
-        parsed_date = datetime.now(timezone.utc)
-        if watched_at:
-            try:
-                parsed_date = datetime.fromisoformat(str(watched_at).replace("Z", "+00:00"))
-            except ValueError as e:
-                logger.debug(f"Swallowed exception parsing watched date: {e}", exc_info=True)
-        return parsed_date
+        try:
+            return parse_datetime_utc(watched_at)
+        except ValueError as e:
+            logger.debug(f"Swallowed exception parsing watched date: {e}", exc_info=True)
+            return datetime.now(timezone.utc)

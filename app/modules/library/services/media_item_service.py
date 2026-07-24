@@ -23,13 +23,15 @@ class MediaItemService:
         media_item_id = None
         metadata_match_id = None
 
-        if isinstance(item_id, str) and item_id.startswith("tmdb_"):
-            parts = item_id.split("_")
-            if len(parts) >= 4:
+        from app.core.identifier_utils import parse_identifier
+        parsed = parse_identifier(item_id)
+
+        if parsed and parsed.provider == "tmdb":
+            if parsed.season is not None and parsed.episode is not None:
                 # TV Episode format: tmdb_{tv_id}_{season}_{episode}
-                tv_id = parts[1]
-                season_num = int(parts[2])
-                episode_num = int(parts[3])
+                tv_id = parsed.external_id
+                season_num = parsed.season
+                episode_num = parsed.episode
                 
                 # 1. TV show match
                 tv_match = self.db.query(MetadataMatch).filter(
@@ -43,12 +45,12 @@ class MediaItemService:
                     self.db.flush()
                 
                 # 2. Season match
-                season_match = self.db.query(MetadataMatch).filter(
-                    MetadataMatch.provider == Provider.TMDB,
-                    MetadataMatch.parent_id == tv_match.id,
-                    MetadataMatch.media_type == MediaType.SEASON,
-                    MetadataMatch.season_number == season_num
-                ).first()
+                from app.modules.metadata.services.metadata_service import MetadataService
+                season_match = MetadataService(self.db).get_season_match(
+                    provider=Provider.TMDB,
+                    parent_id=tv_match.id,
+                    season_number=season_num
+                )
                 if not season_match:
                     season_match = MetadataMatch(
                         provider=Provider.TMDB,
@@ -104,7 +106,7 @@ class MediaItemService:
                 metadata_match_id = episode_match.id
                 media_item_id = episode_match.media_item_id
             else:
-                tmdb_id = parts[1]
+                tmdb_id = parsed.external_id
                 query = self.db.query(MetadataMatch).filter(
                     MetadataMatch.provider == Provider.TMDB,
                     MetadataMatch.external_id == tmdb_id

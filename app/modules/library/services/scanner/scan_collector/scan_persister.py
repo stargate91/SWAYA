@@ -186,8 +186,9 @@ class ScanPersister:
                         
                         title = fn_data.get("title") or it_data.get("title") or fd_data.get("title") or Path(item_entity.filename).stem
                         year = fn_data.get("year") or it_data.get("year") or fd_data.get("year")
-                        season = fn_data.get("season") or it_data.get("season") or fd_data.get("season")
-                        episode = fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
+                        from app.core.episode_utils import extract_season_from_parsed_info, extract_episode_from_parsed_info
+                        season = extract_season_from_parsed_info(triple)
+                        episode = extract_episode_from_parsed_info(triple)
                         
                         item_entity.group_hash = self.analyzer.generate_group_hash(title, year, season, episode)
                         

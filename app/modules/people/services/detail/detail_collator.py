@@ -206,7 +206,7 @@ class PersonDetailCollator:
             if effective_profile.startswith(("http://", "https://")):
                 is_remote_profile = True
                 profile_url = effective_profile
-            elif effective_profile.startswith("/"):
+            elif effective_profile.startswith("/") and not effective_profile.startswith("/media/"):
                 is_remote_profile = True
                 profile_url = self.image_downloader.get_download_url(effective_profile, "people") or f"https://image.tmdb.org/t/p/h632{effective_profile}"
 
@@ -253,7 +253,7 @@ class PersonDetailCollator:
             if effective_backdrop.startswith(("http://", "https://")):
                 is_remote = True
                 url = effective_backdrop
-            elif effective_backdrop.startswith("/"):
+            elif effective_backdrop.startswith("/") and not effective_backdrop.startswith("/media/"):
                 is_remote = True
                 url = self.image_downloader.get_download_url(effective_backdrop, "backdrops") or f"https://image.tmdb.org/t/p/original{effective_backdrop}"
             
@@ -304,13 +304,8 @@ class PersonDetailCollator:
                 for peak, title in peaks:
                     resolved_snapshot = None
                     if peak.snapshot_path:
-                        snap_path = peak.snapshot_path
-                        if not snap_path.startswith("/media/"):
-                            if snap_path.startswith("snapshots/"):
-                                snap_path = f"/media/images/{snap_path}"
-                            else:
-                                snap_path = f"/media/images/snapshots/{snap_path}"
-                        resolved_snapshot = self.image_service.resolve_image_url(snap_path, "snapshots")
+                        resolved_snapshot = self.image_service.resolve_snapshot_url(peak.snapshot_path)
+
                     
                     finishes.append({
                         "id": peak.id,

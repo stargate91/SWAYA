@@ -51,7 +51,7 @@ class PlaybackService:
                                 match_db = ep
                                 break
             except ValueError as e:
-                logger.debug(f"Swallowed exception in PlaybackService.resolve_item_id_from_external: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
         elif len(parts) == 3:
             try:
                 tv_show_id = parts[0]
@@ -83,7 +83,7 @@ class PlaybackService:
                                 match_db = ep
                                 break
             except ValueError as e:
-                logger.debug(f"Swallowed exception in PlaybackService.resolve_item_id_from_external: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
 
         if not match_db and "_" in item_str:
             parts = item_str.split("_", 1)
