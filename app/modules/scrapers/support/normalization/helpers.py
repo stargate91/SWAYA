@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+from app.core.date_utils import parse_date
 
 def normalize_tag_names(raw_tags: Any) -> List[str]:
     names: Dict[str, str] = {}
@@ -17,7 +18,6 @@ def normalize_tag_names(raw_tags: Any) -> List[str]:
             names.setdefault(normalized.casefold(), normalized)
     return list(names.values())
 
-from app.core.date_utils import parse_date
 
 def safe_parse_date(date_str: Optional[str]) -> Optional[datetime]:
     """Safely parse date strings from APIs into datetime objects."""

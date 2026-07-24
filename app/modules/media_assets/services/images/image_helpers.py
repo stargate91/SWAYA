@@ -75,3 +75,49 @@ def queue_img_download(
     if not existing:
         image_downloader.enqueue_download(url, subfolder, clean_filename)
     return f"{subfolder}/{clean_filename}"
+
+
+def queue_tmdb_media_assets(
+    image_downloader,
+    tmdb_id: int,
+    tmdb_data: dict,
+    effective_poster: Optional[str] = None,
+    effective_backdrop: Optional[str] = None,
+    effective_logo: Optional[str] = None,
+    is_tv_show: bool = False
+) -> None:
+    """Consolidated helper to enqueue TMDB media assets for background downloading."""
+    if not image_downloader or not tmdb_data:
+        return
+
+    # 1. Poster
+    poster_path = effective_poster or tmdb_data.get("poster_path")
+    if poster_path:
+        queue_img_download(image_downloader, poster_path, "posters", f"tmdb_{tmdb_id}")
+
+    # 2. Backdrop
+    b_path = effective_backdrop or tmdb_data.get("backdrop_path")
+    if b_path:
+        queue_img_download(image_downloader, b_path, "backdrops", f"tmdb_{tmdb_id}")
+
+    # 3. Logo
+    l_path = effective_logo or tmdb_data.get("logo_path")
+    if l_path:
+        queue_img_download(image_downloader, l_path, "logos", f"tmdb_{tmdb_id}")
+
+    # 4. Cast & Crew Profiles
+    credits = tmdb_data.get("aggregate_credits") or tmdb_data.get("credits") or {}
+    all_people = (credits.get("cast") or []) + (credits.get("crew") or [])
+    for person in all_people:
+        p_profile = person.get("profile_path")
+        p_id = person.get("id")
+        if p_profile and p_id:
+            queue_img_download(image_downloader, p_profile, "people", f"tmdb_{p_id}")
+
+    # 5. Season Posters (TV Show only)
+    if is_tv_show:
+        for season in tmdb_data.get("seasons", []) or []:
+            s_poster = season.get("poster_path")
+            s_num = season.get("season_number")
+            if s_poster and s_num is not None:
+                queue_img_download(image_downloader, s_poster, "posters", f"tmdb_tv_{tmdb_id}_season_{s_num}")

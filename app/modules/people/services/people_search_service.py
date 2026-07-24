@@ -1,4 +1,3 @@
-import hashlib
 import logging
 from typing import Optional, List, Dict, Any
 from app.core.exceptions import NotFoundException, BadRequestException
@@ -22,16 +21,13 @@ class PeopleSearchService:
             resolver = MediaItemService(db)
         self.resolver = resolver
         if image_service is None:
-            from app.modules.images.services.image_processing_service import ImageProcessingService
-            image_service = ImageProcessingService(db)
+            from app.modules.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
         self.image_service = image_service
         if people_repo is None:
             from app.modules.people.services.person_service import PersonService
             people_repo = PersonService(db)
         self.people_repo = people_repo
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
 
     def search_people_tmdb(self, query: str, language: Optional[str] = None, adult_only: bool = False, page: int = 1, source: str = "all") -> List[Dict[str, Any]]:
         db = self.db
@@ -57,7 +53,8 @@ class PeopleSearchService:
                         continue
                     try:
                         scraper_client = self.scrapers.get_scraper(provider_enum, db)
-                    except Exception:
+                    except Exception as e:
+                        logger.warning(f"Failed to load scraper for {provider_enum}: {e}")
                         scraper_client = None
                     if not scraper_client:
                         continue
@@ -103,7 +100,7 @@ class PeopleSearchService:
                             "name": perf.get("name"),
                             "adult": True,
                             "gender": mapped_gender,
-                            "profile_path": self._resolve_img(profile_url, "people") if profile_url else None,
+                            "profile_path": self.image_service.resolve_image_url(profile_url, "people") if profile_url else None,
                             "known_for_department": "Acting",
                             "known_for": [],
                             "is_active": bool(person.is_active) if person else False,
@@ -132,10 +129,7 @@ class PeopleSearchService:
             try:
                 person_ids.append(int(result.get("id")))
             except (TypeError, ValueError) as e:
-                try:
-                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                except Exception:
-                    pass
+                logger.debug(f"Failed parsing TMDB person ID: {e}", exc_info=True)
                 continue
 
         local_people = {}
@@ -176,10 +170,7 @@ class PeopleSearchService:
             try:
                 person_id = int(result.get("id"))
             except (TypeError, ValueError) as e:
-                try:
-                    logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                except Exception:
-                    pass
+                logger.debug(f"Failed parsing TMDB person ID in results loop: {e}", exc_info=True)
                 continue
 
             local_person = local_people.get(person_id)
@@ -208,7 +199,7 @@ class PeopleSearchService:
                 "name": name,
                 "adult": bool(result.get("adult")),
                 "gender": mapped_gender,
-                "profile_path": self._resolve_img(result.get("profile_path"), "people") if result.get("profile_path") else None,
+                "profile_path": self.image_service.resolve_image_url(result.get("profile_path"), "people") if result.get("profile_path") else None,
                 "known_for_department": result.get("known_for_department") or "Acting",
                 "known_for": known_for_list,
                 "is_active": bool(local_person.is_active) if local_person else False,

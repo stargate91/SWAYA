@@ -84,13 +84,22 @@ class LibraryScanner:
         with StatusCoordinator.scan_status_lock:
             StatusCoordinator.scan_status["scan_mode"] = scan_mode.value
         logger.info("[scan:%s] Starting background scan | task_id=%s | paths=%s | include_adult=%s", scan_mode.value, task_id, paths, include_adult)
+        
+        from app.core.database import SessionLocal
+        from app.modules.library.services.media_item_service import MediaItemService
+        from app.modules.settings.services.settings_service import SettingsService
+        
+        task_db = SessionLocal()
+        task_resolver = MediaItemService(task_db)
+        task_settings = SettingsService(task_db)
+        
         try:
-            repaired_count = self.resolver.repair_inconsistent_matched_items()
+            repaired_count = task_resolver.repair_inconsistent_matched_items()
             if repaired_count > 0:
                 logger.info(f"Automatically repaired {repaired_count} inconsistent matched items by resetting status to NEW.")
 
             libraries_to_scan = []
-            all_libs = self.resolver.get_all_libraries()
+            all_libs = task_resolver.get_all_libraries()
             
             import os
             for p in paths:
@@ -110,13 +119,13 @@ class LibraryScanner:
                         
                         # Update relative paths of media items in this library
                         from app.modules.library.models import MediaItem, ExtraFile
-                        items = self.db.query(MediaItem).filter(MediaItem.library_id == lib.id).all()
+                        items = task_db.query(MediaItem).filter(MediaItem.library_id == lib.id).all()
                         for item in items:
                             abs_path = os.path.join(old_root, item.relative_path)
                             item.relative_path = os.path.relpath(abs_path, p).replace("\\", "/")
                             
                         # Update ExtraFiles in the library
-                        extras = self.db.query(ExtraFile).join(MediaItem).filter(MediaItem.library_id == lib.id).all()
+                        extras = task_db.query(ExtraFile).join(MediaItem).filter(MediaItem.library_id == lib.id).all()
                         for ex in extras:
                             abs_path = os.path.join(old_root, ex.relative_path)
                             ex.relative_path = os.path.relpath(abs_path, p).replace("\\", "/")
@@ -143,7 +152,7 @@ class LibraryScanner:
                     lib_to_paths[matched_lib.id].append(p)
                 else:
                     is_adult_lib = bool(include_adult or scan_mode == ScanMode.SCENES)
-                    new_lib = self.resolver.create_library(name=os.path.basename(p) or "Library", root_path=p, is_adult=is_adult_lib)
+                    new_lib = task_resolver.create_library(name=os.path.basename(p) or "Library", root_path=p, is_adult=is_adult_lib)
                     libraries_to_scan.append(new_lib)
                     if new_lib.id not in lib_to_paths:
                         lib_to_paths[new_lib.id] = []
@@ -152,11 +161,11 @@ class LibraryScanner:
             if not libraries_to_scan:
                 libraries_to_scan = all_libs
             else:
-                self.db.commit()
+                task_db.commit()
 
             total_items_to_enrich = []
             from app.modules.library.services.scanner.scanner_manager import ScannerManager
-            scanner = ScannerManager(self.db, settings=self.service.settings, fs=self.service.fs)
+            scanner = ScannerManager(task_db, settings=task_settings, fs=self.service.fs)
             
             logger.info("[scan:%s] Libraries selected: %s", scan_mode.value, [lib.root_path for lib in libraries_to_scan])
 
@@ -192,7 +201,7 @@ class LibraryScanner:
                     
                 if self.scan_resolver_factory:
                     resolver = self.scan_resolver_factory(
-                        self.db,
+                        task_db,
                         mode=scan_mode,
                         stop_checker=self.service._is_stop_requested,
                         include_adult=include_adult,
@@ -215,7 +224,7 @@ class LibraryScanner:
                 logger.info("[scan:%s] Resolver phase finished for %s items", scan_mode.value, len(total_items_to_enrich))
 
             if total_items_to_enrich:
-                match_ids = self.resolver.get_metadata_match_ids_for_media_items([item.id for item in total_items_to_enrich])
+                match_ids = task_resolver.get_metadata_match_ids_for_media_items([item.id for item in total_items_to_enrich])
                 if match_ids:
                     logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
                     self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
@@ -224,6 +233,7 @@ class LibraryScanner:
             logger.error(f"Scan task failed: {e}", exc_info=True)
             raise e
         finally:
+            task_db.close()
             logger.info("[scan:%s] Scan task finished", scan_mode.value)
             self.task_manager.download_worker.is_paused = False
             with StatusCoordinator.scan_status_lock:
@@ -280,12 +290,19 @@ class LibraryScanner:
             })
             
         logger.info("[scan:%s] Starting background scan retry | task_id=%s | provider=%s", scan_mode.value, task_id, provider)
+        
+        from app.core.database import SessionLocal
+        from app.modules.library.services.media_item_service import MediaItemService
+        
+        task_db = SessionLocal()
+        task_resolver = MediaItemService(task_db)
+        
         try:
-            items_to_retry = self.resolver.get_items_for_scan_retry(scan_mode)
+            items_to_retry = task_resolver.get_items_for_scan_retry(scan_mode)
             logger.info("[scan:%s] Found %s items to retry resolving.", scan_mode.value, len(items_to_retry))
             
             if items_to_retry and not self.service._is_stop_requested():
-                self.resolver.reset_items_for_retry([item.id for item in items_to_retry])
+                task_resolver.reset_items_for_retry([item.id for item in items_to_retry])
                 
                 with StatusCoordinator.scan_status_lock:
                     StatusCoordinator.scan_status["phase"] = "resolving"
@@ -294,7 +311,7 @@ class LibraryScanner:
                     
                 if self.scan_resolver_factory:
                     resolver = self.scan_resolver_factory(
-                        self.db,
+                        task_db,
                         mode=scan_mode,
                         stop_checker=self.service._is_stop_requested,
                         include_adult=include_adult,
@@ -313,7 +330,7 @@ class LibraryScanner:
                 await asyncio.to_thread(resolver.resolve_all, items_to_retry, progress_callback=resolve_progress_cb, task_id=task_id)
                 logger.info("[scan:%s] Retry Resolver phase finished for %s items", scan_mode.value, len(items_to_retry))
                 
-                match_ids = self.resolver.get_metadata_match_ids_for_media_items([item.id for item in items_to_retry])
+                match_ids = task_resolver.get_metadata_match_ids_for_media_items([item.id for item in items_to_retry])
                 if match_ids:
                     logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
                     self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
@@ -322,6 +339,7 @@ class LibraryScanner:
             logger.error(f"Scan retry task failed: {e}", exc_info=True)
             raise e
         finally:
+            task_db.close()
             logger.info("[scan:%s] Scan retry task finished", scan_mode.value)
             self.task_manager.download_worker.is_paused = False
             with StatusCoordinator.scan_status_lock:

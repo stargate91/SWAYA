@@ -29,3 +29,11 @@ def extract_youtube_trailer_key(videos: list) -> str | None:
     if youtube_trailers:
         return youtube_trailers[0].get("key")
     return None
+
+
+def fnv1a_hash(s: str) -> str:
+    hash_val = 2166136261
+    for char in s.encode('utf-8'):
+        hash_val ^= char
+        hash_val = (hash_val * 16777619) & 0xffffffff
+    return f"{hash_val:08x}"

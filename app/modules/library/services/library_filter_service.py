@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.modules.metadata.models import MetadataMatch, MetadataLocalization
 from app.modules.users.models import Tag
 from app.modules.library.schemas import FilterOptionsResponse, LibraryTagsResponse, TagGroupItem
+from app.modules.settings.services.settings_service import SettingsService
 
 
 logger = logging.getLogger(__name__)
@@ -106,7 +107,6 @@ class LibraryFilterService:
         if True:
             from app.modules.people.models import Person, MediaPersonLink
             from app.modules.metadata.models import Studio
-            from app.modules.settings.services.settings_service import SettingsService
 
             settings_adapter = SettingsService(self.db)
             gender_pref = settings_adapter.get_setting("adult_gender_preference") if is_adult else "all"

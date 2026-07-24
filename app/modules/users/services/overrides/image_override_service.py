@@ -5,15 +5,9 @@ from typing import Dict, Any, Optional
 
 from app.modules.media_assets.services.images import image_processing_service
 from app.core.exceptions import NotFoundException, BadRequestException
+from app.core.string_utils import fnv1a_hash
 
 logger = logging.getLogger(__name__)
-
-def fnv1a_hash(s: str) -> str:
-    hash_val = 2166136261
-    for char in s.encode('utf-8'):
-        hash_val ^= char
-        hash_val = (hash_val * 16777619) & 0xffffffff
-    return f"{hash_val:08x}"
 
 class ImageOverrideService:
     def __init__(self, parent_service):
@@ -82,7 +76,6 @@ class ImageOverrideService:
                         safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
                         filename = f"{safe_prefix}_{name}_{url_hash}{ext}"
                         
-                        import threading
                         override_id = override.id
                         def bg_download():
                             try:
@@ -105,7 +98,13 @@ class ImageOverrideService:
                                         db_bg.close()
                             except Exception as e:
                                 logger.error(f"Failed to download generic override image in bg: {e}")
-                        threading.Thread(target=bg_download, daemon=True).start()
+
+                        from app.modules.tasks import task_manager
+                        if task_manager and task_manager.executor:
+                            task_manager.executor.submit(bg_download)
+                        else:
+                            import threading
+                            threading.Thread(target=bg_download, daemon=True).start()
                 else:
                     logger.warning("No image_downloader available for user override image download")
             except Exception as e:

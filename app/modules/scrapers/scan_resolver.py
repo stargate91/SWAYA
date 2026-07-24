@@ -1,16 +1,13 @@
-import time
 import logging
 import concurrent.futures
 from typing import List, Optional, Callable, Any
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import OperationalError
 
 
 
 from app.modules.library.models import MediaItem
 from app.core.enums import ItemStatus, ScanMode
 from app.modules.scrapers.scan_resolution_pipelines import get_scan_resolution_pipeline
-from app.core.database import SessionLocal
 from app.core.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LANGUAGE
 
 logger = logging.getLogger(__name__)

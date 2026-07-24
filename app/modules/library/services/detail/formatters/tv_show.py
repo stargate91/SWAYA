@@ -16,10 +16,13 @@ from app.modules.users.models import UserOverride
 from app.core.enums import Provider, MediaType
 from app.core.genre_utils import split_genres as _split_genres
 
+from app.modules.library.services.detail.detail_mixins import EffectiveImageResolver
+
 logger = logging.getLogger(__name__)
 
 class TvShowFormatter:
-    def __init__(self):
+    def __init__(self, settings_service=None):
+        self.settings_service = settings_service
         self.ep_formatter = TvEpisodeFormatter()
         self.season_formatter = TvSeasonFormatter()
         self.local_resolver = TvLocalResolver()
@@ -27,9 +30,7 @@ class TvShowFormatter:
         self.credits_formatter = TvCreditsFormatter()
         self.metadata_resolver = TvShowMetadataResolver()
 
-    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
-        from app.modules.media_assets.services.images import image_processing_service
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+
 
     def format(
         self,
@@ -47,12 +48,11 @@ class TvShowFormatter:
         try:
             tv_tmdb_id_int = int(parsed.external_id) if parsed else int(tv_tmdb_id)
         except (ValueError, TypeError):
-            return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid tv TMDB ID")
         
-        from app.core.language import get_user_ui_language
-        from app.modules.settings.services.settings_service import SettingsService
-        settings = SettingsService(db)
-        ui_lang = language or get_user_ui_language(settings)
+        from app.core.language import LanguageService
+        ui_lang = language or LanguageService.resolve_ui_lang(db, self.settings_service)
         
         series_match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
@@ -173,14 +173,14 @@ class TvShowFormatter:
             tmdb_scraper=tmdb_scraper,
             ep_formatter=self.ep_formatter,
             current_uid=current_uid,
-            resolve_img_fn=self._resolve_img
+            resolve_img_fn=image_processing_service.resolve_image_url
         )
 
         cast, directors, writers, sound = self.credits_formatter.format_credits(
             db=db,
             tmdb_data=tmdb_data,
             current_uid=current_uid,
-            resolve_img_fn=self._resolve_img
+            resolve_img_fn=image_processing_service.resolve_image_url
         )
             
         override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
@@ -192,31 +192,9 @@ class TvShowFormatter:
         
         from app.core.language import LanguageService
         loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang) if series_match else None
-
-        from app.modules.media_assets.services.images import image_processing_service
-        effective_poster = None
-        if override and override.custom_poster:
-            effective_poster = override.custom_poster
-        elif loc_db and loc_db.local_poster_path:
-            effective_poster = loc_db.local_poster_path
-        else:
-            effective_poster = image_processing_service.pick_poster_path(tmdb_data, preferred_language=ui_lang) or tmdb_data.get("poster_path")
-
-        effective_backdrop = None
-        if override and override.custom_backdrop:
-            effective_backdrop = override.custom_backdrop
-        elif series_match and series_match.local_backdrop_path:
-            effective_backdrop = series_match.local_backdrop_path
-        else:
-            effective_backdrop = image_processing_service.pick_backdrop_path(tmdb_data, preferred_language=ui_lang, allow_low_res=True)
-
-        effective_logo = None
-        if override and override.custom_logo:
-            effective_logo = override.custom_logo
-        elif loc_db and loc_db.local_logo_path:
-            effective_logo = loc_db.local_logo_path
-        else:
-            effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+        effective_poster, effective_backdrop, effective_logo = EffectiveImageResolver.resolve(
+            override, loc_db, series_match, tmdb_data, ui_lang
+        )
 
         # Enqueue local asset downloads for TMDB TV show assets (poster, backdrop, logo, cast profiles, season posters)
         try:
@@ -310,38 +288,13 @@ class TvShowFormatter:
         return TvShowDetailResponse(**result)
 
     def _queue_tmdb_tv_assets(self, image_downloader, tv_tmdb_id: int, tmdb_data: dict, effective_poster: str = None, effective_backdrop: str = None, effective_logo: str = None):
-        if not image_downloader or not tmdb_data:
-            return
-
-        from app.modules.media_assets.services.images import queue_img_download
-
-        # 1. Poster
-        poster_path = effective_poster or tmdb_data.get("poster_path")
-        if poster_path:
-            queue_img_download(image_downloader, poster_path, "posters", f"tmdb_{tv_tmdb_id}")
-
-        # 2. Backdrop
-        b_path = effective_backdrop or tmdb_data.get("backdrop_path")
-        if b_path:
-            queue_img_download(image_downloader, b_path, "backdrops", f"tmdb_{tv_tmdb_id}")
-
-        # 3. Logo
-        l_path = effective_logo or tmdb_data.get("logo_path")
-        if l_path:
-            queue_img_download(image_downloader, l_path, "logos", f"tmdb_{tv_tmdb_id}")
-
-        # 4. Cast & Crew Profiles
-        credits = tmdb_data.get("aggregate_credits") or tmdb_data.get("credits") or {}
-        all_people = (credits.get("cast") or []) + (credits.get("crew") or [])
-        for person in all_people:
-            p_profile = person.get("profile_path")
-            p_id = person.get("id")
-            if p_profile and p_id:
-                queue_img_download(image_downloader, p_profile, "people", f"tmdb_{p_id}")
-
-        # 5. Season Posters
-        for season in tmdb_data.get("seasons", []) or []:
-            s_poster = season.get("poster_path")
-            s_num = season.get("season_number")
-            if s_poster and s_num is not None:
-                queue_img_download(image_downloader, s_poster, "posters", f"tmdb_tv_{tv_tmdb_id}_season_{s_num}")
+        from app.modules.media_assets.services.images import queue_tmdb_media_assets
+        queue_tmdb_media_assets(
+            image_downloader=image_downloader,
+            tmdb_id=tv_tmdb_id,
+            tmdb_data=tmdb_data,
+            effective_poster=effective_poster,
+            effective_backdrop=effective_backdrop,
+            effective_logo=effective_logo,
+            is_tv_show=True
+        )

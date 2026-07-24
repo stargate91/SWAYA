@@ -3,6 +3,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import Session
 from app.modules.users.models import UserOverride
 from app.core.identifier_utils import parse_identifier
+from app.core.enums import Provider
 
 
 logger = logging.getLogger(__name__)
@@ -136,7 +137,7 @@ class TitleLockReader:
             physical_override = self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
-                UserOverride.metadata_match_id == None
+                UserOverride.metadata_match_id.is_(None)
             ).first()
             if physical_override:
                 try:
@@ -202,7 +203,7 @@ class TitleLockReader:
             return self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
-                UserOverride.metadata_match_id == None
+                UserOverride.metadata_match_id.is_(None)
             ).first()
 
         override = query_physical()

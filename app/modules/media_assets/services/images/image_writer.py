@@ -55,7 +55,6 @@ def finalize_file(temp_path: Path, target_path: Path, url: Optional[str] = None)
     # Verify image integrity via PIL (unless SVG) and cap at 4K for scene_stills/backdrops
     if not is_svg:
         try:
-            need_save = False
             with Image.open(temp_path) as img:
                 img.verify()
             

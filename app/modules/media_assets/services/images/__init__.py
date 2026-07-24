@@ -5,5 +5,16 @@ from app.modules.media_assets.services.image_service import (
     ImageProcessingService,
     image_processing_service,
 )
-from app.modules.media_assets.services.images.image_helpers import queue_img_download
+from app.modules.media_assets.services.images.image_helpers import (
+    queue_img_download,
+    queue_tmdb_media_assets,
+)
+
+__all__ = [
+    "ImageProcessingService",
+    "image_processing_service",
+    "queue_img_download",
+    "queue_tmdb_media_assets",
+]
+
 

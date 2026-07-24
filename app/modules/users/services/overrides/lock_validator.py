@@ -1,12 +1,10 @@
 import logging
-from datetime import datetime, timezone
 from typing import List, Any, Optional
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.modules.users.models import Tag
 from app.modules.metadata.models import MetadataMatch
-from app.core.date_utils import parse_datetime_utc
 
 logger = logging.getLogger(__name__)
 

@@ -17,6 +17,27 @@ from app.modules.people.domain.images import merge_images
 from app.modules.people.domain.filters import should_exclude_adult_performer
 from typing import Optional
 
+__all__ = [
+    "_normalize_words",
+    "_is_self_or_guest_credit",
+    "_department_matches_credit",
+    "_is_voice_credit",
+    "known_for_score",
+    "select_known_for",
+    "resolve_person_known_for_backdrop",
+    "calculate_underage_threshold",
+    "calculate_butt_size",
+    "calculate_breast_size",
+    "is_underage_performer",
+    "merge_images",
+    "should_exclude_adult_performer",
+    "resolve_and_enqueue_person_profile_image",
+    "get_cup_size_sql_order",
+    "query_local_profiles_by_tmdb_ids",
+    "CUP_SIZE_ORDER",
+]
+
+
 def resolve_and_enqueue_person_profile_image(
     db,
     person,

@@ -51,6 +51,7 @@ class TaskManager:
         self._active_tasks: Dict[int, asyncio.Task] = {}
         self._active_task_names: Dict[int, str] = {}
         self._cancelled_tasks = set()
+        self._last_cancelled_check = {}
         
         if max_workers is None:
             logical = os.cpu_count() or 4
@@ -93,7 +94,13 @@ class TaskManager:
         if task_id in self._cancelled_tasks:
             return True
         
-        # Fallback check against database
+        # Throttled fallback check against database (at most once every 2 seconds)
+        now = time.time()
+        last_check = self._last_cancelled_check.get(task_id, 0.0)
+        if now - last_check < 2.0:
+            return False
+            
+        self._last_cancelled_check[task_id] = now
         db = self.session_factory()
         try:
             task = db.query(BackgroundTask).filter(BackgroundTask.id == task_id).first()

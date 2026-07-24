@@ -197,7 +197,7 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         )
         config.custom_text = settings.get("naming_custom_tag", "default")
     except Exception as e:
-        print(f"Error loading FormatterConfig from DB: {e}")
+        logger.error(f"Error loading FormatterConfig from DB: {e}", exc_info=True)
     return config
 
 

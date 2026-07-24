@@ -43,9 +43,8 @@ class OfflineResolverPipeline(BaseResolverPipeline):
         )
 
         # Extract still frame at 50% mark using ffmpeg/ffprobe
-        from app.modules.library.filesystem.fs_utils import to_win_long_path, get_video_duration
+        from app.modules.library.filesystem.fs_utils import get_video_duration
         from app.modules.media_assets.services.images import image_processing_service
-        import subprocess
         
         image_filename = f"offline_{item.id}.jpg"
         
@@ -54,7 +53,6 @@ class OfflineResolverPipeline(BaseResolverPipeline):
         target_image_path = img_service.get_original_path("scene_stills", image_filename)
         
         if Path(item.current_path).exists():
-            long_path = to_win_long_path(item.current_path)
             duration = get_video_duration(item.current_path)
 
             seek_seconds = duration * 0.5

@@ -71,7 +71,8 @@ class ScraperPersister:
                             media_item_id=media_item_id
                         )
                         self.metadata_repo.flush()
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Failed to create scene match, falling back to query: {e}", exc_info=True)
                     match = self.metadata_repo.get_match(
                         provider=provider,
                         external_id=scene_id,
@@ -101,7 +102,8 @@ class ScraperPersister:
                 try:
                     with self.db.begin_nested():
                         self.metadata_repo.flush()
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Failed to flush scene localization, falling back to query: {e}", exc_info=True)
                     loc = self.metadata_repo.get_localization(match.id, DEFAULT_FALLBACK_LANGUAGE)
             else:
                 for k, v in norm["localization"].items():
@@ -132,7 +134,8 @@ class ScraperPersister:
                             media_type=MediaType.MOVIE
                         )
                         self.metadata_repo.flush()
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Failed to create TMDB movie match, falling back to query: {e}", exc_info=True)
                     match = self.metadata_repo.get_match(
                         provider=Provider.TMDB,
                         external_id=movie_id,
@@ -164,7 +167,8 @@ class ScraperPersister:
                 try:
                     with self.db.begin_nested():
                         self.metadata_repo.flush()
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Failed to flush movie localization, falling back to query: {e}", exc_info=True)
                     loc = self.metadata_repo.get_localization(match.id, language)
             else:
                 for k, v in norm["localization"].items():

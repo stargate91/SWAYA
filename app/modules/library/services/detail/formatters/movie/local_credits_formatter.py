@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Tuple, List, Dict
 from sqlalchemy.orm import Session, joinedload
-from datetime import datetime
 
 from app.modules.people.models import Person, MediaPersonLink
 from app.modules.users.models import UserOverride
@@ -56,6 +55,7 @@ class LocalCreditsFormatter:
                 continue
 
             custom_img = override_map.get(person.id)
+            from app.core.date_utils import calculate_age_at_release
             person_data = {
                 "id": person.id,
                 "name": person.name,
@@ -70,7 +70,7 @@ class LocalCreditsFormatter:
                 "scene_count": person.scene_count,
                 "rating_porndb": person.rating_porndb,
                 "gender": person.gender,
-                "age_at_release": self._calculate_age_at_release(person.birthday, release_date_str)
+                "age_at_release": calculate_age_at_release(person.birthday, release_date_str)
             }
             if person_data["job"].lower() == "director":
                 directors.append(person_data)
@@ -80,7 +80,3 @@ class LocalCreditsFormatter:
                 cast.append(person_data)
 
         return cast, directors, writers
-
-    def _calculate_age_at_release(self, birthday_str: str, release_date_str: str) -> Any:
-        from app.core.date_utils import calculate_age_at_release
-        return calculate_age_at_release(birthday_str, release_date_str)

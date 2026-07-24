@@ -22,7 +22,8 @@ def ignore_path(path: Any) -> None:
         return
     try:
         resolved = str(Path(path).resolve())
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Watcher: Failed to resolve path '{path}', using raw string: {e}")
         resolved = str(path)
     with _lock:
         _ignored_paths.add(resolved)
@@ -33,7 +34,8 @@ def stop_ignoring(path: Any) -> None:
         return
     try:
         resolved = str(Path(path).resolve())
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Watcher: Failed to resolve path '{path}', using raw string: {e}")
         resolved = str(path)
     with _lock:
         _ignored_paths.discard(resolved)
@@ -42,7 +44,8 @@ def stop_ignoring(path: Any) -> None:
 def is_path_ignored(path: str) -> bool:
     try:
         resolved = str(Path(path).resolve())
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Watcher: Failed to resolve path '{path}', using raw string: {e}")
         resolved = str(path)
     with _lock:
         if resolved in _ignored_paths:

@@ -1,8 +1,5 @@
-import re
-import os
 import logging
-from urllib.parse import urlparse
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from sqlalchemy.orm import Session
 
 from app.modules.metadata.models import MetadataMatch
@@ -21,52 +18,16 @@ class MatchPersister:
 
     def queue_adult_assets(self, match: MetadataMatch) -> None:
         """Queues poster/backdrop downloads for adult matches."""
-        def queue_image(path: Optional[str], subfolder: str, prefix: str) -> Optional[str]:
-            if not path:
-                return None
-
-            url = self.image_downloader.get_download_url(path, subfolder)
-            if not url:
-                return None
-
-            basename = os.path.basename(urlparse(path).path)
-            if not basename:
-                return None
-
-            ext = os.path.splitext(basename)[1].lower()
-            if ext not in {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}:
-                try:
-                    import requests
-                    resp = requests.head(url, timeout=3, allow_redirects=True)
-                    ct = resp.headers.get("Content-Type", "").lower()
-                    if "png" in ct:
-                        ext = ".png"
-                    elif "webp" in ct:
-                        ext = ".webp"
-                    elif "gif" in ct:
-                        ext = ".gif"
-                    elif "svg" in ct:
-                        ext = ".svg"
-                    else:
-                        ext = ".jpg"
-                except Exception:
-                    ext = ".jpg"
-                basename = f"{basename}{ext}"
-
-            safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
-            filename = f"{safe_prefix}_{basename}"
-            self.image_downloader.enqueue_download(url, subfolder, filename)
-            return f"{subfolder}/{filename}"
-
         asset_prefix = f"{match.provider.value if hasattr(match.provider, 'value') else match.provider}_{match.external_id}"
         backdrop_subfolder = "scene_stills" if MediaType.is_adult_type(match.media_type) else "backdrops"
-        match.local_backdrop_path = queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
+        match.local_backdrop_path = self.image_downloader.queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
 
         loc = next((x for x in match.localizations if x.locale == DEFAULT_FALLBACK_LANGUAGE), None)
         if not loc and match.localizations:
             loc = match.localizations[0]
         if loc and loc.poster_path:
-            loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
+            loc.local_poster_path = self.image_downloader.queue_image(loc.poster_path, "posters", asset_prefix)
+
 
     def persist_collection(self, coll_info: Dict[str, Any], match: MetadataMatch, language: str):
         coll_id = coll_info["external_id"]
@@ -80,7 +41,8 @@ class MatchPersister:
                         backdrop_path=coll_info["backdrop_path"]
                     )
                     self.metadata_repo.flush()
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to create collection, falling back to query: {e}", exc_info=True)
                 collection = self.metadata_repo.get_collection(Provider.TMDB, coll_id)
         match.collection = collection
         
@@ -98,33 +60,9 @@ class MatchPersister:
             loc.poster_path = coll_info.get("poster_path") or loc.poster_path
             
             if loc.poster_path and not loc.local_poster_path:
-                try:
-                    url = self.image_downloader.get_download_url(loc.poster_path, "posters")
-                    if url:
-                        import re
-                        from urllib.parse import urlparse
-                        basename = os.path.basename(urlparse(loc.poster_path).path)
-                        ext = os.path.splitext(basename)[1].lower() or ".jpg"
-                        asset_prefix = f"tmdb_{collection.external_id}"
-                        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", asset_prefix).strip("_")
-                        filename = f"{safe_prefix}_{basename}{ext}"
-                        self.image_downloader.enqueue_download(url, "posters", filename)
-                        loc.local_poster_path = f"posters/{filename}"
-                except Exception as e:
-                    logger.error(f"Failed to queue image download for collection in persistence: {e}")
+                asset_prefix = f"tmdb_{collection.external_id}"
+                loc.local_poster_path = self.image_downloader.queue_image(loc.poster_path, "posters", asset_prefix)
 
             if collection.backdrop_path and not collection.local_backdrop_path:
-                try:
-                    url = self.image_downloader.get_download_url(collection.backdrop_path, "backdrops")
-                    if url:
-                        import re
-                        from urllib.parse import urlparse
-                        basename = os.path.basename(urlparse(collection.backdrop_path).path)
-                        ext = os.path.splitext(basename)[1].lower() or ".jpg"
-                        asset_prefix = f"tmdb_{collection.external_id}"
-                        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", asset_prefix).strip("_")
-                        filename = f"{safe_prefix}_{basename}{ext}"
-                        self.image_downloader.enqueue_download(url, "backdrops", filename)
-                        collection.local_backdrop_path = f"backdrops/{filename}"
-                except Exception as e:
-                    logger.error(f"Failed to queue backdrop download for collection in persistence: {e}")
+                asset_prefix = f"tmdb_{collection.external_id}"
+                collection.local_backdrop_path = self.image_downloader.queue_image(collection.backdrop_path, "backdrops", asset_prefix)

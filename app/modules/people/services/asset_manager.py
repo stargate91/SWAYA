@@ -7,18 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.modules.people.models import Person
 from app.core.user_context import get_current_user_id
-
-
-
+from app.core.string_utils import fnv1a_hash
 
 logger = logging.getLogger(__name__)
-
-def fnv1a_hash(s: str) -> str:
-    hash_val = 2166136261
-    for char in s.encode('utf-8'):
-        hash_val ^= char
-        hash_val = (hash_val * 16777619) & 0xffffffff
-    return f"{hash_val:08x}"
 
 class PerformerAssetManager:
     def __init__(self, db: Session, resolver: Optional[Any] = None, image_service: Any = None, image_downloader: Any = None):
@@ -27,6 +18,9 @@ class PerformerAssetManager:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
+        if image_service is None:
+            from app.modules.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
         self.image_service = image_service
         self.image_downloader = image_downloader
 
@@ -34,9 +28,6 @@ class PerformerAssetManager:
         """Create a fresh session for background threads."""
         from app.core.database import SessionLocal
         return SessionLocal()
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
 
     def update_person_backdrop(self, person_id: int, backdrop_path: str) -> Dict[str, Any]:
         db = self.db
@@ -77,7 +68,6 @@ class PerformerAssetManager:
                     safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
                     filename = f"{safe_prefix}_{name}_{url_hash}{ext}"
                     
-                    import threading
                     def bg_download():
                         try:
                             downloader.download_now(url, "backdrops", filename)
@@ -92,7 +82,13 @@ class PerformerAssetManager:
                                 db_bg.close()
                         except Exception as e:
                             logger.error(f"Failed to download person backdrop in bg: {e}")
-                    threading.Thread(target=bg_download, daemon=True).start()
+
+                    from app.modules.tasks import task_manager
+                    if task_manager and task_manager.executor:
+                        task_manager.executor.submit(bg_download)
+                    else:
+                        import threading
+                        threading.Thread(target=bg_download, daemon=True).start()
             except Exception as e:
                 logger.error(f"Failed to download person backdrop override image: {e}")
 
@@ -110,7 +106,7 @@ class PerformerAssetManager:
 
         return {
             "status": "success",
-            "backdrop_path": self._resolve_img(backdrop_path, "backdrops", size="original"),
+            "backdrop_path": self.image_service.resolve_image_url(backdrop_path, "backdrops", size="original"),
             "has_local_backdrop": bool(backdrop_path)
         }
 
@@ -187,7 +183,6 @@ class PerformerAssetManager:
                     safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
                     filename = f"{safe_prefix}_{name}_{url_hash}{ext}"
                     
-                    import threading
                     def bg_download():
                         try:
                             downloader.download_now(url, "people", filename)
@@ -202,7 +197,13 @@ class PerformerAssetManager:
                                 db_bg.close()
                         except Exception as e:
                             logger.error(f"Failed to download person profile in bg: {e}")
-                    threading.Thread(target=bg_download, daemon=True).start()
+
+                    from app.modules.tasks import task_manager
+                    if task_manager and task_manager.executor:
+                        task_manager.executor.submit(bg_download)
+                    else:
+                        import threading
+                        threading.Thread(target=bg_download, daemon=True).start()
             except Exception as e:
                 logger.error(f"Failed to download person profile override image: {e}")
 
@@ -217,7 +218,7 @@ class PerformerAssetManager:
 
         return {
             "status": "success",
-            "profile_path": self._resolve_img(profile_path, "people"),
+            "profile_path": self.image_service.resolve_image_url(profile_path, "people"),
             "has_local_profile": bool(profile_path)
         }
 

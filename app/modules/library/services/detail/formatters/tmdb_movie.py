@@ -1,13 +1,12 @@
 import logging
 from typing import Any
-from fastapi.responses import JSONResponse
 
 from app.modules.metadata.models import MetadataMatch
 from app.core.language import LanguageService
 from app.core.genre_utils import split_genres as _split_genres
 from app.modules.library.schemas import MovieDetailResponse
 from app.modules.library.services.detail.formatters.base import MovieDetailFormatter
-from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
+from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder, EffectiveImageResolver
 from app.core.date_utils import get_year_from_date
 
 from app.modules.media_assets.services.images import image_processing_service
@@ -15,30 +14,28 @@ from app.modules.media_assets.services.images import image_processing_service
 logger = logging.getLogger(__name__)
 
 class TmdbMovieFormatter(MovieDetailFormatter):
-    def __init__(self):
+    def __init__(self, settings_service=None):
         from app.modules.library.services.detail.formatters.movie.movie_credits_formatter import MovieCreditsFormatter
         from app.modules.library.services.detail.formatters.movie.movie_db_syncer import MovieDbSyncer
+        self.settings_service = settings_service
         self.credits_formatter = MovieCreditsFormatter()
         self.db_syncer = MovieDbSyncer()
 
-    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
-        from app.modules.media_assets.services.images import image_processing_service
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+
 
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         from app.core.identifier_utils import parse_identifier
         parsed = parse_identifier(item_id)
         if not parsed or parsed.provider != "tmdb":
-            return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid TMDB ID format")
         try:
             tmdb_id = int(parsed.external_id)
         except ValueError:
-            return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid TMDB ID format")
         
-        from app.core.language import get_user_ui_language
-        from app.modules.settings.services.settings_service import SettingsService
-        settings = SettingsService(db)
-        ui_lang = get_user_ui_language(settings)
+        ui_lang = LanguageService.resolve_ui_lang(db, self.settings_service)
         
         from app.core.enums import Provider, MediaType
         
@@ -52,7 +49,8 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
         try:
             tmdb_data = tmdb_scraper.get_details(tmdb_id, "movie", language=ui_lang)
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to fetch TMDB movie details for TMDB ID {tmdb_id}: {e}", exc_info=True)
             tmdb_data = None
 
         if not tmdb_data and match:
@@ -106,7 +104,8 @@ class TmdbMovieFormatter(MovieDetailFormatter):
 
 
         if not tmdb_data:
-            return JSONResponse(status_code=404, content={"error": "Movie not found on TMDB"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Movie not found on TMDB")
         
         credits = tmdb_data.get("credits", {})
         release_date = tmdb_data.get("release_date")
@@ -119,36 +118,14 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         )
         year = get_year_from_date(release_date)
         
-        match = db.query(MetadataMatch).filter(
-            MetadataMatch.provider == Provider.TMDB,
-            MetadataMatch.external_id == str(tmdb_id),
-            MetadataMatch.media_type == MediaType.MOVIE
-        ).first()
-
         metadata_override, physical_override = OverrideResolver.resolve_overrides(
             db, current_uid, match=match
         )
 
         override = metadata_override
-        
-        from app.modules.media_assets.services.images import image_processing_service
-        effective_poster = None
-        if override and override.custom_poster:
-            effective_poster = override.custom_poster
-        else:
-            effective_poster = image_processing_service.pick_poster_path(tmdb_data, preferred_language=ui_lang) or tmdb_data.get("poster_path")
-
-        effective_backdrop = None
-        if override and override.custom_backdrop:
-            effective_backdrop = override.custom_backdrop
-        else:
-            effective_backdrop = image_processing_service.pick_backdrop_path(tmdb_data, preferred_language=ui_lang, allow_low_res=True)
-
-        effective_logo = None
-        if override and override.custom_logo:
-            effective_logo = override.custom_logo
-        else:
-            effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+        effective_poster, effective_backdrop, effective_logo = EffectiveImageResolver.resolve(
+            override, None, match, tmdb_data, ui_lang
+        )
 
         if match:
             self.db_syncer.sync_db_metadata(
@@ -193,7 +170,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             "title": tmdb_data.get("title") or tmdb_data.get("original_title") or "Unknown",
             "keywords": keywords_list,
             "trailer_key": trailer_key,
-            "logo_path": self._resolve_img(effective_logo, "logos"),
+            "logo_path": image_processing_service.resolve_image_url(effective_logo, "logos"),
             "original_title": tmdb_data.get("original_title"),
             "tagline": tmdb_data.get("tagline"),
             "overview": tmdb_data.get("overview"),
@@ -253,29 +230,17 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         return MovieDetailResponse(**result)
 
     def _queue_tmdb_movie_assets(self, image_downloader, tmdb_id: int, tmdb_data: dict, effective_poster: str = None, effective_backdrop: str = None, effective_logo: str = None):
-        if not image_downloader or not tmdb_data:
-            return
+        from app.modules.media_assets.services.images import queue_tmdb_media_assets
+        queue_tmdb_media_assets(
+            image_downloader=image_downloader,
+            tmdb_id=tmdb_id,
+            tmdb_data=tmdb_data,
+            effective_poster=effective_poster,
+            effective_backdrop=effective_backdrop,
+            effective_logo=effective_logo,
+            is_tv_show=False
+        )
 
-        from app.modules.media_assets.services.images import queue_img_download
 
-        poster_path = effective_poster or tmdb_data.get("poster_path")
-        if poster_path:
-            queue_img_download(image_downloader, poster_path, "posters", f"tmdb_{tmdb_id}")
-
-        b_path = effective_backdrop or tmdb_data.get("backdrop_path")
-        if b_path:
-            queue_img_download(image_downloader, b_path, "backdrops", f"tmdb_{tmdb_id}")
-
-        l_path = effective_logo or tmdb_data.get("logo_path")
-        if l_path:
-            queue_img_download(image_downloader, l_path, "logos", f"tmdb_{tmdb_id}")
-
-        credits = tmdb_data.get("credits", {})
-        all_people = (credits.get("cast") or []) + (credits.get("crew") or [])
-        for person in all_people:
-            p_profile = person.get("profile_path")
-            p_id = person.get("id")
-            if p_profile and p_id:
-                queue_img_download(image_downloader, p_profile, "people", f"tmdb_{p_id}")
 
 

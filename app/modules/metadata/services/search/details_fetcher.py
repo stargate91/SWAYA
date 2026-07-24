@@ -1,7 +1,7 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from app.core.enums import MediaType, Provider
+from app.core.enums import MediaType
 from app.core.identifier_utils import parse_identifier
 
 from app.modules.metadata.models import MetadataMatch

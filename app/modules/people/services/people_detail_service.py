@@ -59,8 +59,7 @@ class PeopleDetailService:
             image_downloader=image_downloader
         )
 
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
+
 
     def get_people(
         self,
@@ -142,8 +141,6 @@ class PeopleDetailService:
 def scrape_healthyceleb_data(db: Session, person_id: Any, url: Optional[str] = None) -> Dict[str, Any]:
     import re
     import requests
-    import unicodedata
-    from datetime import datetime
     from html.parser import HTMLParser
     from app.core.string_utils import slugify_name
     from app.core.exceptions import NotFoundException, BadRequestException, AppException

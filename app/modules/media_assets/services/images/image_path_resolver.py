@@ -1,12 +1,18 @@
+import fnmatch
 import logging
-logger = logging.getLogger(__name__)
 import os
-from typing import Optional
 from pathlib import Path
+from threading import Lock
+import time
+from typing import Optional
+
 from app.core.constants import (
     MEDIA_IMAGE_SUBFOLDERS,
     MIN_CACHED_IMAGE_BYTES,
 )
+from app.core.enums import MediaSubfolder
+
+logger = logging.getLogger(__name__)
 
 def ensure_folders(image_root: Path) -> None:
     """Ensures all subdirectories exist for original assets and thumbnails."""
@@ -18,18 +24,12 @@ def get_original_path(image_root: Path, subfolder: str, filename: str) -> Path:
     """Returns target path for original resolution image."""
     return image_root / "original" / subfolder / filename.lstrip("/")
 
-from app.core.enums import MediaSubfolder
-
 def get_thumbnail_path(image_root: Path, subfolder: str, filename: str) -> Path:
     """Returns target path for the thumbnail image (keeping original extension, except for scene_stills which forces .jpg)."""
     if subfolder == MediaSubfolder.SCENE_STILLS:
         base, _ = os.path.splitext(filename)
         filename = f"{base}.jpg"
     return image_root / "thumbnails" / subfolder / filename.lstrip("/")
-
-import time
-import fnmatch
-from threading import Lock
 
 _dir_cache = {}
 _dir_cache_lock = Lock()

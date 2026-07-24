@@ -108,7 +108,6 @@ class DownloadWorker:
         try:
             from app.modules.metadata.models import MetadataLocalization
             from app.modules.people.models import Person
-            from pathlib import Path
             
             # 1. Recover performer profiles
             people = db.query(Person).filter(
@@ -116,9 +115,10 @@ class DownloadWorker:
                 Person.local_profile_path.isnot(None)
             ).all()
             for p in people:
-                local_path = Path(p.local_profile_path)
-                if not local_path.exists():
-                    self.enqueue_download(p.profile_path, "people", local_path.name)
+                filename = p.local_profile_path.split("/")[-1]
+                local_path = self.image_service.get_original_path("people", filename)
+                if not self.image_service.exists(local_path):
+                    self.enqueue_download(p.profile_path, "people", filename)
 
             # 2. Recover localized posters
             locs = db.query(MetadataLocalization).filter(
@@ -126,9 +126,10 @@ class DownloadWorker:
                 MetadataLocalization.local_poster_path.isnot(None)
             ).all()
             for loc in locs:
-                local_path = Path(loc.local_poster_path)
-                if not local_path.exists():
-                    self.enqueue_download(loc.poster_path, "posters", local_path.name)
+                filename = loc.local_poster_path.split("/")[-1]
+                local_path = self.image_service.get_original_path("posters", filename)
+                if not self.image_service.exists(local_path):
+                    self.enqueue_download(loc.poster_path, "posters", filename)
         except Exception as e:
             logger.error(f"Failed to recover missing images: {e}")
         finally:

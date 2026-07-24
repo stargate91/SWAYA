@@ -96,23 +96,22 @@ class SceneMetadataSyncer:
             try:
                 match_db.release_date = datetime.strptime(date_str, "%Y-%m-%d")
                 db_updated = True
-            except Exception as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
-        if scene_data.get("rating") is not None and float(scene_data.get("rating")) > 0:
+            except ValueError as e:
+                logger.warning(f"Failed parsing release date '{date_str}': {e}")
+        if scene_data.get("rating") is not None:
             try:
-                match_db.rating_porndb = float(scene_data.get("rating"))
-                db_updated = True
-            except Exception as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+                rating_val = float(scene_data.get("rating"))
+                if rating_val > 0:
+                    match_db.rating_porndb = rating_val
+                    db_updated = True
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Failed to parse rating: {e}")
         
-        duration_raw = scene_data.get("duration")
-        if duration_raw and not match_db.runtime:
-            try:
-                duration_sec = int(duration_raw)
-                match_db.runtime = int(duration_sec // 60)
-                db_updated = True
-            except Exception as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+        from app.core.date_utils import parse_duration_seconds
+        duration_sec = parse_duration_seconds(scene_data.get("duration"))
+        if duration_sec and not match_db.runtime:
+            match_db.runtime = int(duration_sec // 60)
+            db_updated = True
         
         loc_db = next((x for x in match_db.localizations if x.locale == "en"), None)
 

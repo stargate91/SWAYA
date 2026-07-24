@@ -29,11 +29,8 @@ class FilmographyService:
         self.local_aggregator = LocalCreditsAggregator(db, resolver, image_service)
         self.prioritizer = CreditsPrioritizer()
         self.remote_fetcher = RemoteCreditsFetcher(db, resolver, image_service, scrapers=scrapers)
-        self.combined_resolver = CombinedFilmographyResolver(self.prioritizer, self._resolve_img)
-        self.paginated_retriever = PaginatedCreditsRetriever(db, resolver, self._resolve_img, self._fetch_remote_credits)
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
+        self.combined_resolver = CombinedFilmographyResolver(self.prioritizer, self.image_service.resolve_image_url)
+        self.paginated_retriever = PaginatedCreditsRetriever(db, resolver, self.image_service.resolve_image_url, self._fetch_remote_credits)
 
     def aggregate_credits(self, person_id: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         return self.local_aggregator.aggregate_credits(person_id)

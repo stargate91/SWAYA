@@ -266,41 +266,45 @@ class LibraryListingService:
         filter_butt_shape: Optional[str] = None,
         filter_butt_size: Optional[str] = None,
         filter_rating: str = "all",
+        params: Optional[ListingFilterParams] = None,
     ) -> LibraryTabResponse:
         """
         Retrieves a paginated, filtered, and sorted list of library items for a specific UI tab.
         """
-        params = ListingFilterParams(
-            tab=tab,
-            page=page,
-            page_size=page_size,
-            sort_by=sort_by,
-            search=search,
-            selected_tags=selected_tags,
-            selected_genre=selected_genre,
-            selected_decade=selected_decade,
-            selected_year=selected_year,
-            filter_favorite=filter_favorite,
-            filter_watched=filter_watched,
-            filter_ownership=filter_ownership,
-            filter_status=filter_status,
-            filter_gender=filter_gender,
-            people_role=people_role,
-            include_adult=include_adult,
-            selected_performer_id=selected_performer_id,
-            selected_studio_id=selected_studio_id,
-            selected_network_id=selected_network_id,
-            filter_hair_color=filter_hair_color,
-            filter_ethnicity=filter_ethnicity,
-            filter_eye_color=filter_eye_color,
-            filter_tattoos=filter_tattoos,
-            filter_piercings=filter_piercings,
-            filter_breast_type=filter_breast_type,
-            filter_breast_size=filter_breast_size,
-            filter_butt_shape=filter_butt_shape,
-            filter_butt_size=filter_butt_size,
-            filter_rating=filter_rating,
-        )
+        if params is None:
+            params = ListingFilterParams(
+                tab=tab,
+                page=page,
+                page_size=page_size,
+                sort_by=sort_by,
+                search=search,
+                selected_tags=selected_tags,
+                selected_genre=selected_genre,
+                selected_decade=selected_decade,
+                selected_year=selected_year,
+                filter_favorite=filter_favorite,
+                filter_watched=filter_watched,
+                filter_ownership=filter_ownership,
+                filter_status=filter_status,
+                filter_gender=filter_gender,
+                people_role=people_role,
+                include_adult=include_adult,
+                selected_performer_id=selected_performer_id,
+                selected_studio_id=selected_studio_id,
+                selected_network_id=selected_network_id,
+                filter_hair_color=filter_hair_color,
+                filter_ethnicity=filter_ethnicity,
+                filter_eye_color=filter_eye_color,
+                filter_tattoos=filter_tattoos,
+                filter_piercings=filter_piercings,
+                filter_breast_type=filter_breast_type,
+                filter_breast_size=filter_breast_size,
+                filter_butt_shape=filter_butt_shape,
+                filter_butt_size=filter_butt_size,
+                filter_rating=filter_rating,
+            )
+        else:
+            tab = params.tab
 
         if tab in ("people", "adult_people"):
             builder = PeopleQueryBuilder(self.db, resolver=self.resolver)

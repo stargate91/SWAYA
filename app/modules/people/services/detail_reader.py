@@ -33,6 +33,9 @@ class PerformerDetailReader:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
+        if image_service is None:
+            from app.modules.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
         self.image_service = image_service
         self.filmography_service = filmography_service
 
@@ -42,9 +45,6 @@ class PerformerDetailReader:
         self.resolver_helper = PersonResolver(db, self.search_service)
         self.collator = PersonDetailCollator(db, scrapers, self.tmdb, resolver, image_service, filmography_service, image_downloader=image_downloader)
         self.paginator = FilmographyPaginator(self.tmdb, filmography_service)
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
 
     def get_people(
         self,
@@ -102,7 +102,7 @@ class PerformerDetailReader:
         resolved_backdrops = []
         for bd in backdrops:
             resolved_bd = dict(bd)
-            resolved_bd["file_path"] = self._resolve_img(bd.get("file_path"), "backdrops", size="original")
+            resolved_bd["file_path"] = self.image_service.resolve_image_url(bd.get("file_path"), "backdrops", size="original")
             resolved_backdrops.append(resolved_bd)
 
         return {

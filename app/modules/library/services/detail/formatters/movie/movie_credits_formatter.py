@@ -1,12 +1,9 @@
 import logging
 from typing import List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
-from app.modules.people.models import Person
-from app.modules.users.models import UserOverride
+from app.modules.library.services.detail.formatters.base import BaseCreditsFormatter
 
 logger = logging.getLogger(__name__)
-
-from app.modules.library.services.detail.formatters.base import BaseCreditsFormatter
 
 class MovieCreditsFormatter(BaseCreditsFormatter):
     def format_credits(

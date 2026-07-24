@@ -181,5 +181,11 @@ class MetadataService:
         self.db.add(loc)
         return loc
 
+    def delete_matches_by_item_id(self, media_item_id: int) -> None:
+        matches = self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == media_item_id).all()
+        for m in matches:
+            self.db.delete(m)
+
     def flush(self) -> None:
         self.db.flush()
+

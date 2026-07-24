@@ -2,8 +2,9 @@ import logging
 from typing import Optional, List, Dict, Any, Tuple
 from app.modules.people.helpers import select_known_for
 from app.modules.people.services.filmography.prioritizer import CreditsPrioritizer
-
 from app.core.date_utils import get_year_from_date
+
+logger = logging.getLogger(__name__)
 
 class CombinedFilmographyResolver:
     def __init__(self, prioritizer: CreditsPrioritizer, resolve_img_fn: Any):

@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import List, Optional, Any, TYPE_CHECKING
-from sqlalchemy import String, Integer, Float, DateTime, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, Table, Column, BigInteger
+from sqlalchemy import String, Integer, Float, DateTime, JSON, Boolean, ForeignKey, UniqueConstraint, Table, Column, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.core.enums import Provider
+
 
 if TYPE_CHECKING:
     from app.modules.users.models import UserOverride

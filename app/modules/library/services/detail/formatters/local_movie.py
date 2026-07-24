@@ -1,37 +1,35 @@
 import logging
 from typing import Any
 from sqlalchemy.orm import joinedload
-from fastapi.responses import JSONResponse
 
 from app.core.enums import Provider, MediaType
 from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch, MediaCollection
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.core.language import LanguageService
 from app.core.genre_utils import split_genres as _split_genres
 from app.modules.library.schemas import MovieDetailResponse
 from app.modules.library.services.detail.formatters.base import MovieDetailFormatter
-from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
+from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder, EffectiveImageResolver
 from app.modules.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
 class LocalMovieFormatter(MovieDetailFormatter):
-    def __init__(self):
+    def __init__(self, settings_service=None):
         from app.modules.library.services.detail.formatters.movie.local_credits_formatter import LocalCreditsFormatter
         from app.modules.library.services.detail.formatters.movie.local_metadata_resolver import LocalMetadataResolver
+        self.settings_service = settings_service
         self.credits_formatter = LocalCreditsFormatter()
         self.metadata_resolver = LocalMetadataResolver()
 
-    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
-        from app.modules.media_assets.services.images import image_processing_service
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+
 
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         try:
             item_id_int = int(item_id)
         except ValueError:
-            return JSONResponse(status_code=400, content={"error": "Invalid item ID"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid item ID")
         
         item = db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
@@ -44,7 +42,8 @@ class LocalMovieFormatter(MovieDetailFormatter):
         ).filter(MediaItem.id == item_id_int).first()
         
         if not item:
-            return JSONResponse(status_code=404, content={"error": "Item not found"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Item not found")
         
         active_match = next((m for m in item.matches if m.media_item_id == item.id and m.is_active), None)
         if not active_match:
@@ -52,17 +51,15 @@ class LocalMovieFormatter(MovieDetailFormatter):
         if not active_match and item.matches:
             active_match = item.matches[0]
             
-        from app.core.language import get_user_ui_language
-        from app.modules.settings.services.settings_service import SettingsService
-        settings = SettingsService(db)
-        ui_lang = get_user_ui_language(settings)
+        from app.core.language import LanguageService
+        ui_lang = LanguageService.resolve_ui_lang(db, self.settings_service)
         loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
         
         cast, directors, writers = self.credits_formatter.format_credits(
             db=db,
             active_match=active_match,
             current_uid=current_uid,
-            resolve_img_fn=self._resolve_img
+            resolve_img_fn=image_processing_service.resolve_image_url
         )
         
         technical = item.technical_info
@@ -131,6 +128,10 @@ class LocalMovieFormatter(MovieDetailFormatter):
                 tv_loc = LanguageService.get_best_localization(tv_match.localizations, ui_lang) if tv_match.localizations else None
                 tv_title = tv_loc.title if tv_loc else tv_match.original_title
 
+        effective_poster, effective_backdrop, effective_logo = EffectiveImageResolver.resolve(
+            override, loc, active_match
+        )
+
         result = {
             "id": item.id,
             "title": title,
@@ -142,7 +143,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "keywords": keywords_list,
             "trailer_key": trailer_key,
             "extras": extras_list,
-            "logo_path": image_processing_service.resolve_image_url(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
+            "logo_path": image_processing_service.resolve_image_url(effective_logo, "logos"),
             "original_title": active_match.original_title if active_match else None,
             "tagline": loc.tagline if loc else None,
             "overview": overview,
@@ -158,10 +159,10 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "vote_count_tmdb": active_match.vote_count_tmdb if (active_match and active_match.vote_count_tmdb is not None) else None,
             "budget": active_match.budget if active_match else None,
             "revenue": active_match.revenue if active_match else None,
-            "companies": [{"name": s.name, "logo_path": self._resolve_img(s.logo_path, "logos")} for s in active_match.studios] if active_match else [],
+            "companies": [{"name": s.name, "logo_path": image_processing_service.resolve_image_url(s.logo_path, "logos")} for s in active_match.studios] if active_match else [],
             "networks": [],
-            "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else (loc.poster_path if loc else None), "posters"),
-            "backdrop_path": self._resolve_img(override.custom_backdrop if (override and override.custom_backdrop) else (active_match.backdrop_path if active_match else None), "backdrops", size="original"),
+            "poster_path": image_processing_service.resolve_image_url(effective_poster, "posters"),
+            "backdrop_path": image_processing_service.resolve_image_url(effective_backdrop, "backdrops", size="original"),
             "original_language": loc.original_language if loc else DEFAULT_FALLBACK_LANGUAGE,
             "type": (active_match.media_type.value if hasattr(active_match.media_type, "value") else active_match.media_type) if active_match else "movie",
             "tmdb_id": int(active_match.external_id) if (active_match and active_match.provider == Provider.TMDB and active_match.external_id.isdigit()) else None,

@@ -1,5 +1,4 @@
 import logging
-logger = logging.getLogger(__name__)
 from typing import List, Optional, Any, TYPE_CHECKING
 from datetime import datetime
 from sqlalchemy import String, Integer, Float, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, DateTime, func
@@ -7,6 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.core.enums import RoleType, Provider
+
+logger = logging.getLogger(__name__)
+
 
 if TYPE_CHECKING:
     from app.modules.metadata.models import MetadataMatch

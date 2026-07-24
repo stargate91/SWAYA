@@ -1,9 +1,8 @@
 import os
-import shutil
-import platform
 import logging
 import requests
 import uuid
+import threading
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 from sqlalchemy.orm import Session
@@ -13,10 +12,8 @@ from app.modules.settings.models import UserSetting, SystemSetting
 
 from app.modules.media_assets.services.images import image_processing_service
 
-
 logger = logging.getLogger(__name__)
 
-import threading
 _settings_lock = threading.Lock()
 _system_settings_cache = None
 _user_settings_cache = {}
@@ -43,7 +40,8 @@ class SettingsService:
             from app.core.user_context import get_current_user_id
             try:
                 user_id = get_current_user_id()
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to retrieve current user ID: {e}", exc_info=True)
                 user_id = None
         self.user_id = user_id
 
@@ -77,7 +75,8 @@ class SettingsService:
             from app.core.user_context import get_current_user_id
             try:
                 user_id = get_current_user_id()
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to retrieve current user ID in get_setting: {e}", exc_info=True)
                 user_id = None
         if user_id is not None:
             global _user_settings_cache
@@ -123,7 +122,8 @@ class SettingsService:
             from app.core.user_context import get_current_user_id
             try:
                 user_id = get_current_user_id()
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to retrieve current user ID in set_setting: {e}", exc_info=True)
                 user_id = None
         
         setting = self.db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
@@ -195,11 +195,6 @@ class SettingsService:
 
     def update_settings(self, settings: Dict[str, Any]) -> Dict[str, Any]:
         # Convert values to correct types if needed (e.g. check current value of torrent_enabled)
-        from app.modules.settings.models import UserSetting
-        old_torrent_enabled_setting = self.db.query(UserSetting).filter(UserSetting.key == "torrent_enabled", UserSetting.user_id == self.user_id).first()
-        old_enabled = False
-        if old_torrent_enabled_setting:
-            old_enabled = str(old_torrent_enabled_setting.value).lower() in ("true", "1")
 
         for key, value in settings.items():
             self.set_setting(key, value, self.user_id)

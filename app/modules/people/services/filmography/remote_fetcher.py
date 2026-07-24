@@ -19,11 +19,11 @@ class RemoteCreditsFetcher:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
+        if image_service is None:
+            from app.modules.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
         self.image_service = image_service
         self.scrapers = scrapers
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
 
     def fetch_remote_known_for(self, person_id: int, source: str, ext_id: str) -> list[dict[str, Any]]:
         db = self.db
@@ -276,8 +276,8 @@ class RemoteCreditsFetcher:
                     "media_type": media_type,
                     "year": match.release_date.year if match.release_date else None,
                     "release_date": match.release_date.isoformat() if match.release_date else None,
-                    "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
-                    "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
+                    "poster_path": self.image_service.resolve_image_url(match_loc.poster_path if match_loc else None, "posters"),
+                    "backdrop_path": self.image_service.resolve_image_url(match.backdrop_path, "backdrops", size="original"),
                     "rating": match.rating_tmdb or 0.0,
                     "rating_porndb": match.rating_porndb,
                     "job": link.role.value if hasattr(link.role, "value") else str(link.role),

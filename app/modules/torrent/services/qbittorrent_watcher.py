@@ -2,7 +2,6 @@ import time
 import logging
 import threading
 from typing import Set, List
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

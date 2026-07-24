@@ -99,8 +99,6 @@ class MetadataSearchService:
             elif type_lower == "person":
                 results = self.adult_resolver.search_performers(self.db, self.scrapers, query, prov_enum, page=page)
 
-        # 1. Post-process to calculate and append target_path
-        from app.modules.media_assets.services.images import image_processing_service
         for r in results:
             from app.modules.scrapers.support.registry import ProviderRegistry
             m_type = r.get("media_type")

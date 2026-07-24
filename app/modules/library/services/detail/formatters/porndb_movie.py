@@ -1,6 +1,5 @@
 import logging
-from typing import Any, Optional
-from fastapi.responses import JSONResponse
+from typing import Any
 from app.core.gender_utils import map_gender_str_to_int, map_gender_int_to_str
 from app.core.date_utils import parse_date
 
@@ -10,38 +9,38 @@ from app.core.enums import Provider, MediaType
 from app.modules.users.models import UserOverride
 from app.modules.library.schemas import MovieDetailResponse
 from app.modules.library.services.detail.formatters.base import MovieDetailFormatter
-from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
+from app.modules.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder, EffectiveImageResolver
 from app.modules.metadata.models import MetadataMatch
 
 from app.modules.people.models import Person, ExternalSourceLink
+
+from app.modules.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
 
 
 class PornDbMovieFormatter(MovieDetailFormatter):
-    def __init__(self):
+    def __init__(self, settings_service=None):
         super().__init__()
         from app.modules.library.services.detail.formatters.movie.movie_db_syncer import MovieDbSyncer
+        self.settings_service = settings_service
         self.db_syncer = MovieDbSyncer()
 
-    def _resolve_img(self, path: Any, subfolder: str, size: str = "w500") -> Any:
-        from app.modules.media_assets.services.images import image_processing_service
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+
 
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         from app.core.identifier_utils import parse_identifier
         parsed = parse_identifier(item_id)
         if not parsed or parsed.provider != "porndb":
-            print(f"[DEBUG] PornDbMovieFormatter.format: Invalid PornDB ID format: {item_id}")
-            return JSONResponse(status_code=400, content={"error": "Invalid PornDB ID format"})
+            logger.warning(f"Invalid PornDB ID format: {item_id}")
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid PornDB ID format")
         porndb_id = parsed.external_id
             
-        print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
-        from app.core.language import get_user_ui_language
-        from app.modules.settings.services.settings_service import SettingsService
-        settings = SettingsService(db)
-        ui_lang = get_user_ui_language(settings)
+        logger.debug(f"PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
+        from app.core.language import LanguageService
+        ui_lang = LanguageService.resolve_ui_lang(db, self.settings_service)
         
         
         match = db.query(MetadataMatch).filter(
@@ -54,7 +53,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
         porndb_scraper = scrapers.get_scraper(Provider.PORNDB, db)
         try:
             movie_data = porndb_scraper.fetch_movie(porndb_id)
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to fetch PornDB movie details for PornDB ID {porndb_id}: {e}", exc_info=True)
             movie_data = None
 
         if not movie_data and match:
@@ -90,12 +90,15 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 }
 
         if not movie_data:
-            return JSONResponse(status_code=404, content={"error": "Movie not found on PornDB"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Movie not found on PornDB")
             
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == current_uid,
-            UserOverride.custom_title == (movie_data.get("title") or "Unknown Movie")
-        ).first()
+        override = None
+        if match:
+            override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.metadata_match_id == match.id
+            ).first()
             
         date_str = movie_data.get("date")
         from app.core.date_utils import get_year_from_date
@@ -138,7 +141,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                     UserOverride.person_id == person_db.id
                 ).first()
                 custom_img = override_obj.custom_poster if override_obj else None
-                resolved_img = self._resolve_img(custom_img or person_db.local_profile_path or person_db.profile_path, "people")
+                resolved_img = image_processing_service.resolve_image_url(custom_img or person_db.local_profile_path or person_db.profile_path, "people")
             else:
                 p_id = f"porndb:{p_info.get('id')}"
                 resolved_img = p_info.get("image")
@@ -199,19 +202,19 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 effective_poster=raw_poster,
             )
 
-        poster_url = raw_poster
-        backdrop_url = raw_backdrop
+        loc_db = None
         if match:
             from app.core.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
-            if loc_db and loc_db.local_poster_path:
-                poster_url = loc_db.local_poster_path
-            elif loc_db and loc_db.poster_path:
-                poster_url = loc_db.poster_path
-            backdrop_url = match.local_backdrop_path or match.backdrop_path or backdrop_url
 
         metadata_override, physical_override = OverrideResolver.resolve_overrides(
             db, current_uid, match=match
+        )
+        effective_override = metadata_override if metadata_override else override
+
+        poster_url, backdrop_url, _ = EffectiveImageResolver.resolve(
+            effective_override, loc_db, match,
+            fallback_poster=raw_poster, fallback_backdrop=raw_backdrop
         )
 
         is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
@@ -222,44 +225,27 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             db, current_uid, match.media_item_id if match else None
         )
 
-        # Use metadata_override if available, else fallback to override
-        effective_override = metadata_override if metadata_override else override
+
 
         companies = []
         site = movie_data.get("site")
         if site and site.get("name"):
             companies.append({
                 "name": site.get("name"),
-                "logo_path": self._resolve_img(site.get("logo") or site.get("image") or site.get("poster"), "logos")
+                "logo_path": image_processing_service.resolve_image_url(site.get("logo") or site.get("image") or site.get("poster"), "logos")
             })
 
             parent_site = site.get("parent") or site.get("network")
             if isinstance(parent_site, dict) and parent_site.get("name"):
                 companies.append({
                     "name": parent_site.get("name"),
-                    "logo_path": self._resolve_img(parent_site.get("logo") or parent_site.get("image") or parent_site.get("poster"), "logos")
+                    "logo_path": image_processing_service.resolve_image_url(parent_site.get("logo") or parent_site.get("image") or parent_site.get("poster"), "logos")
                 })
 
         networks = []
 
-        duration_val = None
-        duration_raw = movie_data.get("duration")
-        if duration_raw:
-            if isinstance(duration_raw, (int, float)):
-                duration_val = int(duration_raw)
-            elif isinstance(duration_raw, str):
-                val = duration_raw.strip()
-                if val.isdigit():
-                    duration_val = int(val)
-                else:
-                    parts = val.split(":")
-                    try:
-                        if len(parts) == 2:
-                            duration_val = int(parts[0]) * 60 + int(parts[1])
-                        elif len(parts) == 3:
-                            duration_val = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                    except ValueError as e:
-                        logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:217: {e}", exc_info=True)
+        from app.core.date_utils import parse_duration_seconds
+        duration_val = parse_duration_seconds(movie_data.get("duration"))
 
         result = {
             "id": f"porndb_{porndb_id}",
@@ -284,8 +270,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "revenue": None,
             "companies": companies,
             "networks": networks,
-            "poster_path": self._resolve_img(effective_override.custom_poster if (effective_override and effective_override.custom_poster) else poster_url, "posters"),
-            "backdrop_path": self._resolve_img(backdrop_url, "backdrops", size="original") if backdrop_url else None,
+            "poster_path": image_processing_service.resolve_image_url(effective_override.custom_poster if (effective_override and effective_override.custom_poster) else poster_url, "posters"),
+            "backdrop_path": image_processing_service.resolve_image_url(backdrop_url, "backdrops", size="original") if backdrop_url else None,
             "original_language": "en",
             "type": "movie",
             "tmdb_id": 0,

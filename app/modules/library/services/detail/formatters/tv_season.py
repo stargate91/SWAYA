@@ -1,13 +1,17 @@
+import logging
 from typing import Any
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
 
 from app.modules.library.models import MediaItem
 from app.modules.media_assets.services.images import image_processing_service
 from app.core.enums import ItemStatus
-from app.modules.users.models import UserOverride
+
+logger = logging.getLogger(__name__)
 
 class TvSeasonFormatter:
+    def __init__(self, settings_service=None):
+        self.settings_service = settings_service
+
     def format(
         self,
         tv_tmdb_id: str,
@@ -21,12 +25,11 @@ class TvSeasonFormatter:
         try:
             tv_tmdb_id_int = int(parsed.external_id) if parsed else int(tv_tmdb_id)
         except (ValueError, TypeError):
-            return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid tv TMDB ID")
         
-        from app.core.language import get_user_ui_language
-        from app.modules.settings.services.settings_service import SettingsService
-        settings = SettingsService(db)
-        ui_lang = get_user_ui_language(settings)
+        from app.core.language import LanguageService
+        ui_lang = LanguageService.resolve_ui_lang(db, self.settings_service)
         
         from app.modules.metadata.models import MetadataMatch
         from app.core.enums import Provider, MediaType
@@ -79,11 +82,13 @@ class TvSeasonFormatter:
         if not season_detail:
             try:
                 season_detail = tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang) or {}
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Failed to fetch TMDB season details for TV ID {tv_tmdb_id_int} S{season_number}: {e}", exc_info=True)
                 season_detail = {}
                 
         if not season_detail:
-            return JSONResponse(status_code=404, content={"error": "Season not found"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Season not found")
         
         local_items = db.query(MediaItem).join(MediaItem.matches).filter(
             MetadataMatch.external_id == str(tv_tmdb_id_int),

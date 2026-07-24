@@ -270,10 +270,10 @@ class LibraryContentService:
         query = self.db.query(Person).filter(Person.is_active)
         if not include_adult:
             query = query.filter(
-                Person.is_adult == False
+                Person.is_adult.is_(False)
             )
         else:
-            query = query.filter(Person.is_adult == True)
+            query = query.filter(Person.is_adult.is_(True))
         
         effective_gender = gender
         if effective_gender is None and include_adult:

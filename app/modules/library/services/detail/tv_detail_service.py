@@ -5,6 +5,7 @@ from app.core.identifier_utils import parse_identifier
 
 
 # Import strategy formatters
+from app.modules.settings.services.settings_service import SettingsService
 from app.modules.library.services.detail.formatters.tv_show import TvShowFormatter
 from app.modules.library.services.detail.formatters.tv_season import TvSeasonFormatter
 from app.core.enums import MediaType, ItemStatus, Provider
@@ -20,8 +21,9 @@ class TvDetailService:
         self.db = db
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.get_scraper(Provider.TMDB, db)
-        self.show_formatter = TvShowFormatter()
-        self.season_formatter = TvSeasonFormatter()
+        self.settings = SettingsService(db)
+        self.show_formatter = TvShowFormatter(self.settings)
+        self.season_formatter = TvSeasonFormatter(self.settings)
 
     def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 999, initial_episodes_limit: int = 999, language: str = None):
         return self.show_formatter.format(

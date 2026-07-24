@@ -1,14 +1,9 @@
 import logging
 from typing import Any
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
-
-from app.core.exceptions import NotFoundException
 from app.core.language import LanguageService
 from app.modules.media.schemas import WatchedHistoryResponse
-from app.modules.users.models import UserOverride
 from app.core.episode_utils import get_first_int
-from app.core.date_utils import parse_datetime_utc
 
 logger = logging.getLogger(__name__)
 

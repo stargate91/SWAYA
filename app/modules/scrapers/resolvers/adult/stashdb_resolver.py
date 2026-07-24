@@ -1,6 +1,6 @@
 import logging
 from app.core.enums import Provider
-from app.modules.scrapers.resolvers.adult.base_resolver import BaseStashGraphQLResolver, HASH_QUERY, SEARCH_QUERY
+from app.modules.scrapers.resolvers.adult.base_resolver import BaseStashGraphQLResolver
 
 logger = logging.getLogger(__name__)
 

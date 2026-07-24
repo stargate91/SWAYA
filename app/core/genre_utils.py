@@ -27,27 +27,13 @@ def split_genres(genres: list[str]) -> list[str]:
         if not g:
             continue
 
-        normalized_key = "".join(ch for ch in g.casefold() if ch.isalnum())
-        alias = genre_aliases.get(normalized_key)
-        target_g = alias if alias else g
+        target_g = _canonicalize_genre_label(g)
 
-        parts = []
-        if " & " in target_g:
-            parts = target_g.split(" & ")
-        elif " and " in target_g:
-            parts = target_g.split(" and ")
-        elif " és " in target_g:
-            parts = target_g.split(" és ")
-        elif " / " in target_g:
-            parts = target_g.split(" / ")
-        elif "/" in target_g:
-            parts = target_g.split("/")
-        elif ";" in target_g:
-            parts = target_g.split(";")
-        elif "," in target_g:
-            parts = target_g.split(",")
-        else:
-            parts = [target_g]
+        parts = [target_g]
+        for sep in [" & ", " and ", " és ", " / ", "/", ";", ","]:
+            if sep in target_g:
+                parts = target_g.split(sep)
+                break
         
         for part in parts:
             part_clean = _canonicalize_genre_label(part)

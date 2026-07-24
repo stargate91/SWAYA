@@ -5,6 +5,7 @@ from app.core.identifier_utils import parse_identifier
 
 
 
+from app.modules.settings.services.settings_service import SettingsService
 from app.modules.library.services.detail.formatters.porndb_movie import PornDbMovieFormatter
 from app.modules.library.services.detail.formatters.tmdb_movie import TmdbMovieFormatter
 from app.modules.library.services.detail.formatters.local_movie import LocalMovieFormatter
@@ -15,9 +16,10 @@ class MovieDetailService:
     def __init__(self, db: Session, scrapers: Any):
         self.db = db
         self.scrapers = scrapers
-        self.porndb_formatter = PornDbMovieFormatter()
-        self.tmdb_formatter = TmdbMovieFormatter()
-        self.local_formatter = LocalMovieFormatter()
+        self.settings = SettingsService(db)
+        self.porndb_formatter = PornDbMovieFormatter(self.settings)
+        self.tmdb_formatter = TmdbMovieFormatter(self.settings)
+        self.local_formatter = LocalMovieFormatter(self.settings)
 
     def get_library_item_detail(self, item_id: str, full_people: bool = False):
         from app.core.user_context import get_current_user_id

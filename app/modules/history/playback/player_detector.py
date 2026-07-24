@@ -102,7 +102,12 @@ def launch_media_file(file_path: str, settings, start_seconds: int = 0) -> dict:
 
     if player_path and player_type:
         proc = None
-        port = 8080 if player_type == "vlc" else 13579
+        from app.core.net_utils import is_port_in_use
+        base_port = 8080 if player_type == "vlc" else 13579
+        port = base_port
+        if player_type == "vlc":
+            while is_port_in_use(port):
+                port += 1
 
         if player_type == "vlc":
             args = [player_path, normalized_path]
@@ -128,13 +133,22 @@ def launch_media_file(file_path: str, settings, start_seconds: int = 0) -> dict:
                 "message": f"Launched {player_type.upper()} for {normalized_path}",
             }
 
-    logger.info(f"VLC or MPC-HC not found. Falling back to default OS player for: {normalized_path}")
-    if platform.system() == "Windows":
-        os.startfile(normalized_path)
-    elif platform.system() == "Darwin":
-        subprocess.Popen(["open", normalized_path])
-    else:
-        subprocess.Popen(["xdg-open", normalized_path])
+    try:
+        if platform.system() == "Windows":
+            os.startfile(normalized_path)
+        elif platform.system() == "Darwin":
+            subprocess.Popen(["open", normalized_path])
+        else:
+            subprocess.Popen(["xdg-open", normalized_path])
+    except Exception as e:
+        logger.error(f"Failed to launch default OS player for {normalized_path}: {e}", exc_info=True)
+        return {
+            "status": "error",
+            "player_type": "default",
+            "process": None,
+            "port": None,
+            "message": f"Failed to launch default OS player: {e}",
+        }
 
     return {
         "status": "success",

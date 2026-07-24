@@ -2,7 +2,6 @@ from __future__ import annotations
 import logging
 from typing import Optional, Any
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
 
 from app.core.enums import MediaType, ItemStatus, Provider
 from app.modules.library.models import MediaItem
@@ -10,7 +9,6 @@ from app.modules.metadata.models import MetadataMatch
 from app.modules.users.models import UserOverride
 
 
-from app.core.language import LanguageService
 from app.core.date_utils import get_year_from_date
 from app.modules.library.schemas import CollectionDetailResponse
 from app.modules.media_assets.services.images import image_processing_service
@@ -29,12 +27,11 @@ class CollectionDetailService:
         try:
             collection_tmdb_id_int = int(collection_tmdb_id)
         except ValueError:
-            return JSONResponse(status_code=400, content={"error": "Invalid collection TMDB ID"})
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Invalid collection TMDB ID")
         
-        from app.core.language import get_user_ui_language
-        from app.modules.settings.services.settings_service import SettingsService
-        settings = SettingsService(db)
-        ui_lang = language or get_user_ui_language(settings)
+        from app.core.language import LanguageService
+        ui_lang = language or LanguageService.resolve_ui_lang(db)
         
         from app.modules.metadata.models import MediaCollection, MediaCollectionLocalization
         from app.core.enums import Provider
@@ -58,7 +55,8 @@ class CollectionDetailService:
                 collection_tmdb_id_int,
                 language=ui_lang
             ) or {}
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to fetch TMDB collection details for ID {collection_tmdb_id_int}: {e}", exc_info=True)
             tmdb_details = {}
 
         if tmdb_details:

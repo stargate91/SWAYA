@@ -1,9 +1,7 @@
-import os
 import sys
 import zipfile
 import urllib.request
 import subprocess
-import shutil
 import logging
 import uuid
 import json

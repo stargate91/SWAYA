@@ -188,8 +188,7 @@ class PlaybackService:
         override = self.overrides.get_or_create_media_item_override(item.id)
         recalculate_watch_state(item.playback_logs, override)
 
-    def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
-        return image_processing_service.resolve_image_url(path, subfolder)
+
 
     def _serialize_playback_logs(self, item) -> list[dict]:
         logs = sorted(item.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
@@ -241,6 +240,15 @@ class PlaybackService:
                 message=f"Launched {player_type.upper()} with precision tracking.",
                 player_type=player_type,
                 port=port,
+                resume_position=override.resume_position,
+                is_watched=override.is_watched,
+            )
+
+        if launch_result.get("status") == "error":
+            return PlaybackStatusResponse(
+                status="error",
+                message=launch_result.get("message", "Failed to launch default OS player"),
+                player_type="default",
                 resume_position=override.resume_position,
                 is_watched=override.is_watched,
             )
@@ -597,6 +605,13 @@ class PlaybackService:
         launch_result = launch_media_file(file_path, self.settings, start_seconds=start_seconds)
         player_type = launch_result.get("player_type") or "default"
         port = launch_result.get("port")
+        if launch_result.get("status") == "error":
+            return PlaybackStatusResponse(
+                status="error",
+                message=launch_result.get("message", "Failed to launch default OS player"),
+                player_type=player_type,
+                port=port,
+            )
         return PlaybackStatusResponse(
             status="success",
             message=f"Launched {player_type.upper()} preview for {file_path}",
@@ -641,7 +656,7 @@ class PlaybackService:
             db=self.db,
             playback_repo=self.playback_repo,
             overrides=self.overrides,
-            resolve_img_fn=self._resolve_img,
+            resolve_img_fn=image_processing_service.resolve_image_url,
             page=page,
             limit=limit,
             include_adult=include_adult

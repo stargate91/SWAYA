@@ -167,8 +167,10 @@ class MetadataResolver:
         try:
             self.scrapers.enrich_mainstream(db, item, ui_lang, commit=True)
         except Exception as e:
-            logger.error(f"Enrichment failed during manual resolve: {e}")
+            logger.error(f"Enrichment failed during manual resolve: {e}", exc_info=True)
             db.rollback()
+            from app.core.exceptions import AppException
+            raise AppException(f"Failed to enrich item metadata: {str(e)}", status_code=500)
 
         return {"status": "success", "item_id": item.id, "match_id": match.id}
 

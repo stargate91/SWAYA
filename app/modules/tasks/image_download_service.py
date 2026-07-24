@@ -48,3 +48,49 @@ class ImageDownloadService:
         except Exception as e:
             logger.error(f"Failed to get download URL via ImageDownloadService: {e}")
         return None
+
+    def queue_image(self, path: Optional[str], subfolder: str, prefix: str) -> Optional[str]:
+        """
+        Unified helper to build download URL, sanitize the filename with a prefix,
+        determine file extension, and enqueue the image asset download.
+        """
+        if not path:
+            return None
+
+        url = self.get_download_url(path, subfolder)
+        if not url:
+            return None
+
+        import os
+        import re
+        import requests
+        from urllib.parse import urlparse
+
+        basename = os.path.basename(urlparse(path).path)
+        if not basename:
+            return None
+
+        ext = os.path.splitext(basename)[1].lower()
+        if ext not in {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}:
+            try:
+                resp = requests.head(url, timeout=3, allow_redirects=True)
+                ct = resp.headers.get("Content-Type", "").lower()
+                if "png" in ct:
+                    ext = ".png"
+                elif "webp" in ct:
+                    ext = ".webp"
+                elif "gif" in ct:
+                    ext = ".gif"
+                elif "svg" in ct:
+                    ext = ".svg"
+                else:
+                    ext = ".jpg"
+            except Exception:
+                ext = ".jpg"
+            basename = f"{basename}{ext}"
+
+        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+        filename = f"{safe_prefix}_{basename}"
+        self.enqueue_download(url, subfolder, filename)
+        return f"{subfolder}/{filename}"
+

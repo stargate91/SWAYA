@@ -1,10 +1,11 @@
 import logging
-logger = logging.getLogger(__name__)
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from app.core.enums import Provider, MediaType
 from app.modules.metadata.models import MetadataMatch
 from app.modules.users.models import UserOverride
+
+logger = logging.getLogger(__name__)
 
 class TvEpisodeFormatter:
     def format_episodes(

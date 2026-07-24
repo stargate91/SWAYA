@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from app.modules.people.models import Person
 from app.modules.users.models import UserOverride, Tag
-from app.core.enums import Provider
 from app.core.exceptions import NotFoundException
 from app.core.user_context import get_current_user_id
 from sqlalchemy import func

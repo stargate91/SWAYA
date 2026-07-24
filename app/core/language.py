@@ -1,6 +1,7 @@
 from typing import Optional, List, Any
 from app.core.enums import Provider
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.modules.settings.services.settings_service import SettingsService
 
 
 class LanguageService:
@@ -84,6 +85,12 @@ class LanguageService:
 
         # Fallback to the first available
         return localizations[0]
+
+    @staticmethod
+    def resolve_ui_lang(db: Any, settings_service: Optional[Any] = None) -> str:
+        """Resolves the preferred user UI language code."""
+        settings = settings_service or SettingsService(db)
+        return get_user_ui_language(settings)
 
 
 def get_user_ui_language(settings, user_id=None) -> str:

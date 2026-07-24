@@ -14,10 +14,10 @@ class PeopleQueryBuilder:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
+        if image_service is None:
+            from app.modules.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
         self.image_service = image_service
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
 
     def get_people(
         self,
@@ -206,7 +206,7 @@ class PeopleQueryBuilder:
             people_list.append({
                 "id": person.id,
                 "name": person.name,
-                "profile_path": self._resolve_img(person.profile_path, "people"),
+                "profile_path": self.image_service.resolve_image_url(person.profile_path, "people"),
                 "gender": person.gender,
                 "scene_count": person.scene_count,
                 "rating_porndb": person.rating_porndb,

@@ -14,30 +14,12 @@ class ScenePlaybackResolver:
         physical_override: Optional[UserOverride],
         current_uid: int
     ) -> Tuple[bool, int, int, Optional[str], List[Dict[str, Any]], int, List[Dict[str, Any]]]:
-        is_watched = False
-        watch_count = 0
-        resume_position = 0
-        last_watched_at_dt = None
-
-        if metadata_override:
-            is_watched = metadata_override.is_watched
-            watch_count = metadata_override.watch_count or 0
-            last_watched_at_dt = metadata_override.last_watched_at
-        elif override:
-            is_watched = override.is_watched
-            watch_count = override.watch_count or 0
-            last_watched_at_dt = override.last_watched_at
-
-        if physical_override:
-            if physical_override.is_watched:
-                is_watched = True
-            if physical_override.watch_count and physical_override.watch_count > watch_count:
-                watch_count = physical_override.watch_count
-            if physical_override.resume_position:
-                resume_position = physical_override.resume_position
-            if physical_override.last_watched_at:
-                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
-                    last_watched_at_dt = physical_override.last_watched_at
+        from app.modules.library.services.detail.detail_mixins import OverrideResolver
+        is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
+            metadata_override=metadata_override,
+            physical_override=physical_override,
+            fallback_override=override
+        )
 
         playback_logs = []
         if match_db and match_db.media_item_id:

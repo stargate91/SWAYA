@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta, timezone
+import logging
 from typing import Optional, Any
 
 from app.core.database import CacheSessionLocal
 from app.core.enums import Provider, MediaType, CacheStatus
 from app.modules.scrapers.models import APICache
 from app.core.constants import DEFAULT_TTLS
+
+logger = logging.getLogger(__name__)
 
 
 class CacheService:
@@ -131,14 +134,30 @@ class CacheService:
                 db.add(cache)
             try:
                 db.commit()
-            except Exception:
+            except Exception as e:
                 db.rollback()
+                logger.warning(
+                    "Failed to commit initial cache insert for provider %s, key %s. "
+                    "Rolling back and attempting fallback merge. Error: %s",
+                    provider,
+                    cache_key,
+                    e,
+                    exc_info=True
+                )
                 # Try fallback merge or update on conflict
                 try:
                     db.merge(cache)
                     db.commit()
-                except Exception:
+                except Exception as ex:
                     db.rollback()
+                    logger.error(
+                        "Failed to merge cache entry as fallback for provider %s, key %s. "
+                        "Error: %s",
+                        provider,
+                        cache_key,
+                        ex,
+                        exc_info=True
+                    )
 
     def invalidate(self, provider: Provider, cache_key: str) -> None:
         """Removes a specific cache key entry."""

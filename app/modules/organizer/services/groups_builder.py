@@ -166,9 +166,7 @@ class OrganizerGroupsBuilder:
                 target_image_path = self.img_service.get_original_path("scene_stills", image_filename)
                 
                 if not Path(target_image_path).exists() and Path(item.current_path).exists():
-                    from app.modules.library.filesystem.fs_utils import to_win_long_path, get_video_duration
-                    import subprocess
-                    long_path = to_win_long_path(item.current_path)
+                    from app.modules.library.filesystem.fs_utils import get_video_duration
                     duration = get_video_duration(item.current_path)
 
                     seek_seconds = duration * 0.5

@@ -1,7 +1,4 @@
 import logging
-import os
-import re
-from urllib.parse import urlparse
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 
@@ -134,41 +131,8 @@ class MainstreamEnricher:
             self.db.flush()
 
     def _queue_image(self, path: Optional[str], subfolder: str, prefix: str) -> Optional[str]:
-        if not path:
-            return None
+        return self.image_downloader.queue_image(path, subfolder, prefix)
 
-        url = self.image_downloader.get_download_url(path, subfolder)
-        if not url:
-            return None
-
-        basename = os.path.basename(urlparse(path).path)
-        if not basename:
-            return None
-
-        ext = os.path.splitext(basename)[1].lower()
-        if ext not in {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}:
-            try:
-                import requests
-                resp = requests.head(url, timeout=3, allow_redirects=True)
-                ct = resp.headers.get("Content-Type", "").lower()
-                if "png" in ct:
-                    ext = ".png"
-                elif "webp" in ct:
-                    ext = ".webp"
-                elif "gif" in ct:
-                    ext = ".gif"
-                elif "svg" in ct:
-                    ext = ".svg"
-                else:
-                    ext = ".jpg"
-            except Exception:
-                ext = ".jpg"
-            basename = f"{basename}{ext}"
-
-        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
-        filename = f"{safe_prefix}_{basename}"
-        self.image_downloader.enqueue_download(url, subfolder, filename)
-        return f"{subfolder}/{filename}"
 
     def _get_details_cached(self, tmdb_id: int, item_type: str, language: str) -> Dict[str, Any]:
         cache_key = (item_type, tmdb_id, language)

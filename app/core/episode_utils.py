@@ -1,7 +1,8 @@
-import logging
-logger = logging.getLogger(__name__)
 import json
+import logging
 from typing import Optional, Union, List, Any
+
+logger = logging.getLogger(__name__)
 
 def normalize_episode_numbers(episode_number: Union[int, float, str, list]) -> List[int]:
     """
@@ -87,24 +88,22 @@ def get_first_int(val: Any) -> Optional[int]:
     nums = normalize_episode_numbers(val)
     return nums[0] if nums else None
 
-def extract_season_from_parsed_info(parsed_info: Optional[dict]) -> Optional[Any]:
-    """
-    Safely extracts the season value from parsed metadata dictionaries (fn, it, fd).
-    """
+def _extract_field_from_parsed_info(parsed_info: Optional[dict], field_name: str) -> Optional[Any]:
     if not parsed_info:
         return None
     fn_data = parsed_info.get("fn") or {}
     it_data = parsed_info.get("it") or {}
     fd_data = parsed_info.get("fd") or {}
-    return parsed_info.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
+    return parsed_info.get(field_name) or fn_data.get(field_name) or it_data.get(field_name) or fd_data.get(field_name)
+
+def extract_season_from_parsed_info(parsed_info: Optional[dict]) -> Optional[Any]:
+    """
+    Safely extracts the season value from parsed metadata dictionaries (fn, it, fd).
+    """
+    return _extract_field_from_parsed_info(parsed_info, "season")
 
 def extract_episode_from_parsed_info(parsed_info: Optional[dict]) -> Optional[Any]:
     """
     Safely extracts the episode value from parsed metadata dictionaries (fn, it, fd).
     """
-    if not parsed_info:
-        return None
-    fn_data = parsed_info.get("fn") or {}
-    it_data = parsed_info.get("it") or {}
-    fd_data = parsed_info.get("fd") or {}
-    return parsed_info.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
+    return _extract_field_from_parsed_info(parsed_info, "episode")

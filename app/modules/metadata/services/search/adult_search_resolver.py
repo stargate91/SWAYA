@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.core.enums import Provider
 from app.core.date_utils import get_year_from_date
+from app.core.gender_utils import map_gender_str_to_int
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,6 @@ def _provider_source_name(prov_enum: Provider) -> str:
     cfg = ProviderRegistry.get_config(prov_enum)
     return cfg.prefix if cfg else prov_enum.value
 
-
-from app.core.gender_utils import map_gender_str_to_int
 
 def _map_performer_gender(gender_val) -> int:
     return map_gender_str_to_int(gender_val)

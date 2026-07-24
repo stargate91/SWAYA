@@ -171,3 +171,64 @@ class ExternalLinksBuilder:
     def append_links(result: dict, ext_ids: dict, media_type: str) -> None:
         from app.modules.library.services.detail.external_links import generate_external_links
         result["external_links"] = generate_external_links(ext_ids, media_type)
+
+
+class EffectiveImageResolver:
+    """Unifies override, local DB and scraper picks / fallback image resolution logic."""
+
+    @staticmethod
+    def resolve(
+        override: Optional[UserOverride],
+        loc_db: Optional[Any],
+        match: Optional[MetadataMatch],
+        tmdb_data: Optional[Dict[str, Any]] = None,
+        ui_lang: Optional[str] = None,
+        fallback_poster: Optional[str] = None,
+        fallback_backdrop: Optional[str] = None,
+        fallback_logo: Optional[str] = None
+    ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+        from app.modules.media_assets.services.images import image_processing_service
+
+        # 1. Poster Resolution
+        poster = None
+        if override and override.custom_poster:
+            poster = override.custom_poster
+        elif loc_db and getattr(loc_db, "local_poster_path", None):
+            poster = loc_db.local_poster_path
+        elif loc_db and getattr(loc_db, "poster_path", None):
+            poster = loc_db.poster_path
+        elif tmdb_data:
+            poster = image_processing_service.pick_poster_path(tmdb_data, preferred_language=ui_lang) or tmdb_data.get("poster_path")
+        
+        if not poster:
+            poster = fallback_poster
+
+        # 2. Backdrop Resolution
+        backdrop = None
+        if override and override.custom_backdrop:
+            backdrop = override.custom_backdrop
+        elif match and getattr(match, "local_backdrop_path", None):
+            backdrop = match.local_backdrop_path
+        elif match and getattr(match, "backdrop_path", None):
+            backdrop = match.backdrop_path
+        elif tmdb_data:
+            backdrop = image_processing_service.pick_backdrop_path(tmdb_data, preferred_language=ui_lang, allow_low_res=True)
+            
+        if not backdrop:
+            backdrop = fallback_backdrop
+
+        # 3. Logo Resolution
+        logo = None
+        if override and override.custom_logo:
+            logo = override.custom_logo
+        elif loc_db and getattr(loc_db, "local_logo_path", None):
+            logo = loc_db.local_logo_path
+        elif loc_db and getattr(loc_db, "logo_path", None):
+            logo = loc_db.logo_path
+        elif tmdb_data:
+            logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+            
+        if not logo:
+            logo = fallback_logo
+
+        return poster, backdrop, logo

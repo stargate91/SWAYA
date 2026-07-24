@@ -1,6 +1,7 @@
 from typing import Optional, Any, Dict
 
 from app.core.cache_service import CacheService
+from app.core.enums import Provider
 
 
 class ScraperService:
@@ -18,7 +19,6 @@ class ScraperService:
             self.settings_service = SettingsService(db)
             
         self.cache = cache_service or CacheService()
-        from app.core.enums import Provider
         from app.modules.scrapers.support.registry import ProviderRegistry
         from app.modules.scrapers.support.gateway import scraper_gateway
         
@@ -32,27 +32,22 @@ class ScraperService:
 
     @property
     def tmdb(self):
-        from app.core.enums import Provider
         return self.scrapers.get(Provider.TMDB)
 
     @property
     def omdb(self):
-        from app.core.enums import Provider
         return self.scrapers.get(Provider.OMDB)
 
     @property
     def stashdb(self):
-        from app.core.enums import Provider
         return self.scrapers.get(Provider.STASHDB)
 
     @property
     def porndb(self):
-        from app.core.enums import Provider
         return self.scrapers.get(Provider.PORNDB)
 
     @property
     def fansdb(self):
-        from app.core.enums import Provider
         return self.scrapers.get(Provider.FANSDB)
 
     def get_scraper(self, provider: Provider) -> Optional[Any]:
@@ -74,15 +69,12 @@ class ScraperService:
         return self.omdb.fetch_omdb(imdb_id, force_refresh) if self.omdb else None
 
     def fetch_stashdb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
-        from app.core.enums import Provider
         return self.fetch_scene(Provider.STASHDB, scene_id, force_refresh)
 
     def fetch_porndb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
-        from app.core.enums import Provider
         return self.fetch_scene(Provider.PORNDB, scene_id, force_refresh)
 
     def fetch_fansdb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
-        from app.core.enums import Provider
         return self.fetch_scene(Provider.FANSDB, scene_id, force_refresh)
 
     def log_search(

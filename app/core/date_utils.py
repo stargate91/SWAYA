@@ -2,10 +2,12 @@ import logging
 from datetime import date, datetime, timezone
 from typing import Any, Optional
 
+logger = logging.getLogger(__name__)
+
 def parse_datetime_utc(value: Any) -> datetime:
     """
     Safely parses a datetime string (handling ISO formats and 'Z' suffix) or object.
-    Defaults to the current UTC time if value is empty/invalid.
+    Defaults to the current UTC time if value is empty.
     Raises ValueError if parsing fails.
     """
     if not value:
@@ -15,11 +17,9 @@ def parse_datetime_utc(value: Any) -> datetime:
     try:
         normalized = str(value).strip().replace("Z", "+00:00")
         return datetime.fromisoformat(normalized)
-    except Exception:
-        return datetime.now(timezone.utc)
-
-
-logger = logging.getLogger(__name__)
+    except Exception as e:
+        logger.warning(f"Failed to parse datetime value '{value}': {e}")
+        raise ValueError(f"Failed to parse datetime value '{value}': {e}") from e
 
 def parse_date(value: Any, formats: Optional[list[str]] = None) -> Optional[date]:
     """
@@ -86,3 +86,32 @@ def calculate_age_at_release(birthday_str: Optional[Any], release_date_str: Opti
     except Exception as e:
         logger.debug(f"Failed to calculate age at release: {e}", exc_info=True)
         return None
+
+
+def parse_duration_seconds(value: Any) -> Optional[int]:
+    """
+    Safely parses a duration value (numeric, float string, or HH:MM:SS / MM:SS string)
+    and returns the duration in seconds as an integer.
+    """
+    if not value:
+        return None
+    if isinstance(value, (int, float)):
+        return int(value)
+    if isinstance(value, str):
+        val = value.strip()
+        if not val:
+            return None
+        if val.isdigit():
+            return int(val)
+        if "." in val and val.replace(".", "", 1).isdigit():
+            return int(float(val))
+        if ":" in val:
+            parts = val.split(":")
+            try:
+                if len(parts) == 2:
+                    return int(parts[0]) * 60 + int(parts[1])
+                elif len(parts) == 3:
+                    return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+            except ValueError as e:
+                logger.debug(f"Failed parsing colon duration '{value}': {e}", exc_info=True)
+    return None

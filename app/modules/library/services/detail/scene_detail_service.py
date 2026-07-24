@@ -10,12 +10,14 @@ from app.modules.scrapers.support.registry import ProviderRegistry
 from app.modules.metadata.models import Studio, MetadataMatch
 from app.modules.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
 from app.core.date_utils import get_year_from_date
-from app.core.gender_utils import map_gender_int_to_str
+from app.core.gender_utils import map_gender_int_to_str, map_gender_str_to_int
 
 # Sub-services
 from app.modules.library.services.detail.scene.cast_builder import SceneCastBuilder
 from app.modules.library.services.detail.scene.playback_resolver import ScenePlaybackResolver
 from app.modules.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer, _download_image_now
+
+from app.modules.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +25,26 @@ PROVIDER_PREFIXES = tuple(ProviderRegistry.get_all_prefixes())
 
 def _strip_provider_prefix(value: str) -> str:
     cleaned = str(value or "")
-    while "_" in cleaned:
+    for _ in range(10):
+        if "_" not in cleaned:
+            break
         prefix, rest = cleaned.split("_", 1)
         if not ProviderRegistry.is_valid_prefix(prefix):
             break
         cleaned = rest
     return cleaned
+
+
+def extract_studio_logo(studio_data: dict) -> Optional[str]:
+    if not studio_data:
+        return None
+    if studio_data.get("image_path"):
+        return studio_data.get("image_path")
+    images = studio_data.get("images") or []
+    if images and isinstance(images[0], dict) and images[0].get("url"):
+        return images[0].get("url")
+    return studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster")
+
 
 class SceneDetailService:
     def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[Any] = None):
@@ -39,15 +55,7 @@ class SceneDetailService:
         self.playback_resolver = ScenePlaybackResolver()
         self.metadata_syncer = SceneMetadataSyncer()
 
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        from app.modules.media_assets.services.images import image_processing_service
-        return image_processing_service.resolve_image_url(path, subfolder, size)
-
-    def get_scene_detail(self, item_id: str) -> Any:
-        from app.modules.library.schemas import SceneDetailResponse
-        db = self.db
-        
-        print(f"[DEBUG] SceneDetailService.get_scene_detail called with item_id={item_id}")
+    def _resolve_provider_and_uuid(self, db: Session, item_id: str) -> tuple[Optional[str], str, Optional[Any]]:
         provider_prefix = None
         item = None
         if "_" in item_id:
@@ -73,9 +81,14 @@ class SceneDetailService:
                     scene_uuid = item_id
             else:
                 scene_uuid = item_id
+        return provider_prefix, scene_uuid, item
 
-        print(f"[DEBUG] SceneDetailService.get_scene_detail: resolved provider_prefix={provider_prefix}, scene_uuid={scene_uuid}")
-        # Try to load scene details from the local database
+    def _fetch_scene_data(
+        self,
+        db: Session,
+        provider_prefix: Optional[str],
+        scene_uuid: str
+    ) -> tuple[Optional[dict], Optional[MetadataMatch]]:
         prov_enum = None
         if provider_prefix:
             prov_enum = ProviderRegistry.get_provider_by_prefix(provider_prefix)
@@ -101,7 +114,7 @@ class SceneDetailService:
         match = query.order_by(desc(MetadataMatch.media_item_id.isnot(None))).first()
         if match and not prov_enum:
             prov_enum = match.provider
-            
+
         from app.core.cache_service import CacheService
         cache_srv = CacheService()
         effective_provider = prov_enum
@@ -110,7 +123,6 @@ class SceneDetailService:
         cache_key = f"{prov_str}_scene_{scene_uuid}"
         
         scene_data = None
-        # Check permanent APICache first
         if effective_provider:
             cached_scene = cache_srv.get(effective_provider, cache_key)
             if cached_scene and isinstance(cached_scene, dict) and cached_scene.get("title"):
@@ -123,14 +135,10 @@ class SceneDetailService:
                     scene_data = scraper.fetch_scene(scene_uuid)
                     if not scene_data and effective_provider == Provider.PORNDB:
                         scene_data = scraper.fetch_scene(f"scene_{scene_uuid}")
-                except Exception as e:
-                    import traceback
-                    print(f"[ERROR] SceneDetailService.get_scene_detail fetch_scene raised exception: {e}")
-                    traceback.print_exc()
+                except Exception:
                     logger.exception("Failed to fetch scene from scraper")
                     scene_data = None
 
-            # Store in APICache permanently if fetched successfully
             if scene_data and effective_provider:
                 cache_srv.set(
                     provider=effective_provider,
@@ -138,19 +146,16 @@ class SceneDetailService:
                     raw_data=scene_data,
                     media_type=MediaType.SCENE,
                     external_id=scene_uuid,
-                    ttl_seconds=None # Permanent local cache
+                    ttl_seconds=None
                 )
-                # Synchronously download scene still, performer profiles, and studio logo before rendering
                 if self.image_downloader:
                     asset_prefix = f"{effective_provider.value}_{scene_uuid}"
-
                     images_list = scene_data.get("images") or []
                     if images_list:
                         img_url = images_list[0].get("url") if isinstance(images_list[0], dict) else None
                         if img_url and img_url.startswith(("http://", "https://")):
                             _download_image_now(self.image_downloader, img_url, "scene_stills", asset_prefix)
 
-                    # Download performer images — GraphQL structure: performers[].performer.images[].url
                     for p_entry in (scene_data.get("performers") or []):
                         perf = p_entry.get("performer") or p_entry
                         p_images = perf.get("images") or []
@@ -161,18 +166,14 @@ class SceneDetailService:
                             p_prefix = f"{effective_provider.value}_{p_id_val}" if (effective_provider and p_id_val) else f"person_{p_name}"
                             _download_image_now(self.image_downloader, p_img, "people", p_prefix)
 
-                    # Download studio logo — GraphQL structure: studio.image_path or studio.images[].url
                     st_data = scene_data.get("studio") or scene_data.get("site") or {}
-                    st_images = st_data.get("images") or []
-                    st_logo = st_data.get("image_path") or (st_images[0].get("url") if st_images and isinstance(st_images[0], dict) else None)
+                    st_logo = extract_studio_logo(st_data)
                     st_name = st_data.get("name")
                     if st_logo and st_logo.startswith(("http://", "https://")) and st_name:
                         _download_image_now(self.image_downloader, st_logo, "logos", f"studio_{st_name}")
 
-                    # Download parent/network studio logo — GraphQL structure: studio.parent.image_path or studio.parent.images[].url
                     parent_data = st_data.get("parent") or st_data.get("network") or {}
-                    parent_images = parent_data.get("images") or []
-                    parent_logo = parent_data.get("image_path") or (parent_images[0].get("url") if parent_images and isinstance(parent_images[0], dict) else None)
+                    parent_logo = extract_studio_logo(parent_data)
                     parent_name = parent_data.get("name")
                     if parent_logo and parent_logo.startswith(("http://", "https://")) and parent_name:
                         _download_image_now(self.image_downloader, parent_logo, "logos", f"studio_{parent_name}")
@@ -224,50 +225,16 @@ class SceneDetailService:
                     "performers": performers,
                     "tags": [{"name": t} for t in (match.suggested_tags or [])]
                 }
+        return scene_data, match
 
-        
-        print(f"[DEBUG] SceneDetailService.get_scene_detail fetch_scene result: success={bool(scene_data)}")
-        if not scene_data:
-            return JSONResponse(status_code=404, content={"error": "Scene not found on StashDB/FansDB/PornDB"})
-        
-        title = scene_data.get("title") or "Unknown Scene"
-        images = scene_data.get("images") or []
-        poster_url = images[0].get("url") if images else None
-        
-        date_str = scene_data.get("date")
-        year = get_year_from_date(date_str)
-        
-        duration_raw = scene_data.get("duration")
-        duration_sec = None
-        duration_str = None
-        
-        if duration_raw:
-            if isinstance(duration_raw, (int, float)):
-                duration_sec = int(duration_raw)
-            elif isinstance(duration_raw, str):
-                val = duration_raw.strip()
-                if val.isdigit():
-                    duration_sec = int(val)
-                elif "." in val and val.replace(".", "", 1).isdigit():
-                    duration_sec = int(float(val))
-                elif ":" in val:
-                    parts = val.split(":")
-                    try:
-                        if len(parts) == 2:
-                            duration_sec = int(parts[0]) * 60 + int(parts[1])
-                        elif len(parts) == 3:
-                            duration_sec = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                    except ValueError as e:
-                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
-
-        if duration_sec:
-            duration_min = duration_sec // 60
-            if duration_min > 0:
-                duration_str = f"{duration_min} min"
-        
-        studio_data = scene_data.get("studio") or scene_data.get("site") or {}
+    def _resolve_studio_logos(
+        self,
+        db: Session,
+        studio_data: dict,
+        parent_data: dict
+    ) -> tuple[Optional[str], Optional[str]]:
+        from app.modules.metadata.models import Studio
         studio_name = studio_data.get("name")
-        
         studio_logo = None
         if studio_name:
             studio_db = db.query(Studio).filter(Studio.name == studio_name).first()
@@ -275,20 +242,18 @@ class SceneDetailService:
                 studio_logo = studio_db.logo_path
         
         if not studio_logo:
-            studio_images = studio_data.get("images") or []
-            studio_logo = studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster"))
+            studio_logo = extract_studio_logo(studio_data)
             if studio_name and studio_logo and studio_logo.startswith(("http://", "https://")):
                 studio_db = db.query(Studio).filter(Studio.name == studio_name).first()
                 if studio_db and not studio_db.logo_path:
                     studio_db.logo_path = studio_logo
                     try:
                         db.commit()
-                    except Exception:
+                    except Exception as e:
+                        logger.warning(f"Failed to commit studio logo update: {e}")
                         db.rollback()
         
-        parent_data = studio_data.get("parent") or studio_data.get("network") or {}
         parent_name = parent_data.get("name")
-        
         parent_logo = None
         if parent_name:
             parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
@@ -296,17 +261,52 @@ class SceneDetailService:
                 parent_logo = parent_studio_db.logo_path
                 
         if not parent_logo:
-            parent_images = parent_data.get("images") or []
-            parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
+            parent_logo = extract_studio_logo(parent_data)
             if parent_name and parent_logo and parent_logo.startswith(("http://", "https://")):
                 parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
                 if parent_studio_db and not parent_studio_db.logo_path:
                     parent_studio_db.logo_path = parent_logo
                     try:
                         db.commit()
-                    except Exception:
+                    except Exception as e:
+                        logger.warning(f"Failed to commit parent studio logo update: {e}")
                         db.rollback()
+        return studio_logo, parent_logo
 
+    def get_scene_detail(self, item_id: str) -> Any:
+        from app.modules.library.schemas import SceneDetailResponse
+        db = self.db
+        logger.debug(f"SceneDetailService.get_scene_detail called with item_id={item_id}")
+        
+        provider_prefix, scene_uuid, item = self._resolve_provider_and_uuid(db, item_id)
+        scene_data, match = self._fetch_scene_data(db, provider_prefix, scene_uuid)
+        
+        if not scene_data:
+            return JSONResponse(status_code=404, content={"error": "Scene not found on StashDB/FansDB/PornDB"})
+            
+        title = scene_data.get("title") or "Unknown Scene"
+        images = scene_data.get("images") or []
+        poster_url = images[0].get("url") if images else None
+        
+        date_str = scene_data.get("date")
+        year = get_year_from_date(date_str)
+        
+        from app.core.date_utils import parse_duration_seconds
+        duration_sec = parse_duration_seconds(scene_data.get("duration"))
+        duration_str = None
+
+        if duration_sec:
+            duration_min = duration_sec // 60
+            if duration_min > 0:
+                duration_str = f"{duration_min} min"
+        
+        studio_data = scene_data.get("studio") or scene_data.get("site") or {}
+        parent_data = studio_data.get("parent") or studio_data.get("network") or {}
+        
+        studio_logo, parent_logo = self._resolve_studio_logos(db, studio_data, parent_data)
+        studio_name = studio_data.get("name")
+        parent_name = parent_data.get("name")
+        
         match_db = match or db.query(MetadataMatch).filter(
             MetadataMatch.external_id == scene_uuid,
             MetadataMatch.media_type == MediaType.SCENE
@@ -319,9 +319,8 @@ class SceneDetailService:
         from app.core.user_context import get_current_user_id
         current_uid = get_current_user_id() or 1
 
-        # 1. Build performers list using CastBuilder
         cast = self.cast_builder.build_cast(
-            db, match_db, scene_data, date_str, current_uid, provider_prefix, self._resolve_img
+            db, match_db, scene_data, date_str, current_uid, provider_prefix, image_processing_service.resolve_image_url
         )
 
         metadata_override, physical_override = OverrideResolver.resolve_overrides(
@@ -341,12 +340,10 @@ class SceneDetailService:
         if not ext_background:
             ext_background = scene_data.get("image") or poster_url
 
-        # 2. Sync metadata via MetadataSyncer
         if match_db:
             self.metadata_syncer.sync_metadata(
                 db, match_db, title, scene_data, poster_url, ext_background, date_str
             )
-            # 2b. Sync performer links so they appear in list views
             self._sync_performer_links(db, match_db, scene_data, provider_prefix)
             self._sync_studios(db, match_db, scene_data, image_downloader=self.image_downloader)
 
@@ -361,10 +358,9 @@ class SceneDetailService:
                 if not local_poster:
                     local_poster = loc_db.local_poster_path or loc_db.poster_path
             
-        poster_resolved = self._resolve_img(local_poster or poster_url, "posters")
-        backdrop_resolved = self._resolve_img(local_backdrop or ext_background, "backdrops", size="original")
+        poster_resolved = image_processing_service.resolve_image_url(local_poster or poster_url, "posters")
+        backdrop_resolved = image_processing_service.resolve_image_url(local_backdrop or ext_background, "backdrops", size="original")
 
-        # 3. Resolve playback details using PlaybackResolver
         is_watched, watch_count, resume_position, last_watched_str, playback_logs, peaks_count, peaks_history = \
             self.playback_resolver.resolve_playback_and_peaks(
                 db, match_db, metadata_override, override, physical_override, current_uid
@@ -401,7 +397,7 @@ class SceneDetailService:
             "title": title,
             "keywords": [],
             "trailer_key": None,
-            "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (studio_logo or parent_logo), "logos"),
+            "logo_path": image_processing_service.resolve_image_url(override.custom_logo if (override and override.custom_logo) else (studio_logo or parent_logo), "logos"),
             "original_poster_path": poster_url,
             "original_backdrop_path": poster_url,
             "original_title": None,
@@ -414,8 +410,8 @@ class SceneDetailService:
             "formatted_duration": duration_str,
             "rating_tmdb": 0.0,
             "vote_count_tmdb": 0,
-            "companies": [{"name": studio_name, "logo_path": self._resolve_img(studio_logo, "logos")}] if studio_name else [],
-            "networks": [{"name": parent_name, "logo_path": self._resolve_img(parent_logo, "logos")}] if parent_name else [],
+            "companies": [{"name": studio_name, "logo_path": image_processing_service.resolve_image_url(studio_logo, "logos")}] if studio_name else [],
+            "networks": [{"name": parent_name, "logo_path": image_processing_service.resolve_image_url(parent_logo, "logos")}] if parent_name else [],
             "poster_path": poster_resolved,
             "backdrop_path": backdrop_resolved,
             "original_language": None,
@@ -507,14 +503,7 @@ class SceneDetailService:
 
                 if not person_db:
                     # Create the performer
-                    gender_str = str(perf.get("gender") or "").upper()
-                    mapped_gender = 0
-                    if "FEMALE" in gender_str:
-                        mapped_gender = 1
-                    elif "MALE" in gender_str:
-                        mapped_gender = 2
-                    elif gender_str:
-                        mapped_gender = 3
+                    mapped_gender = map_gender_str_to_int(perf.get("gender"))
                     
                     p_images = perf.get("images") or []
                     p_img = p_images[0].get("url") if p_images else (perf.get("image") or perf.get("profile_path"))
@@ -570,7 +559,6 @@ class SceneDetailService:
 
     def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict, image_downloader: Optional[Any] = None):
         """Ensure studios exist in the DB and are linked to the match."""
-        from app.modules.metadata.models import Studio
         from app.modules.library.services.detail.scene.metadata_syncer import _queue_image
 
         studio_data = scene_data.get("studio") or scene_data.get("site") or {}
@@ -578,13 +566,11 @@ class SceneDetailService:
         if not studio_name:
             return
 
-        studio_images = studio_data.get("images") or []
-        studio_logo = studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster"))
+        studio_logo = extract_studio_logo(studio_data)
 
         parent_data = studio_data.get("parent") or studio_data.get("network") or {}
         parent_name = parent_data.get("name")
-        parent_images = parent_data.get("images") or []
-        parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
+        parent_logo = extract_studio_logo(parent_data)
 
         try:
             studio_db = db.query(Studio).filter(Studio.name == studio_name).first()

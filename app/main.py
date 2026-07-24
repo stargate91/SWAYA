@@ -141,6 +141,7 @@ async def user_context_middleware(request: Request, call_next):
         try:
             user_id = int(header_val)
         except ValueError as e:
+            logger.warning(f"Invalid user ID received in header, defaulting to 1: {e}")
             logger.debug(f"Swallowed exception: {e}", exc_info=True)
     else:
         qp_val = request.query_params.get("user_id")
@@ -148,6 +149,7 @@ async def user_context_middleware(request: Request, call_next):
             try:
                 user_id = int(qp_val)
             except ValueError as e:
+                logger.warning(f"Invalid user ID received in query params, defaulting to 1: {e}")
                 logger.debug(f"Swallowed exception: {e}", exc_info=True)
                 
     token = set_current_user_id(user_id)

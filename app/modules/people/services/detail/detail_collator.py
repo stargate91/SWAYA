@@ -25,14 +25,14 @@ class PersonDetailCollator:
             from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
+        if image_service is None:
+            from app.modules.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
         self.image_service = image_service
         self.filmography_service = filmography_service
         self.stats_calculator = PerformerStatsCalculator()
         self.profile_merger = ProfileMerger()
         self.image_downloader = image_downloader
-
-    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return self.image_service.resolve_image_url(path, subfolder, size)
 
     def get_person_detail(self, person: Person, user_id: int, ui_lang: str) -> PersonDetailDTO:
         """Collates database objects, overrides, statistics, and scraper details to assemble a performer's profile."""
@@ -308,11 +308,11 @@ class PersonDetailCollator:
             "known_for_department": person.known_for_department,
             "is_adult": person.is_adult,
             "profile_path": (
-                self._resolve_img(override_dict.get("custom_poster"), "people")
+                self.image_service.resolve_image_url(override_dict.get("custom_poster"), "people")
                 if override_dict and override_dict.get("custom_poster")
-                else (self._resolve_img(person.local_profile_path, "people") or self._resolve_img(person.profile_path, "people"))
+                else (self.image_service.resolve_image_url(person.local_profile_path, "people") or self.image_service.resolve_image_url(person.profile_path, "people"))
             ),
-            "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
+            "backdrop_path": self.image_service.resolve_image_url(effective_backdrop, "backdrops", size="original"),
             "backdrop_source_tmdb_id": source_tmdb_id,
             "backdrop_source_media_type": source_media_type,
             "is_active": person.is_active,
@@ -322,7 +322,7 @@ class PersonDetailCollator:
             "custom_tags": override_dict.get("custom_tags") if override_dict else [],
             "homepage": person.homepage,
             "external_ids": external_ids,
-            "images": [self._resolve_img(img, "people") for img in (person.images or [])],
+            "images": [self.image_service.resolve_image_url(img, "people") for img in (person.images or [])],
             "hair_color": person.hair_color,
             "eye_color": person.eye_color,
             "ethnicity": person.ethnicity,
@@ -346,8 +346,8 @@ class PersonDetailCollator:
             "known_for": [
                 {
                     **item,
-                    "poster_path": self._resolve_img(item.get("poster_path"), "posters") if item.get("poster_path") else None,
-                    "backdrop_path": self._resolve_img(item.get("backdrop_path"), "backdrops", size="original") if item.get("backdrop_path") else None,
+                    "poster_path": self.image_service.resolve_image_url(item.get("poster_path"), "posters") if item.get("poster_path") else None,
+                    "backdrop_path": self.image_service.resolve_image_url(item.get("backdrop_path"), "backdrops", size="original") if item.get("backdrop_path") else None,
                 }
                 for item in known_for[:10]
             ],

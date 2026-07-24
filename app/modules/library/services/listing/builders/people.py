@@ -1,10 +1,11 @@
 import logging
-logger = logging.getLogger(__name__)
 from typing import Tuple, List, Any
 from sqlalchemy.orm import Session
 
 from app.modules.people.services.people_library_service import PeopleLibraryService
 from app.modules.library.services.listing.filter_params import ListingFilterParams
+
+logger = logging.getLogger(__name__)
 
 
 

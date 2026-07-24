@@ -133,7 +133,8 @@ class StudioPersister:
                     with self.db.begin_nested():
                         studio = self.metadata_repo.create_studio(name=cleaned_s_name, logo_path=studio_info["logo_path"])
                         self.metadata_repo.flush()
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Failed to create studio, falling back to query: {e}", exc_info=True)
                     studio = self.metadata_repo.resolve_studio_by_name(cleaned_s_name)
             
             # If the scraper name is different from the canonical name, create a StudioAlias
@@ -149,11 +150,7 @@ class StudioPersister:
                             self.db.add(new_alias)
                             self.db.flush()
                     except Exception as e:
-                        try:
-                            logger.debug(f"Swallowed exception: {e}", exc_info=True)
-                        except Exception:
-                            pass
-                        pass
+                        logger.debug(f"Failed to create StudioAlias: {e}", exc_info=True)
             
             if studio_info.get("logo_path") and (
                 not studio.logo_path 
@@ -183,7 +180,8 @@ class StudioPersister:
                         with self.db.begin_nested():
                             parent_studio = self.metadata_repo.create_studio(name=p_name, logo_path=parent_info["logo_path"])
                             self.metadata_repo.flush()
-                    except Exception:
+                    except Exception as e:
+                        logger.debug(f"Failed to create parent studio, falling back to query: {e}", exc_info=True)
                         parent_studio = self.metadata_repo.resolve_studio_by_name(p_name)
                 elif parent_info.get("logo_path") and (
                     not parent_studio.logo_path 
